@@ -1,6 +1,6 @@
 import { supabase } from "../../../lib/supabase"
 import Link from "next/link"
-import WeddingAddGuestForm from "./WeddingAddGuestForm.tsx"
+import WeddingAddGuestForm from "./WeddingAddGuestForm"
 
 export default async function WeddingDashboardPage({
   params,
