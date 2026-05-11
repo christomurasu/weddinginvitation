@@ -41,7 +41,7 @@ export default function WeddingAddGuestForm({
       max_attendees: parseInt(form.max_attendees) || 1,
       note: form.note,
     })
-    setGeneratedLink(`${window.location.origin}/invitation-page/${code}`)
+    setGeneratedLink(`https://sfinvitation.id/invitation-page/${code}`)
     setForm({ name: "", greeting: "", table_number: "", max_attendees: "1", note: "" })
     setLoading(false)
     router.refresh()
