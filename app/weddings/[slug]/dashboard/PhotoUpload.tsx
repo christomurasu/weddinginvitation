@@ -3,12 +3,18 @@ import { useState, useRef } from "react"
 import { supabase } from "../../../lib/supabase"
 import { useRouter } from "next/navigation"
 
+interface Photo {
+  id: string
+  url: string
+  order_index: number
+}
+
 export default function PhotoUpload({ 
   weddingId,
   photos
 }: { 
   weddingId: string
-  photos: any[]
+  photos: Photo[]
 }) {
   const router = useRouter()
   const fileRef = useRef<HTMLInputElement>(null)

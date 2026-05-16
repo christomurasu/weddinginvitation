@@ -6,6 +6,7 @@ export default function CoverPage({
   coverPhotoUrl,
   verse,
   verseSource,
+  logoUrl,
 }: {
   partner1: string
   partner2: string
@@ -14,6 +15,7 @@ export default function CoverPage({
   coverPhotoUrl?: string
   verse?: string
   verseSource?: string
+  logoUrl?: string
 }) {
   return (
     <div style={{
@@ -55,14 +57,16 @@ export default function CoverPage({
         alignItems: "center", width: "100%"
       }}>
 
-        {/* Logo SF */}
-        <div style={{ width: 80, height: 80, marginBottom: 28 }}>
-          <img
-            src="/images/SF_Invitation_Logo.png"
-            alt="SF Invitation"
-            style={{ width: "100%", height: "100%", objectFit: "contain" }}
-          />
-        </div>
+        {/* Logo per wedding */}
+        {logoUrl && (
+          <div style={{ width: 80, height: 80, marginBottom: 28 }}>
+            <img
+              src={logoUrl}
+              alt="Wedding logo"
+              style={{ width: "100%", height: "100%", objectFit: "contain" }}
+            />
+          </div>
+        )}
 
         {/* Foto mempelai */}
         <div style={{
@@ -77,10 +81,7 @@ export default function CoverPage({
             <img
               src={couplePhotoUrl}
               alt="Couple"
-              style={{
-                width: "100%", height: "100%",
-                objectFit: "cover"
-              }}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           ) : (
             <div style={{

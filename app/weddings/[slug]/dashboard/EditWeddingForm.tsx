@@ -21,9 +21,9 @@ interface Wedding {
   verse_source: string
   cover_photo_url: string
   couple_photo_url: string
+  logo_url: string
 }
 
-// ── Moved OUTSIDE EditWeddingForm ──
 function PhotoField({
   label,
   field,
@@ -32,17 +32,19 @@ function PhotoField({
   onUpload,
 }: {
   label: string
-  field: "cover_photo_url" | "couple_photo_url"
+  field: "cover_photo_url" | "couple_photo_url" | "logo_url"
   value: string
   uploading: string | null
-  onUpload: (e: React.ChangeEvent<HTMLInputElement>, field: "cover_photo_url" | "couple_photo_url") => void
+  onUpload: (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: "cover_photo_url" | "couple_photo_url" | "logo_url"
+  ) => void
 }) {
   const labelStyle = {
     fontSize: 10, letterSpacing: "0.15em",
     textTransform: "uppercase" as const,
     color: "#888780", display: "block", marginBottom: 6
   }
-
   return (
     <div style={{ marginBottom: 16 }}>
       <label style={labelStyle}>{label}</label>
@@ -55,13 +57,10 @@ function PhotoField({
         }}>
           {value ? (
             <img src={value} alt={label}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              style={{ width: "100%", height: "100%", objectFit: "contain" }} />
           ) : (
-            <p style={{
-              fontSize: 10, color: "#b4b2a9",
-              textAlign: "center", padding: 4
-            }}>
-              Belum ada foto
+            <p style={{ fontSize: 10, color: "#b4b2a9", textAlign: "center", padding: 4 }}>
+              Belum ada
             </p>
           )}
         </div>
@@ -74,7 +73,7 @@ function PhotoField({
             textTransform: "uppercase",
             cursor: uploading === field ? "not-allowed" : "pointer"
           }}>
-            {uploading === field ? "Uploading..." : "Upload Foto"}
+            {uploading === field ? "Uploading..." : "Upload"}
           </label>
           <input
             id={`upload-${field}`}
@@ -114,6 +113,7 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
     verse_source: wedding.verse_source ?? "",
     cover_photo_url: wedding.cover_photo_url ?? "",
     couple_photo_url: wedding.couple_photo_url ?? "",
+    logo_url: wedding.logo_url ?? "",
   })
 
   async function compressImage(file: File): Promise<Blob> {
@@ -136,18 +136,21 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
   }
 
   async function handlePhotoUpload(
-    e: React.ChangeEvent<HTMLInputElement>,
-    field: "cover_photo_url" | "couple_photo_url"
-  ) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setUploading(field)
-    const compressed = await compressImage(file)
-    const timestamp = new Date().getTime()
-    const fileName = `${wedding.id}/${field}-${timestamp}.jpg`
+  e: React.ChangeEvent<HTMLInputElement>,
+  field: "cover_photo_url" | "couple_photo_url" | "logo_url"
+) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  setUploading(field)
+
+  const timestamp = new Date().getTime()
+
+  // Logo — upload as-is, jangan compress agar transparansi terjaga
+  if (field === "logo_url") {
+    const fileName = `${wedding.id}/${field}-${timestamp}.png`
     const { data, error } = await supabase.storage
       .from("wedding-photos")
-      .upload(fileName, compressed, { contentType: "image/jpeg", upsert: true })
+      .upload(fileName, file, { contentType: "image/png", upsert: true })
     if (!error && data) {
       const { data: urlData } = supabase.storage
         .from("wedding-photos")
@@ -155,11 +158,29 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
       setForm(f => ({ ...f, [field]: urlData.publicUrl }))
     }
     setUploading(null)
+    return
   }
 
+  // Foto lain — compress ke JPG seperti biasa
+  const compressed = await compressImage(file)
+  const fileName = `${wedding.id}/${field}-${timestamp}.jpg`
+  const { data, error } = await supabase.storage
+    .from("wedding-photos")
+    .upload(fileName, compressed, { contentType: "image/jpeg", upsert: true })
+  if (!error && data) {
+    const { data: urlData } = supabase.storage
+      .from("wedding-photos")
+      .getPublicUrl(data.path)
+    setForm(f => ({ ...f, [field]: urlData.publicUrl }))
+  }
+  setUploading(null)
+}
+
   async function handleSave() {
-    setLoading(true)
-    await supabase.from("weddings").update({
+  setLoading(true)
+  const { data, error } = await supabase
+    .from("weddings")
+    .update({
       partner1: form.partner1,
       partner2: form.partner2,
       date: form.date,
@@ -176,12 +197,20 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
       verse_source: form.verse_source,
       cover_photo_url: form.cover_photo_url,
       couple_photo_url: form.couple_photo_url,
-    }).eq("id", wedding.id)
-    setLoading(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
-    router.refresh()
-  }
+      logo_url: form.logo_url,
+    })
+    .eq("id", wedding.id)
+    .select()
+
+  console.log("Save result:", data)
+  console.log("Save error:", error)
+  console.log("Wedding ID:", wedding.id)
+
+  setLoading(false)
+  setSaved(true)
+  setTimeout(() => setSaved(false), 3000)
+  router.refresh()
+}
 
   const inputStyle = {
     width: "100%", border: "1px solid #e4ddd0",
@@ -198,9 +227,7 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
     textTransform: "uppercase" as const,
     color: "#b8965a", marginBottom: 16, display: "block"
   }
-  const divider = {
-    height: 1, background: "#f0ebe3", margin: "24px 0"
-  }
+  const divider = { height: 1, background: "#f0ebe3", margin: "24px 0" }
 
   return (
     <div style={{
@@ -319,7 +346,14 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
       </div>
 
       <div style={divider} />
-      <span style={sectionLabel}>Foto Cover Page</span>
+      <span style={sectionLabel}>Foto & Logo</span>
+      <PhotoField
+        label="Logo Wedding (muncul di cover page)"
+        field="logo_url"
+        value={form.logo_url}
+        uploading={uploading}
+        onUpload={handlePhotoUpload}
+      />
       <PhotoField
         label="Background / Tekstur Cover"
         field="cover_photo_url"

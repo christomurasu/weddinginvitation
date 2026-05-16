@@ -1,6 +1,8 @@
 import { supabase } from "../../../lib/supabase"
 import Link from "next/link"
 import WeddingAddGuestForm from "./WeddingAddGuestForm"
+import EditWeddingForm from "./EditWeddingForm"
+import PhotoUpload from "./PhotoUpload"
 
 export default async function WeddingDashboardPage({
   params,
@@ -31,6 +33,12 @@ export default async function WeddingDashboardPage({
     .select("*")
     .eq("wedding_id", wedding.id)
     .order("created_at", { ascending: false })
+
+  const { data: photos } = await supabase
+    .from("wedding_photos")
+    .select("*")
+    .eq("wedding_id", wedding.id)
+    .order("order_index", { ascending: true })
 
   const total          = guests?.length ?? 0
   const confirmed      = guests?.filter(g => g.rsvp === "confirmed").length ?? 0
@@ -76,13 +84,20 @@ export default async function WeddingDashboardPage({
         <p style={{ color: "#888780", fontSize: 13 }}>
           {wedding.date} · {wedding.venue}
         </p>
-        <div style={{ marginTop: 16 }}>
+        <div style={{ marginTop: 16, display: "flex", gap: 20, justifyContent: "center" }}>
           <Link href={`/weddings/${slug}/scanner`} style={{
             color: "#b8965a", fontSize: 11,
             letterSpacing: "0.12em", textTransform: "uppercase",
             textDecoration: "none"
           }}>
             Open Scanner →
+          </Link>
+          <Link href={`/invitation-page/${guests?.[0]?.code ?? ""}`} style={{
+            color: "#888780", fontSize: 11,
+            letterSpacing: "0.12em", textTransform: "uppercase",
+            textDecoration: "none"
+          }}>
+            Preview Invitation →
           </Link>
         </div>
       </div>
@@ -97,16 +112,12 @@ export default async function WeddingDashboardPage({
               border: "1px solid #e4ddd0",
               padding: "20px 12px", textAlign: "center"
             }}>
-              <p style={{
-                color: stat.color, fontSize: 38,
-                fontWeight: 300, lineHeight: 1
-              }}>
+              <p style={{ color: stat.color, fontSize: 38, fontWeight: 300, lineHeight: 1 }}>
                 {stat.value}
               </p>
               <p style={{
                 color: "#888780", fontSize: 10,
-                letterSpacing: "0.15em", textTransform: "uppercase",
-                marginTop: 8
+                letterSpacing: "0.15em", textTransform: "uppercase", marginTop: 8
               }}>
                 {stat.label}
               </p>
@@ -114,8 +125,19 @@ export default async function WeddingDashboardPage({
           ))}
         </div>
 
-        {/* Add guest form */}
-        <WeddingAddGuestForm weddingId={wedding.id} slug={slug} />
+        {/* Edit wedding form */}
+        <EditWeddingForm wedding={wedding} />
+
+        {/* Photo upload */}
+        <PhotoUpload
+          weddingId={wedding.id}
+          photos={photos ?? []}
+        />
+
+        {/* Add guest */}
+        <div style={{ marginTop: 24 }}>
+          <WeddingAddGuestForm weddingId={wedding.id} slug={slug} />
+        </div>
 
         {/* Guest table */}
         <div style={{
