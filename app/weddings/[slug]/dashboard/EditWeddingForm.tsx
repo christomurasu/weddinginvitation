@@ -22,6 +22,7 @@ interface Wedding {
   cover_photo_url: string
   couple_photo_url: string
   logo_url: string
+  music_url: string
 }
 
 function PhotoField({
@@ -114,6 +115,7 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
     cover_photo_url: wedding.cover_photo_url ?? "",
     couple_photo_url: wedding.couple_photo_url ?? "",
     logo_url: wedding.logo_url ?? "",
+    music_url: wedding.music_url ?? "",
   })
 
   async function compressImage(file: File): Promise<Blob> {
@@ -136,21 +138,35 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
   }
 
   async function handlePhotoUpload(
-  e: React.ChangeEvent<HTMLInputElement>,
-  field: "cover_photo_url" | "couple_photo_url" | "logo_url"
-) {
-  const file = e.target.files?.[0]
-  if (!file) return
-  setUploading(field)
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: "cover_photo_url" | "couple_photo_url" | "logo_url"
+  ) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(field)
 
-  const timestamp = new Date().getTime()
+    const timestamp = new Date().getTime()
 
-  // Logo — upload as-is, jangan compress agar transparansi terjaga
-  if (field === "logo_url") {
-    const fileName = `${wedding.id}/${field}-${timestamp}.png`
+    if (field === "logo_url") {
+      const fileName = `${wedding.id}/${field}-${timestamp}.png`
+      const { data, error } = await supabase.storage
+        .from("wedding-photos")
+        .upload(fileName, file, { contentType: "image/png", upsert: true })
+      if (!error && data) {
+        const { data: urlData } = supabase.storage
+          .from("wedding-photos")
+          .getPublicUrl(data.path)
+        setForm(f => ({ ...f, [field]: urlData.publicUrl }))
+      }
+      setUploading(null)
+      return
+    }
+
+    const compressed = await compressImage(file)
+    const fileName = `${wedding.id}/${field}-${timestamp}.jpg`
     const { data, error } = await supabase.storage
       .from("wedding-photos")
-      .upload(fileName, file, { contentType: "image/png", upsert: true })
+      .upload(fileName, compressed, { contentType: "image/jpeg", upsert: true })
     if (!error && data) {
       const { data: urlData } = supabase.storage
         .from("wedding-photos")
@@ -158,29 +174,29 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
       setForm(f => ({ ...f, [field]: urlData.publicUrl }))
     }
     setUploading(null)
-    return
   }
 
-  // Foto lain — compress ke JPG seperti biasa
-  const compressed = await compressImage(file)
-  const fileName = `${wedding.id}/${field}-${timestamp}.jpg`
-  const { data, error } = await supabase.storage
-    .from("wedding-photos")
-    .upload(fileName, compressed, { contentType: "image/jpeg", upsert: true })
-  if (!error && data) {
-    const { data: urlData } = supabase.storage
+  async function handleMusicUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading("music_url")
+    const timestamp = new Date().getTime()
+    const fileName = `${wedding.id}/music-${timestamp}.mp3`
+    const { data, error } = await supabase.storage
       .from("wedding-photos")
-      .getPublicUrl(data.path)
-    setForm(f => ({ ...f, [field]: urlData.publicUrl }))
+      .upload(fileName, file, { contentType: "audio/mpeg", upsert: true })
+    if (!error && data) {
+      const { data: urlData } = supabase.storage
+        .from("wedding-photos")
+        .getPublicUrl(data.path)
+      setForm(f => ({ ...f, music_url: urlData.publicUrl }))
+    }
+    setUploading(null)
   }
-  setUploading(null)
-}
 
   async function handleSave() {
-  setLoading(true)
-  const { data, error } = await supabase
-    .from("weddings")
-    .update({
+    setLoading(true)
+    const { error } = await supabase.from("weddings").update({
       partner1: form.partner1,
       partner2: form.partner2,
       date: form.date,
@@ -198,19 +214,16 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
       cover_photo_url: form.cover_photo_url,
       couple_photo_url: form.couple_photo_url,
       logo_url: form.logo_url,
-    })
-    .eq("id", wedding.id)
-    .select()
+      music_url: form.music_url,
+    }).eq("id", wedding.id)
 
-  console.log("Save result:", data)
-  console.log("Save error:", error)
-  console.log("Wedding ID:", wedding.id)
+    if (error) console.error("Save error:", error)
 
-  setLoading(false)
-  setSaved(true)
-  setTimeout(() => setSaved(false), 3000)
-  router.refresh()
-}
+    setLoading(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 3000)
+    router.refresh()
+  }
 
   const inputStyle = {
     width: "100%", border: "1px solid #e4ddd0",
@@ -241,6 +254,7 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
         Edit Wedding Details
       </p>
 
+      {/* Nama mempelai */}
       <span style={sectionLabel}>Nama Mempelai</span>
       <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
         <div style={{ flex: 1 }}>
@@ -255,6 +269,7 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
         </div>
       </div>
 
+      {/* Tanggal & venue */}
       <div style={divider} />
       <span style={sectionLabel}>Tanggal & Venue</span>
       <div style={{ marginBottom: 14 }}>
@@ -282,6 +297,7 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
           placeholder="e.g. Harap konfirmasi sebelum 1 Juni 2025" />
       </div>
 
+      {/* Orang tua */}
       <div style={divider} />
       <span style={sectionLabel}>Nama Orang Tua</span>
       <div style={{ display: "flex", gap: 16, marginBottom: 14 }}>
@@ -323,6 +339,7 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
         </div>
       </div>
 
+      {/* Ayat */}
       <div style={divider} />
       <span style={sectionLabel}>Ayat / Quote</span>
       <div style={{ marginBottom: 14 }}>
@@ -345,6 +362,7 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
           placeholder="e.g. Ecclesiastes 4:9-12" />
       </div>
 
+      {/* Foto & Logo */}
       <div style={divider} />
       <span style={sectionLabel}>Foto & Logo</span>
       <PhotoField
@@ -369,6 +387,52 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
         onUpload={handlePhotoUpload}
       />
 
+      {/* Musik */}
+      <div style={divider} />
+      <span style={sectionLabel}>Musik Latar</span>
+      <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 16 }}>
+        <div style={{
+          flex: 1, background: "#f5f0e8",
+          border: "1px solid #e4ddd0",
+          padding: "12px 14px",
+          display: "flex", alignItems: "center", gap: 10
+        }}>
+          <span style={{ fontSize: 18, color: "#b8965a" }}>♪</span>
+          <div>
+            <p style={{ fontSize: 12, color: form.music_url ? "#2c2c2a" : "#b4b2a9", marginBottom: 2 }}>
+              {form.music_url ? "Musik sudah diupload ✓" : "Belum ada musik"}
+            </p>
+            {form.music_url && (
+              <audio controls src={form.music_url}
+                style={{ height: 28, marginTop: 4, width: "100%" }} />
+            )}
+          </div>
+        </div>
+        <div style={{ flexShrink: 0 }}>
+          <label htmlFor="upload-music" style={{
+            display: "inline-block",
+            background: uploading === "music_url" ? "#888780" : "#2c2c2a",
+            color: "#fff", padding: "9px 18px",
+            fontSize: 10, letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            cursor: uploading === "music_url" ? "not-allowed" : "pointer"
+          }}>
+            {uploading === "music_url" ? "Uploading..." : "Upload MP3"}
+          </label>
+          <input
+            id="upload-music"
+            type="file"
+            accept="audio/mpeg,audio/mp3,.mp3"
+            onChange={handleMusicUpload}
+            style={{ display: "none" }}
+          />
+          <p style={{ fontSize: 10, color: "#b4b2a9", marginTop: 6 }}>
+            Format MP3
+          </p>
+        </div>
+      </div>
+
+      {/* Save */}
       <div style={divider} />
       <button
         onClick={handleSave}
