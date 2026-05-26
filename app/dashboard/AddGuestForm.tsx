@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { supabase } from "../../../lib/supabase"
+import { supabase } from "../lib/supabase"
 import { useRouter } from "next/navigation"
 
 function makeCode() {
@@ -12,13 +12,7 @@ function makeCode() {
   return code
 }
 
-export default function WeddingAddGuestForm({
-  weddingId,
-  slug,
-}: {
-  weddingId: string
-  slug: string
-}) {
+export default function AddGuestForm() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [generatedLink, setGeneratedLink] = useState("")
@@ -27,29 +21,34 @@ export default function WeddingAddGuestForm({
     name: "",
     greeting: "",
     table_number: "",
+    seats: "1",
     max_attendees: "1",
     note: "",
-    invitation_type: "full",
   })
 
   async function handleSubmit() {
     if (!form.name.trim()) return
     setLoading(true)
     const code = makeCode()
+    const { data: wedding } = await supabase
+      .from("weddings")
+      .select("id")
+      .limit(1)
+      .single()
     await supabase.from("guests").insert({
-      wedding_id: weddingId,
+      wedding_id: wedding?.id,
       code,
       name: form.name,
       greeting: form.greeting || `Dear ${form.name}`,
       table_number: form.table_number,
+      seats: parseInt(form.seats) || 1,
       max_attendees: parseInt(form.max_attendees) || 1,
       note: form.note,
-      invitation_type: form.invitation_type,
     })
-    setGeneratedLink(`https://sfinvitation.id/invitation-page/${code}`)
+    setGeneratedLink(`${window.location.origin}/invitation-page/${code}`)
     setForm({
       name: "", greeting: "", table_number: "",
-      max_attendees: "1", note: "", invitation_type: "full"
+      seats: "1", max_attendees: "1", note: ""
     })
     setLoading(false)
     router.refresh()
@@ -58,7 +57,8 @@ export default function WeddingAddGuestForm({
   const inputStyle = {
     width: "100%", border: "1px solid #e4ddd0",
     padding: "10px 12px", fontSize: 13, color: "#2c2c2a",
-    background: "#fdf8ee", outline: "none", fontFamily: "inherit"
+    background: "#fdf8ee", outline: "none",
+    fontFamily: "inherit"
   }
   const labelStyle = {
     fontSize: 10, letterSpacing: "0.15em",
@@ -75,6 +75,7 @@ export default function WeddingAddGuestForm({
         Add New Guest
       </p>
 
+      {/* Row 1 */}
       <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
         <div style={{ flex: 1 }}>
           <label style={labelStyle}>Guest Name *</label>
@@ -90,6 +91,7 @@ export default function WeddingAddGuestForm({
         </div>
       </div>
 
+      {/* Row 2 */}
       <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
         <div style={{ flex: 1 }}>
           <label style={labelStyle}>Table Number</label>
@@ -98,53 +100,19 @@ export default function WeddingAddGuestForm({
             placeholder="e.g. Table 3" />
         </div>
         <div style={{ flex: 1 }}>
-          <label style={labelStyle}>Max Attendees</label>
+          <label style={labelStyle}>Max Attendees Allowed</label>
           <input style={inputStyle} type="number" value={form.max_attendees}
             min="1" max="20"
             onChange={e => setForm({ ...form, max_attendees: e.target.value })} />
         </div>
       </div>
 
-      <div style={{ marginBottom: 16 }}>
+      {/* Row 3 */}
+      <div style={{ marginBottom: 20 }}>
         <label style={labelStyle}>Personal Note (optional)</label>
         <input style={inputStyle} type="text" value={form.note}
           onChange={e => setForm({ ...form, note: e.target.value })}
           placeholder="e.g. Vegetarian meal arranged for you" />
-      </div>
-
-      {/* Toggle tipe undangan */}
-      <div style={{ marginBottom: 20 }}>
-        <label style={labelStyle}>Tipe Undangan</label>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button
-            onClick={() => setForm({ ...form, invitation_type: "full" })}
-            style={{
-              flex: 1, padding: "10px",
-              background: form.invitation_type === "full" ? "#2c2c2a" : "#fdf8ee",
-              color: form.invitation_type === "full" ? "#fff" : "#888780",
-              border: "1px solid #e4ddd0",
-              fontSize: 11, letterSpacing: "0.12em",
-              textTransform: "uppercase", cursor: "pointer",
-              fontFamily: "inherit", transition: "all 0.15s"
-            }}
-          >
-            Pemberkatan + Resepsi
-          </button>
-          <button
-            onClick={() => setForm({ ...form, invitation_type: "ceremony" })}
-            style={{
-              flex: 1, padding: "10px",
-              background: form.invitation_type === "ceremony" ? "#2c2c2a" : "#fdf8ee",
-              color: form.invitation_type === "ceremony" ? "#fff" : "#888780",
-              border: "1px solid #e4ddd0",
-              fontSize: 11, letterSpacing: "0.12em",
-              textTransform: "uppercase", cursor: "pointer",
-              fontFamily: "inherit", transition: "all 0.15s"
-            }}
-          >
-            Pemberkatan Saja
-          </button>
-        </div>
       </div>
 
       <button

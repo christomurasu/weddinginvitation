@@ -22,56 +22,71 @@ export default function PhotoUpload({
   const [deleting, setDeleting] = useState<string | null>(null)
 
   async function compressImage(file: File): Promise<Blob> {
-    return new Promise((resolve) => {
-      const canvas = document.createElement("canvas")
-      const ctx = canvas.getContext("2d")!
-      const img = new Image()
-      const url = URL.createObjectURL(file)
-      
-      img.onload = () => {
-        // Max 1200px width
-        const maxW = 1200
-        const ratio = Math.min(maxW / img.width, 1)
-        canvas.width = img.width * ratio
-        canvas.height = img.height * ratio
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-        URL.revokeObjectURL(url)
-        canvas.toBlob(blob => resolve(blob!), "image/jpeg", 0.8)
-      }
-      img.src = url
-    })
-  }
+  return new Promise((resolve) => {
+    const canvas = document.createElement("canvas")
+    const ctx = canvas.getContext("2d")!
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      const maxW = 1200
+      const ratio = Math.min(maxW / img.width, 1)
+      canvas.width = img.width * ratio
+      canvas.height = img.height * ratio
+      ctx.fillStyle = "#ffffff"
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      URL.revokeObjectURL(url)
+      canvas.toBlob(blob => resolve(blob!), "image/jpeg", 0.82)
+    }
+    img.src = url
+  })
+}
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? [])
-    if (!files.length) return
-    setUploading(true)
+  const files = Array.from(e.target.files ?? [])
+  if (!files.length) return
+  setUploading(true)
 
-    for (const file of files) {
-      const compressed = await compressImage(file)
-      const fileName = `${weddingId}/${Date.now()}-${file.name}`
-      
-      const { data, error } = await supabase.storage
-        .from("wedding-photos")
-        .upload(fileName, compressed, { contentType: "image/jpeg" })
+  for (const file of files) {
+    const timestamp = new Date().getTime()
+    const isPng = file.type === "image/png"
+    const isUnder1MB = file.size < 1 * 1024 * 1024
 
-      if (!error && data) {
-        const { data: urlData } = supabase.storage
-          .from("wedding-photos")
-          .getPublicUrl(data.path)
+    let uploadBlob: Blob
+    let contentType: string
+    const fileName = `${weddingId}/${timestamp}-${file.name}`
 
-        await supabase.from("wedding_photos").insert({
-          wedding_id: weddingId,
-          url: urlData.publicUrl,
-          order_index: photos.length
-        })
-      }
+    if (isPng || isUnder1MB) {
+      // PNG atau file kecil — upload as-is
+      uploadBlob = file
+      contentType = file.type
+    } else {
+      // File besar bukan PNG — compress
+      uploadBlob = await compressImage(file)
+      contentType = "image/jpeg"
     }
 
-    setUploading(false)
-    router.refresh()
-    if (fileRef.current) fileRef.current.value = ""
+    const { data, error } = await supabase.storage
+      .from("wedding-photos")
+      .upload(fileName, uploadBlob, { contentType })
+
+    if (!error && data) {
+      const { data: urlData } = supabase.storage
+        .from("wedding-photos")
+        .getPublicUrl(data.path)
+
+      await supabase.from("wedding_photos").insert({
+        wedding_id: weddingId,
+        url: urlData.publicUrl,
+        order_index: photos.length
+      })
+    }
   }
+
+  setUploading(false)
+  router.refresh()
+  if (fileRef.current) fileRef.current.value = ""
+}
 
   async function handleDelete(photoId: string, url: string) {
     setDeleting(photoId)
