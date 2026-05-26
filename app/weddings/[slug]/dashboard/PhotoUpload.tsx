@@ -55,7 +55,10 @@ export default function PhotoUpload({
     let uploadBlob: Blob
     let contentType: string
     const fileName = `${weddingId}/${timestamp}-${file.name}`
-
+    console.log("File type:", file.type)
+    console.log("File size:", file.size)
+    console.log("isPng:", isPng)
+    console.log("isUnder1MB:", isUnder1MB)
     if (isPng || isUnder1MB) {
       // PNG atau file kecil — upload as-is
       uploadBlob = file
@@ -81,6 +84,8 @@ export default function PhotoUpload({
         order_index: photos.length
       })
     }
+
+    
   }
 
   setUploading(false)

@@ -196,7 +196,7 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
     setUploading(field)
     const timestamp = new Date().getTime()
 
-    const pngFields: PhotoFieldType[] = ["logo_url", "frame_url", "ceremony_image_url", "reception_image_url"]
+    const pngFields: PhotoFieldType[] = ["logo_url", "frame_url", "ceremony_image_url", "reception_image_url", "couple_photo_url"]
     if (pngFields.includes(field)) {
       const fileName = wedding.id + "/" + field + "-" + timestamp + ".png"
       const { data, error } = await supabase.storage
