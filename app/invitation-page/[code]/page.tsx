@@ -4,6 +4,7 @@ import WishForm from "./Wishform"
 import CoverPage from "./CoverPage"
 import MusicPlayer from "./MusicPlayer"
 import CountdownTimer from "./CountdownTimer"
+import ViewportFix from "./ViewportFix"
 
 export default async function InvitationPage({
   params,
@@ -58,9 +59,11 @@ export default async function InvitationPage({
 
   return (
     <>
+      <ViewportFix />
       {wedding.music_url && <MusicPlayer musicUrl={wedding.music_url} />}
 
       <style>{`
+        :root { --vh: 1vh; }
         html {
           scroll-snap-type: y mandatory;
           overflow-y: scroll;
@@ -70,7 +73,7 @@ export default async function InvitationPage({
         .snap-section {
           scroll-snap-align: start;
           scroll-snap-stop: always;
-          min-height: 100svh;
+          min-height: calc(var(--vh, 1vh) * 100);
           width: 100%;
           display: flex;
           flex-direction: column;
