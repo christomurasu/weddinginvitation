@@ -35,6 +35,10 @@ interface Wedding {
   reception_maps_url: string
   reception_image_url: string
   wedding_date_iso: string
+  gallery1_url: string
+  gallery2_url: string
+  gallery3_url: string
+  gallery_overlay_text: string
 }
 
 type PhotoFieldType =
@@ -44,6 +48,17 @@ type PhotoFieldType =
   | "frame_url"
   | "ceremony_image_url"
   | "reception_image_url"
+  | "gallery1_url"
+  | "gallery2_url"
+  | "gallery3_url"
+
+const PNG_FIELDS: PhotoFieldType[] = [
+  "logo_url",
+  "frame_url",
+  "ceremony_image_url",
+  "reception_image_url",
+  "couple_photo_url",
+]
 
 function PhotoField({
   label,
@@ -122,7 +137,7 @@ function PhotoField({
             style={{ display: "none" }}
           />
           <p style={{ fontSize: 11, color: "#b4b2a9", marginTop: 6 }}>
-            {["logo_url", "frame_url", "ceremony_image_url", "reception_image_url"].includes(field)
+            {PNG_FIELDS.includes(field)
               ? "PNG transparan. Tidak dikompresi."
               : "Auto-compressed. Max 1200px."}
           </p>
@@ -169,6 +184,10 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
     reception_maps_url: wedding.reception_maps_url ?? "",
     reception_image_url: wedding.reception_image_url ?? "",
     wedding_date_iso: wedding.wedding_date_iso ?? "",
+    gallery1_url: wedding.gallery1_url ?? "",
+    gallery2_url: wedding.gallery2_url ?? "",
+    gallery3_url: wedding.gallery3_url ?? "",
+    gallery_overlay_text: wedding.gallery_overlay_text ?? "",
   })
 
   async function compressImage(file: File): Promise<Blob> {
@@ -196,8 +215,7 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
     setUploading(field)
     const timestamp = new Date().getTime()
 
-    const pngFields: PhotoFieldType[] = ["logo_url", "frame_url", "ceremony_image_url", "reception_image_url", "couple_photo_url"]
-    if (pngFields.includes(field)) {
+    if (PNG_FIELDS.includes(field)) {
       const fileName = wedding.id + "/" + field + "-" + timestamp + ".png"
       const { data, error } = await supabase.storage
         .from("wedding-photos")
@@ -299,6 +317,10 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
       reception_maps_url: form.reception_maps_url,
       reception_image_url: form.reception_image_url || null,
       wedding_date_iso: form.wedding_date_iso || null,
+      gallery1_url: form.gallery1_url || null,
+      gallery2_url: form.gallery2_url || null,
+      gallery3_url: form.gallery3_url || null,
+      gallery_overlay_text: form.gallery_overlay_text,
     }).eq("id", wedding.id)
     if (error) console.error("Save error:", error)
     setLoading(false)
@@ -507,6 +529,28 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
         onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
       <PhotoField label="Pola Frame Foto Mempelai (PNG transparan)" field="frame_url"
         value={form.frame_url} uploading={uploading} deleting={deleting}
+        onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
+
+      <div style={divider} />
+      <span style={sectionLabel}>Galeri Foto (Section Pertama Setelah Cover)</span>
+      <PhotoField label="Foto 1" field="gallery1_url"
+        value={form.gallery1_url} uploading={uploading} deleting={deleting}
+        onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
+      <PhotoField label="Foto 2 (dengan teks overlay)" field="gallery2_url"
+        value={form.gallery2_url} uploading={uploading} deleting={deleting}
+        onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
+      <div style={{ marginBottom: 16 }}>
+        <label style={labelStyle}>Teks Overlay di Foto 2</label>
+        <textarea
+          value={form.gallery_overlay_text}
+          onChange={e => setForm({ ...form, gallery_overlay_text: e.target.value })}
+          placeholder="e.g. God's plan is always beautiful, and so is the story He wrote for us."
+          rows={2}
+          style={{ ...inputStyle, resize: "vertical", fontStyle: "italic", lineHeight: 1.7 }}
+        />
+      </div>
+      <PhotoField label="Foto 3" field="gallery3_url"
+        value={form.gallery3_url} uploading={uploading} deleting={deleting}
         onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
 
       <div style={divider} />

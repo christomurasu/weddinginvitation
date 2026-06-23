@@ -5,6 +5,29 @@ import CoverPage from "./CoverPage"
 import MusicPlayer from "./MusicPlayer"
 import CountdownTimer from "./CountdownTimer"
 import ViewportFix from "./ViewportFix"
+import Gallery from "./Gallery"
+import type { Metadata } from "next"
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ code: string }>
+}): Promise<Metadata> {
+  const { code } = await params
+
+  const { data: guest } = await supabase
+    .from("guests")
+    .select("weddings(logo_url, partner1, partner2)")
+    .eq("code", code)
+    .single()
+
+  const wedding = guest?.weddings as { logo_url?: string; partner1?: string; partner2?: string } | undefined
+
+  return {
+    title: wedding ? `${wedding.partner1} & ${wedding.partner2}` : "SF Invitation",
+    icons: wedding?.logo_url ? { icon: wedding.logo_url } : undefined,
+  }
+}
 
 export default async function InvitationPage({
   params,
@@ -55,6 +78,8 @@ export default async function InvitationPage({
     ? `url('${wedding.cover_photo_url}') center/cover no-repeat fixed`
     : "#d6cfc6"
 
+  const hasGallery = wedding.gallery1_url || wedding.gallery2_url || wedding.gallery3_url
+
   return (
     <>
       <ViewportFix />
@@ -100,7 +125,7 @@ export default async function InvitationPage({
           flex-shrink: 0;
         }
 
-        .snap-section-auto {
+        .snap-section {
           scroll-snap-align: start;
           scroll-snap-stop: always;
           min-height: calc(var(--vh, 1vh) * 100);
@@ -129,10 +154,14 @@ export default async function InvitationPage({
           />
         </div>
 
-        {photoList[0] && (
-          <div className="snap-section">
-            <img src={photoList[0].url} alt="Photo 1"
-              style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", top: 0, left: 0 }} />
+        {hasGallery && (
+          <div className="snap-section" style={{ height: "100%" }}>
+            <Gallery
+              photo1={wedding.gallery1_url}
+              photo2={wedding.gallery2_url}
+              photo3={wedding.gallery3_url}
+              overlayText={wedding.gallery_overlay_text}
+            />
           </div>
         )}
 
