@@ -39,6 +39,8 @@ interface Wedding {
   gallery2_url: string
   gallery3_url: string
   gallery_overlay_text: string
+  groom_intro_photo_url: string
+  bride_intro_photo_url: string
 }
 
 type PhotoFieldType =
@@ -51,6 +53,8 @@ type PhotoFieldType =
   | "gallery1_url"
   | "gallery2_url"
   | "gallery3_url"
+  | "groom_intro_photo_url"
+  | "bride_intro_photo_url"
 
 const PNG_FIELDS: PhotoFieldType[] = [
   "logo_url",
@@ -188,6 +192,8 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
     gallery2_url: wedding.gallery2_url ?? "",
     gallery3_url: wedding.gallery3_url ?? "",
     gallery_overlay_text: wedding.gallery_overlay_text ?? "",
+    groom_intro_photo_url: wedding.groom_intro_photo_url ?? "",
+    bride_intro_photo_url: wedding.bride_intro_photo_url ?? "",
   })
 
   async function compressImage(file: File): Promise<Blob> {
@@ -321,6 +327,8 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
       gallery2_url: form.gallery2_url || null,
       gallery3_url: form.gallery3_url || null,
       gallery_overlay_text: form.gallery_overlay_text,
+      groom_intro_photo_url: form.groom_intro_photo_url || null,
+      bride_intro_photo_url: form.bride_intro_photo_url || null,
     }).eq("id", wedding.id)
     if (error) console.error("Save error:", error)
     setLoading(false)
@@ -524,7 +532,7 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
       <PhotoField label="Background / Tekstur Cover" field="cover_photo_url"
         value={form.cover_photo_url} uploading={uploading} deleting={deleting}
         onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
-      <PhotoField label="Foto Mempelai" field="couple_photo_url"
+      <PhotoField label="Foto Mempelai (Cover)" field="couple_photo_url"
         value={form.couple_photo_url} uploading={uploading} deleting={deleting}
         onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
       <PhotoField label="Pola Frame Foto Mempelai (PNG transparan)" field="frame_url"
@@ -532,7 +540,16 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
         onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
 
       <div style={divider} />
-      <span style={sectionLabel}>Galeri Foto (Section Pertama Setelah Cover)</span>
+      <span style={sectionLabel}>Foto Pengenalan Mempelai</span>
+      <PhotoField label="Foto Mempelai Pria" field="groom_intro_photo_url"
+        value={form.groom_intro_photo_url} uploading={uploading} deleting={deleting}
+        onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
+      <PhotoField label="Foto Mempelai Wanita" field="bride_intro_photo_url"
+        value={form.bride_intro_photo_url} uploading={uploading} deleting={deleting}
+        onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
+
+      <div style={divider} />
+      <span style={sectionLabel}>Galeri Foto (Section Setelah Pengenalan Mempelai)</span>
       <PhotoField label="Foto 1" field="gallery1_url"
         value={form.gallery1_url} uploading={uploading} deleting={deleting}
         onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />

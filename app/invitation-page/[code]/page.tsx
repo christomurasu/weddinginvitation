@@ -1,11 +1,11 @@
 import { supabase } from "../../lib/supabase"
 import RSVPButtons from "./RSVPButtons"
-import WishForm from "./Wishform"
 import CoverPage from "./CoverPage"
 import MusicPlayer from "./MusicPlayer"
 import CountdownTimer from "./CountdownTimer"
 import ViewportFix from "./ViewportFix"
 import Gallery from "./Gallery"
+import IntroSection from "./IntroSection"
 import type { Metadata } from "next"
 
 export async function generateMetadata({
@@ -66,12 +66,6 @@ export default async function InvitationPage({
     .eq("wedding_id", wedding.id)
     .order("order_index", { ascending: true })).data ?? []
 
-  const wishes = (await supabase
-    .from("wishes")
-    .select("*")
-    .eq("wedding_id", wedding.id)
-    .order("created_at", { ascending: false })).data ?? []
-
   const isCeremonyOnly = guest.invitation_type === "ceremony"
 
   const bgStyle = wedding.cover_photo_url
@@ -125,7 +119,7 @@ export default async function InvitationPage({
           flex-shrink: 0;
         }
 
-        .snap-section {
+        .snap-section-auto {
           scroll-snap-align: start;
           scroll-snap-stop: always;
           min-height: calc(var(--vh, 1vh) * 100);
@@ -155,7 +149,7 @@ export default async function InvitationPage({
         </div>
 
         {hasGallery && (
-          <div className="snap-section" style={{ height: "100%" }}>
+          <div className="snap-section">
             <Gallery
               photo1={wedding.gallery1_url}
               photo2={wedding.gallery2_url}
@@ -165,50 +159,28 @@ export default async function InvitationPage({
           </div>
         )}
 
-        <div className="snap-section" style={{ background: "#faf7f2" }}>
-          <div style={{
-            flex: 1, display: "flex", flexDirection: "column",
-            alignItems: "center", justifyContent: "center",
-            padding: "48px 32px", textAlign: "center"
-          }}>
-            <div style={{ marginBottom: 36 }}>
-              <p style={{ fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "#b8965a", marginBottom: 12 }}>
-                Mempelai Pria
-              </p>
-              <h2 style={{ fontFamily: "Georgia, serif", fontSize: 30, fontWeight: 300, color: "#2c2c2a", marginBottom: 8 }}>
-                {wedding.partner1}
-              </h2>
-              {(wedding.groom_father || wedding.groom_mother) && (
-                <p style={{ fontSize: 13, color: "#888780", lineHeight: 1.8 }}>
-                  {wedding.groom_child_order && "Putra " + wedding.groom_child_order + " dari"}
-                  <br />
-                  {wedding.groom_father && "Bapak " + wedding.groom_father}
-                  {wedding.groom_father && wedding.groom_mother && " & "}
-                  {wedding.groom_mother && "Ibu " + wedding.groom_mother}
-                </p>
-              )}
-            </div>
-            <div style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontSize: 28, color: "#b8965a", marginBottom: 36 }}>
-              &amp;
-            </div>
-            <div>
-              <p style={{ fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "#b8965a", marginBottom: 12 }}>
-                Mempelai Wanita
-              </p>
-              <h2 style={{ fontFamily: "Georgia, serif", fontSize: 30, fontWeight: 300, color: "#2c2c2a", marginBottom: 8 }}>
-                {wedding.partner2}
-              </h2>
-              {(wedding.bride_father || wedding.bride_mother) && (
-                <p style={{ fontSize: 13, color: "#888780", lineHeight: 1.8 }}>
-                  {wedding.bride_child_order && "Putri " + wedding.bride_child_order + " dari"}
-                  <br />
-                  {wedding.bride_father && "Bapak " + wedding.bride_father}
-                  {wedding.bride_father && wedding.bride_mother && " & "}
-                  {wedding.bride_mother && "Ibu " + wedding.bride_mother}
-                </p>
-              )}
-            </div>
-          </div>
+        <div className="snap-section">
+          <IntroSection
+            guestGreeting={guest.greeting || "Honoured Guest"}
+            name={wedding.partner1}
+            parentLabel="The first son of"
+            parentNames={`${wedding.groom_father ?? ""} & ${wedding.groom_mother ?? ""}`}
+            photoUrl={wedding.groom_intro_photo_url}
+            backgroundUrl={wedding.cover_photo_url}
+            align="left"
+          />
+        </div>
+
+        <div className="snap-section">
+          <IntroSection
+            guestGreeting={guest.greeting || "Honoured Guest"}
+            name={wedding.partner2}
+            parentLabel="The first daughter of"
+            parentNames={`${wedding.bride_father ?? ""} & ${wedding.bride_mother ?? ""}`}
+            photoUrl={wedding.bride_intro_photo_url}
+            backgroundUrl={wedding.cover_photo_url}
+            align="right"
+          />
         </div>
 
         {photoList[1] && (
@@ -285,48 +257,6 @@ export default async function InvitationPage({
               style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", top: 0, left: 0 }} />
           </div>
         )}
-
-        <div className="snap-section-auto" style={{ background: "#2c2c2a" }}>
-          <div style={{
-            flex: 1, display: "flex", flexDirection: "column",
-            padding: "48px 28px", maxWidth: 560, margin: "0 auto", width: "100%"
-          }}>
-            <p style={{
-              fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase",
-              color: "#b8965a", marginBottom: 28, textAlign: "center"
-            }}>
-              Ucapan &amp; Doa
-            </p>
-            <WishForm weddingId={wedding.id} />
-            <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 12 }}>
-              {wishes.length > 0 ? wishes.map((w: { id: string; guest_name: string; message: string }) => (
-                <div key={w.id} style={{
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  padding: "16px 20px"
-                }}>
-                  <p style={{
-                    fontFamily: "Georgia, serif", fontStyle: "italic",
-                    fontSize: 14, color: "rgba(255,255,255,0.7)",
-                    lineHeight: 1.7, marginBottom: 10
-                  }}>
-                    &ldquo;{w.message}&rdquo;
-                  </p>
-                  <p style={{ fontSize: 11, color: "#b8965a", letterSpacing: "0.1em" }}>
-                    &mdash; {w.guest_name}
-                  </p>
-                </div>
-              )) : (
-                <p style={{
-                  textAlign: "center", color: "rgba(255,255,255,0.3)",
-                  fontSize: 13, fontStyle: "italic", fontFamily: "Georgia, serif"
-                }}>
-                  Jadilah yang pertama memberikan ucapan.
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
 
         {photoList[3] && (
           <div className="snap-section">
