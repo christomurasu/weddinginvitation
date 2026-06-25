@@ -130,10 +130,10 @@ export default function IntroSection({
               <img src={stampUrl} alt="Stamp"
                 style={{
                   position: "absolute",
-                  bottom: 20, right: 0,
+                  bottom: 30, right: 0,
                   width: stampSize, height: stampSize,
                   objectFit: "contain",
-                  transform: "rotate(10deg)",
+                  transform: "translate(50%, 50%) rotate(10deg)",
                   zIndex: 2
                 }} />
             )}
