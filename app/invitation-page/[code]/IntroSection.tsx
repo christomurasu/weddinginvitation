@@ -29,7 +29,12 @@ export default function IntroSection({
         : "#f5f0e8"
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Italianno&display=swap');
+        @font-face {
+          font-family: 'Sloop';
+          src: url('/fonts/Sloop-ScriptThree.ttf') format('truetype');
+          font-weight: normal;
+          font-style: normal;
+        }
       `}</style>
 
       <div style={{
@@ -51,7 +56,7 @@ export default function IntroSection({
           You are invited to celebrate the wedding of
         </p>
         <h1 style={{
-          fontFamily: "'Italianno', cursive",
+          fontFamily: "'Sloop', cursive",
           fontSize: 64, fontWeight: 400,
           color: "#2c2c2a", lineHeight: 1,
           marginBottom: 16
