@@ -41,6 +41,10 @@ interface Wedding {
   gallery_overlay_text: string
   groom_intro_photo_url: string
   bride_intro_photo_url: string
+  groom_intro_bg_url: string
+  bride_intro_bg_url: string
+  groom_stamp_url: string
+  bride_stamp_url: string
 }
 
 type PhotoFieldType =
@@ -55,6 +59,10 @@ type PhotoFieldType =
   | "gallery3_url"
   | "groom_intro_photo_url"
   | "bride_intro_photo_url"
+  | "groom_intro_bg_url"
+  | "bride_intro_bg_url"
+  | "groom_stamp_url"
+  | "bride_stamp_url"
 
 const PNG_FIELDS: PhotoFieldType[] = [
   "logo_url",
@@ -62,6 +70,8 @@ const PNG_FIELDS: PhotoFieldType[] = [
   "ceremony_image_url",
   "reception_image_url",
   "couple_photo_url",
+  "groom_stamp_url",
+  "bride_stamp_url",
 ]
 
 function PhotoField({
@@ -194,6 +204,10 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
     gallery_overlay_text: wedding.gallery_overlay_text ?? "",
     groom_intro_photo_url: wedding.groom_intro_photo_url ?? "",
     bride_intro_photo_url: wedding.bride_intro_photo_url ?? "",
+    groom_intro_bg_url: wedding.groom_intro_bg_url ?? "",
+    bride_intro_bg_url: wedding.bride_intro_bg_url ?? "",
+    groom_stamp_url: wedding.groom_stamp_url ?? "",
+    bride_stamp_url: wedding.bride_stamp_url ?? "",
   })
 
   async function compressImage(file: File): Promise<Blob> {
@@ -329,6 +343,10 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
       gallery_overlay_text: form.gallery_overlay_text,
       groom_intro_photo_url: form.groom_intro_photo_url || null,
       bride_intro_photo_url: form.bride_intro_photo_url || null,
+      groom_intro_bg_url: form.groom_intro_bg_url || null,
+      bride_intro_bg_url: form.bride_intro_bg_url || null,
+      groom_stamp_url: form.groom_stamp_url || null,
+      bride_stamp_url: form.bride_stamp_url || null,
     }).eq("id", wedding.id)
     if (error) console.error("Save error:", error)
     setLoading(false)
@@ -540,12 +558,27 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
         onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
 
       <div style={divider} />
-      <span style={sectionLabel}>Foto Pengenalan Mempelai</span>
+      <span style={sectionLabel}>Foto Pengenalan Mempelai Pria</span>
       <PhotoField label="Foto Mempelai Pria" field="groom_intro_photo_url"
         value={form.groom_intro_photo_url} uploading={uploading} deleting={deleting}
         onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
+      <PhotoField label="Background Tekstur - Mempelai Pria" field="groom_intro_bg_url"
+        value={form.groom_intro_bg_url} uploading={uploading} deleting={deleting}
+        onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
+      <PhotoField label="Stempel/Cap - Mempelai Pria (PNG)" field="groom_stamp_url"
+        value={form.groom_stamp_url} uploading={uploading} deleting={deleting}
+        onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
+
+      <div style={divider} />
+      <span style={sectionLabel}>Foto Pengenalan Mempelai Wanita</span>
       <PhotoField label="Foto Mempelai Wanita" field="bride_intro_photo_url"
         value={form.bride_intro_photo_url} uploading={uploading} deleting={deleting}
+        onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
+      <PhotoField label="Background Tekstur - Mempelai Wanita" field="bride_intro_bg_url"
+        value={form.bride_intro_bg_url} uploading={uploading} deleting={deleting}
+        onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
+      <PhotoField label="Stempel/Cap - Mempelai Wanita (PNG)" field="bride_stamp_url"
+        value={form.bride_stamp_url} uploading={uploading} deleting={deleting}
         onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
 
       <div style={divider} />

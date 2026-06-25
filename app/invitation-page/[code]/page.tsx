@@ -166,7 +166,9 @@ export default async function InvitationPage({
             parentLabel="The first son of"
             parentNames={`${wedding.groom_father ?? ""} & ${wedding.groom_mother ?? ""}`}
             photoUrl={wedding.groom_intro_photo_url}
-            backgroundUrl={wedding.cover_photo_url}
+            backgroundUrl={wedding.groom_intro_bg_url}
+            stampUrl={wedding.groom_stamp_url}
+            roleLabel="The Groom"
             align="left"
           />
         </div>
@@ -178,8 +180,11 @@ export default async function InvitationPage({
             parentLabel="The first daughter of"
             parentNames={`${wedding.bride_father ?? ""} & ${wedding.bride_mother ?? ""}`}
             photoUrl={wedding.bride_intro_photo_url}
-            backgroundUrl={wedding.cover_photo_url}
+            backgroundUrl={wedding.bride_intro_bg_url}
+            stampUrl={wedding.bride_stamp_url}
+            roleLabel="The Bride"
             align="right"
+            showGreeting={false}
           />
         </div>
 

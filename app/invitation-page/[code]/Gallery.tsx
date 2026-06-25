@@ -14,6 +14,15 @@ export default function Gallery({
       width: "100%", height: "100%",
       display: "flex", flexDirection: "column"
     }}>
+      <style>{`
+        @font-face {
+          font-family: 'Sloop';
+          src: url('/fonts/Sloop-ScriptThree.ttf') format('truetype');
+          font-weight: normal;
+          font-style: normal;
+        }
+      `}</style>
+
       {photo1 && (
         <div style={{ width: "100%", height: "30%", overflow: "hidden" }}>
           <img src={photo1} alt="Gallery 1"
@@ -30,9 +39,8 @@ export default function Gallery({
               position: "absolute", bottom: 16, left: 20, right: 20
             }}>
               <p style={{
-                fontFamily: "Georgia, serif", fontStyle: "italic",
-                fontSize: 14, color: "#fff", lineHeight: 1.5,
-                textShadow: "0 2px 8px rgba(0,0,0,0.6)"
+                fontFamily: "'Sloop', cursive",
+                fontSize: 25, color: "#fff", lineHeight: 1.3
               }}>
                 {overlayText}
               </p>
