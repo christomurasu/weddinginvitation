@@ -1,11 +1,13 @@
 import { supabase } from "../../lib/supabase"
-import RSVPButtons from "./RSVPButtons"
+import RSVPSection from "./RSVPSection"
+import WishForm from "./Wishform"
 import CoverPage from "./CoverPage"
 import MusicPlayer from "./MusicPlayer"
-import CountdownTimer from "./CountdownTimer"
+import CountdownBanner from "./CountdownBanner"
 import ViewportFix from "./ViewportFix"
 import Gallery from "./Gallery"
 import IntroSection from "./IntroSection"
+import DateMapsRow from "./DateMapsRow"
 import type { Metadata } from "next"
 
 export async function generateMetadata({
@@ -66,13 +68,32 @@ export default async function InvitationPage({
     .eq("wedding_id", wedding.id)
     .order("order_index", { ascending: true })).data ?? []
 
+  const wishes = (await supabase
+    .from("wishes")
+    .select("*")
+    .eq("wedding_id", wedding.id)
+    .order("created_at", { ascending: false })).data ?? []
+
   const isCeremonyOnly = guest.invitation_type === "ceremony"
 
   const bgStyle = wedding.cover_photo_url
     ? `url('${wedding.cover_photo_url}') center/cover no-repeat fixed`
     : "#d6cfc6"
 
+  const sectionBg = wedding.cover_photo_url
+    ? { backgroundImage: `url('${wedding.cover_photo_url}')`, backgroundSize: "100% 100%", backgroundRepeat: "no-repeat" as const }
+    : { background: "#f5f0e8" }
+
   const hasGallery = wedding.gallery1_url || wedding.gallery2_url || wedding.gallery3_url
+
+  const isoDate = wedding.wedding_date_iso ? new Date(wedding.wedding_date_iso) : null
+  const dayName = isoDate
+    ? isoDate.toLocaleDateString("en-US", { weekday: "long" })
+    : ""
+  const dayNumber = isoDate ? isoDate.getDate() : ""
+  const monthYear = isoDate
+    ? isoDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    : ""
 
   return (
     <>
@@ -80,6 +101,7 @@ export default async function InvitationPage({
       {wedding.music_url && <MusicPlayer musicUrl={wedding.music_url} />}
 
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
         :root { --vh: 1vh; }
 
         html, body {
@@ -195,62 +217,114 @@ export default async function InvitationPage({
           </div>
         )}
 
-        <div className="snap-section" style={{ background: "#f5f0e8" }}>
+        <div className="snap-section" style={sectionBg}>
           <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+            {wedding.wedding_date_iso && (
+              <CountdownBanner targetDate={wedding.wedding_date_iso} />
+            )}
+            <p style={{
+              fontFamily: "'Poppins', sans-serif",
+              fontWeight: 700, fontSize: 18, color: "#5F5F5F",
+              textAlign: "center", padding: "16px 28px 12px"
+            }}>
+              Holy Matrimony
+            </p>
             {wedding.ceremony_image_url ? (
-              <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
+              <div style={{
+                margin: "0 35px",
+                aspectRatio: "325 / 194",
+                position: "relative",
+                overflow: "hidden",
+                flexShrink: 0
+              }}>
                 <img src={wedding.ceremony_image_url} alt="Gereja"
-                  style={{ width: "100%", height: "100%", objectFit: "contain", position: "absolute", top: 0, left: 0 }} />
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               </div>
             ) : (
-              <div style={{ flex: 1, background: "#ede5d8" }} />
+              <div style={{
+                margin: "0 35px",
+                aspectRatio: "325 / 194",
+                background: "#ede5d8",
+                flexShrink: 0
+              }} />
             )}
-            <div style={{ padding: "24px 28px 32px", background: "#f5f0e8", textAlign: "center" }}>
-              {wedding.wedding_date_iso && (
-                <div style={{ marginBottom: 16 }}>
-                  <CountdownTimer targetDate={wedding.wedding_date_iso} />
-                </div>
-              )}
-              <p style={{ fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "#3b5c2f", marginBottom: 8 }}>
-                Holy Matrimony
-              </p>
-              <h2 style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 400, color: "#2c2c2a", marginBottom: 4 }}>
+            <div style={{ padding: "16px 28px 32px", textAlign: "center", overflowY: "auto" }}>
+              <p style={{
+                fontFamily: "'Poppins', sans-serif",
+                fontWeight: 700, fontSize: 16, color: "#5F5F5F",
+                marginBottom: 6
+              }}>
                 {wedding.ceremony_venue}
-              </h2>
-              <p style={{ fontSize: 12, color: "#888780", lineHeight: 1.6, marginBottom: 4 }}>
+              </p>
+              <p style={{
+                fontFamily: "'Poppins', sans-serif",
+                fontWeight: 400, fontSize: 15, color: "#5F5F5F",
+                lineHeight: 1.5, marginBottom: 16
+              }}>
                 {wedding.ceremony_address}
               </p>
-              <p style={{ fontFamily: "Georgia, serif", fontSize: 15, color: "#b8965a" }}>
-                {wedding.ceremony_time}
-              </p>
+              <DateMapsRow
+                dayName={dayName}
+                day={dayNumber}
+                monthYear={monthYear}
+                time={wedding.ceremony_time}
+                mapsUrl={wedding.ceremony_maps_url}
+              />
             </div>
           </div>
         </div>
 
         {!isCeremonyOnly && (
-          <div className="snap-section" style={{ background: "#f5f0e8" }}>
-            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <div className="snap-section" style={sectionBg}>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+              <p style={{
+                fontFamily: "'Poppins', sans-serif",
+                fontWeight: 700, fontSize: 18, color: "#5F5F5F",
+                textAlign: "center", padding: "16px 28px 12px"
+              }}>
+                Reception
+              </p>
               {wedding.reception_image_url ? (
-                <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
+                <div style={{
+                  margin: "0 35px",
+                  aspectRatio: "325 / 220",
+                  position: "relative",
+                  overflow: "hidden",
+                  flexShrink: 0
+                }}>
                   <img src={wedding.reception_image_url} alt="Venue Resepsi"
-                    style={{ width: "100%", height: "100%", objectFit: "contain", position: "absolute", top: 0, left: 0 }} />
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
               ) : (
-                <div style={{ flex: 1, background: "#ede5d8" }} />
+                <div style={{
+                  margin: "0 35px",
+                  aspectRatio: "325 / 220",
+                  background: "#ede5d8",
+                  flexShrink: 0
+                }} />
               )}
-              <div style={{ padding: "24px 28px 32px", background: "#f5f0e8", textAlign: "center" }}>
-                <p style={{ fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "#3b5c2f", marginBottom: 8 }}>
-                  Reception
-                </p>
-                <h2 style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 400, color: "#2c2c2a", marginBottom: 4 }}>
+              <div style={{ padding: "16px 28px 32px", textAlign: "center", overflowY: "auto" }}>
+                <p style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontWeight: 700, fontSize: 16, color: "#5F5F5F",
+                  marginBottom: 6
+                }}>
                   {wedding.reception_venue}
-                </h2>
-                <p style={{ fontSize: 12, color: "#888780", lineHeight: 1.6, marginBottom: 4 }}>
+                </p>
+                <p style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontWeight: 400, fontSize: 15, color: "#5F5F5F",
+                  lineHeight: 1.5, marginBottom: 16
+                }}>
                   {wedding.reception_address}
                 </p>
-                <p style={{ fontFamily: "Georgia, serif", fontSize: 15, color: "#b8965a" }}>
-                  {wedding.reception_time}
-                </p>
+                <DateMapsRow
+                  dayName={dayName}
+                  day={dayNumber}
+                  monthYear={monthYear}
+                  time={wedding.reception_time}
+                  mapsUrl={wedding.reception_maps_url}
+                />
               </div>
             </div>
           </div>
@@ -270,16 +344,15 @@ export default async function InvitationPage({
           </div>
         )}
 
-        <div className="snap-section" style={{ background: "#faf7f2" }}>
+        <div className="snap-section-auto" style={sectionBg}>
           <div style={{
             flex: 1, display: "flex", flexDirection: "column",
-            alignItems: "center", justifyContent: "center",
-            padding: "32px 24px", width: "100%", maxWidth: 480, margin: "0 auto"
+            padding: "40px 24px", width: "100%", maxWidth: 480, margin: "0 auto"
           }}>
             {guest.note && (
               <div style={{
                 background: "#fdf8ee", border: "1px solid #e8d5a3",
-                padding: "20px 24px", marginBottom: 20, width: "100%"
+                padding: "20px 24px", marginBottom: 24, width: "100%"
               }}>
                 <p style={{ fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "#b8965a", marginBottom: 8 }}>
                   A Personal Note
@@ -289,14 +362,75 @@ export default async function InvitationPage({
                 </p>
               </div>
             )}
-            <div style={{ width: "100%" }}>
-              <RSVPButtons
-                guestCode={code}
-                initialStatus={guest.rsvp}
-                rsvpDeadline={wedding.rsvp_deadline}
-                maxAttendees={guest.max_attendees ?? 1}
-                initialAttendees={guest.actual_attendees ?? 1}
-              />
+
+            <RSVPSection
+              guestCode={code}
+              guestGreeting={guest.greeting || "Honoured Guest"}
+              isCeremonyOnly={isCeremonyOnly}
+              maxAttendees={guest.max_attendees ?? 1}
+              ceremonyRsvp={guest.ceremony_rsvp ?? "pending"}
+              ceremonyAdults={guest.ceremony_adults ?? 0}
+              ceremonyKids={guest.ceremony_kids ?? 0}
+              receptionRsvp={guest.reception_rsvp ?? "pending"}
+              receptionAdults={guest.reception_adults ?? 0}
+              receptionKids={guest.reception_kids ?? 0}
+            />
+
+            <div style={{ marginTop: 8 }}>
+              <p style={{
+                fontFamily: "'Poppins', sans-serif",
+                fontWeight: 700, fontSize: 20, color: "#5F5F5F",
+                textAlign: "center", marginBottom: 16
+              }}>
+                Wishes
+              </p>
+              <WishForm weddingId={wedding.id} guestName={guest.name} />
+            </div>
+          </div>
+        </div>
+
+        <div className="snap-section-auto" style={{ background: "#faf7f2" }}>
+          <div style={{
+            flex: 1, display: "flex", flexDirection: "column",
+            padding: "40px 24px", width: "100%", maxWidth: 480, margin: "0 auto"
+          }}>
+            <p style={{
+              fontFamily: "'Poppins', sans-serif",
+              fontWeight: 700, fontSize: 20, color: "#5F5F5F",
+              textAlign: "center", marginBottom: 24
+            }}>
+              Wishes & Prayers
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {wishes.length > 0 ? wishes.map((w: { id: string; guest_name: string; message: string }) => (
+                <div key={w.id} style={{
+                  background: "rgba(0,0,0,0.03)",
+                  border: "1px solid rgba(0,0,0,0.08)",
+                  padding: "14px 16px"
+                }}>
+                  <p style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontStyle: "italic", fontSize: 13, color: "#5F5F5F",
+                    lineHeight: 1.6, marginBottom: 6
+                  }}>
+                    &ldquo;{w.message}&rdquo;
+                  </p>
+                  <p style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontWeight: 700, fontSize: 11, color: "#b8965a"
+                  }}>
+                    &mdash; {w.guest_name}
+                  </p>
+                </div>
+              )) : (
+                <p style={{
+                  textAlign: "center", color: "#b4b2a9",
+                  fontSize: 13, fontStyle: "italic",
+                  fontFamily: "'Poppins', sans-serif"
+                }}>
+                  Jadilah yang pertama memberikan ucapan.
+                </p>
+              )}
             </div>
           </div>
         </div>

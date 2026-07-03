@@ -155,7 +155,7 @@ export default async function WeddingDashboardPage({
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ background: "#faf8f4", borderBottom: "1px solid #e4ddd0" }}>
-                  {["Guest", "Code", "Table", "Max", "Attending", "RSVP", "Link"].map(h => (
+                  {["Guest", "Code", "Table", "Max", "Attending", "Tipe", "RSVP", "Link"].map(h => (
                     <th key={h} style={{
                       textAlign: "left", padding: "10px 16px",
                       fontSize: 10, letterSpacing: "0.15em",
@@ -203,6 +203,16 @@ export default async function WeddingDashboardPage({
                     </td>
                     <td style={{ padding: "14px 16px" }}>
                       <span style={{
+                        fontSize: 10, padding: "3px 8px",
+                        background: guest.invitation_type === "ceremony" ? "#faeeda" : "#e6f1fb",
+                        color: guest.invitation_type === "ceremony" ? "#854f0b" : "#185fa5",
+                        letterSpacing: "0.08em", textTransform: "uppercase"
+                      }}>
+                        {guest.invitation_type === "ceremony" ? "Pemberkatan" : "Full"}
+                      </span>
+                    </td>
+                    <td style={{ padding: "14px 16px" }}>
+                      <span style={{
                         fontSize: 11, padding: "3px 10px",
                         background: guest.rsvp === "confirmed" ? "#eaf3de"
                           : guest.rsvp === "declined" ? "#fcebeb" : "#f5f0e8",
@@ -224,7 +234,7 @@ export default async function WeddingDashboardPage({
                 ))}
                 {(!guests || guests.length === 0) && (
                   <tr>
-                    <td colSpan={7} style={{
+                    <td colSpan={8} style={{
                       padding: "40px", textAlign: "center",
                       color: "#888780", fontSize: 13
                     }}>
