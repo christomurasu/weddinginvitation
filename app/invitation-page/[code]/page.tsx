@@ -87,13 +87,9 @@ export default async function InvitationPage({
   const hasGallery = wedding.gallery1_url || wedding.gallery2_url || wedding.gallery3_url
 
   const isoDate = wedding.wedding_date_iso ? new Date(wedding.wedding_date_iso) : null
-  const dayName = isoDate
-    ? isoDate.toLocaleDateString("en-US", { weekday: "long" })
-    : ""
+  const dayName = isoDate ? isoDate.toLocaleDateString("en-US", { weekday: "long" }) : ""
   const dayNumber = isoDate ? isoDate.getDate() : ""
-  const monthYear = isoDate
-    ? isoDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
-    : ""
+  const monthYear = isoDate ? isoDate.toLocaleDateString("en-US", { month: "long", year: "numeric" }) : ""
 
   return (
     <>
@@ -231,28 +227,19 @@ export default async function InvitationPage({
             </p>
             {wedding.ceremony_image_url ? (
               <div style={{
-                margin: "0 35px",
-                aspectRatio: "325 / 194",
-                position: "relative",
-                overflow: "hidden",
-                flexShrink: 0
+                margin: "0 35px", aspectRatio: "325 / 194",
+                position: "relative", overflow: "hidden", flexShrink: 0
               }}>
                 <img src={wedding.ceremony_image_url} alt="Gereja"
                   style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               </div>
             ) : (
-              <div style={{
-                margin: "0 35px",
-                aspectRatio: "325 / 194",
-                background: "#ede5d8",
-                flexShrink: 0
-              }} />
+              <div style={{ margin: "0 35px", aspectRatio: "325 / 194", background: "#ede5d8", flexShrink: 0 }} />
             )}
             <div style={{ padding: "16px 28px 32px", textAlign: "center", overflowY: "auto" }}>
               <p style={{
                 fontFamily: "'Poppins', sans-serif",
-                fontWeight: 700, fontSize: 16, color: "#5F5F5F",
-                marginBottom: 6
+                fontWeight: 700, fontSize: 16, color: "#5F5F5F", marginBottom: 6
               }}>
                 {wedding.ceremony_venue}
               </p>
@@ -264,10 +251,8 @@ export default async function InvitationPage({
                 {wedding.ceremony_address}
               </p>
               <DateMapsRow
-                dayName={dayName}
-                day={dayNumber}
-                monthYear={monthYear}
-                time={wedding.ceremony_time}
+                dayName={dayName} day={dayNumber}
+                monthYear={monthYear} time={wedding.ceremony_time}
                 mapsUrl={wedding.ceremony_maps_url}
               />
             </div>
@@ -286,28 +271,19 @@ export default async function InvitationPage({
               </p>
               {wedding.reception_image_url ? (
                 <div style={{
-                  margin: "0 35px",
-                  aspectRatio: "325 / 220",
-                  position: "relative",
-                  overflow: "hidden",
-                  flexShrink: 0
+                  margin: "0 35px", aspectRatio: "325 / 220",
+                  position: "relative", overflow: "hidden", flexShrink: 0
                 }}>
                   <img src={wedding.reception_image_url} alt="Venue Resepsi"
                     style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
               ) : (
-                <div style={{
-                  margin: "0 35px",
-                  aspectRatio: "325 / 220",
-                  background: "#ede5d8",
-                  flexShrink: 0
-                }} />
+                <div style={{ margin: "0 35px", aspectRatio: "325 / 220", background: "#ede5d8", flexShrink: 0 }} />
               )}
               <div style={{ padding: "16px 28px 32px", textAlign: "center", overflowY: "auto" }}>
                 <p style={{
                   fontFamily: "'Poppins', sans-serif",
-                  fontWeight: 700, fontSize: 16, color: "#5F5F5F",
-                  marginBottom: 6
+                  fontWeight: 700, fontSize: 16, color: "#5F5F5F", marginBottom: 6
                 }}>
                   {wedding.reception_venue}
                 </p>
@@ -319,10 +295,8 @@ export default async function InvitationPage({
                   {wedding.reception_address}
                 </p>
                 <DateMapsRow
-                  dayName={dayName}
-                  day={dayNumber}
-                  monthYear={monthYear}
-                  time={wedding.reception_time}
+                  dayName={dayName} day={dayNumber}
+                  monthYear={monthYear} time={wedding.reception_time}
                   mapsUrl={wedding.reception_maps_url}
                 />
               </div>
@@ -389,79 +363,76 @@ export default async function InvitationPage({
           </div>
         </div>
 
-        <div className="snap-section-auto" style={{ background: "#faf7f2" }}>
+        <div className="snap-section" style={sectionBg}>
           <div style={{
             flex: 1, display: "flex", flexDirection: "column",
-            padding: "40px 24px", width: "100%", maxWidth: 480, margin: "0 auto"
+            padding: "40px 0"
           }}>
             <p style={{
               fontFamily: "'Poppins', sans-serif",
               fontWeight: 700, fontSize: 20, color: "#5F5F5F",
-              textAlign: "center", marginBottom: 24
+              letterSpacing: "0.05em",
+              textAlign: "center", marginBottom: 20
             }}>
-              Wishes & Prayers
+              WISHES
             </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {wishes.length > 0 ? wishes.map((w: { id: string; guest_name: string; message: string }) => (
-                <div key={w.id} style={{
-                  background: "rgba(0,0,0,0.03)",
-                  border: "1px solid rgba(0,0,0,0.08)",
-                  padding: "14px 16px"
-                }}>
-                  <p style={{
-                    fontFamily: "'Poppins', sans-serif",
-                    fontStyle: "italic", fontSize: 13, color: "#5F5F5F",
-                    lineHeight: 1.6, marginBottom: 6
+
+            <div style={{
+              margin: "0 25px",
+              background: "#F4F1EA",
+              flex: 1,
+              overflowY: "auto",
+              padding: "16px"
+            }}>
+              {wishes.length > 0 ? wishes.map((w: { id: string; guest_name: string; message: string; created_at: string }) => (
+                <div key={w.id} style={{ marginBottom: 12 }}>
+                  <div style={{
+                    display: "flex", justifyContent: "flex-end",
+                    alignItems: "center", gap: 8, marginBottom: 0
                   }}>
-                    &ldquo;{w.message}&rdquo;
-                  </p>
-                  <p style={{
-                    fontFamily: "'Poppins', sans-serif",
-                    fontWeight: 700, fontSize: 11, color: "#b8965a"
+                    <span style={{
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: 11, color: "#888780"
+                    }}>
+                      {new Date(w.created_at).toLocaleDateString("id-ID", {
+                        day: "numeric", month: "short", year: "numeric",
+                        hour: "2-digit", minute: "2-digit"
+                      })}
+                    </span>
+                    <span style={{
+                      display: "inline-block",
+                      background: "#ffffff",
+                      padding: "6px 12px",
+                      fontFamily: "Georgia, serif",
+                      fontStyle: "italic", fontSize: 14, color: "#5F5F5F"
+                    }}>
+                      {w.guest_name}
+                    </span>
+                  </div>
+                  <div style={{
+                    background: "#E3E0D9",
+                    padding: "12px 14px"
                   }}>
-                    &mdash; {w.guest_name}
-                  </p>
+                    <p style={{
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: 14, color: "#5F5F5F",
+                      lineHeight: 1.6
+                    }}>
+                      {w.message}
+                    </p>
+                  </div>
                 </div>
               )) : (
                 <p style={{
                   textAlign: "center", color: "#b4b2a9",
                   fontSize: 13, fontStyle: "italic",
-                  fontFamily: "'Poppins', sans-serif"
+                  fontFamily: "'Poppins', sans-serif",
+                  marginTop: 20
                 }}>
                   Jadilah yang pertama memberikan ucapan.
                 </p>
               )}
             </div>
-          </div>
-        </div>
-
-        {photoList[4] && (
-          <div className="snap-section">
-            <img src={photoList[4].url} alt="Photo 5"
-              style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", top: 0, left: 0 }} />
-          </div>
-        )}
-
-        <div className="snap-section" style={{ background: "#2c2c2a" }}>
-          <div style={{
-            flex: 1, display: "flex", flexDirection: "column",
-            alignItems: "center", justifyContent: "center",
-            textAlign: "center", padding: "48px 32px"
-          }}>
-            {wedding.logo_url && (
-              <img src={wedding.logo_url} alt="Logo"
-                style={{ width: 70, height: 70, objectFit: "contain", marginBottom: 20, opacity: 0.6 }} />
-            )}
-            <p style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontSize: 22, color: "rgba(255,255,255,0.6)", marginBottom: 8 }}>
-              {wedding.partner1} &amp; {wedding.partner2}
-            </p>
-            <p style={{ fontSize: 12, color: "#888780", marginBottom: 32 }}>
-              {wedding.date}
-            </p>
-            <div style={{ width: 40, height: 1, background: "#b8965a", marginBottom: 32 }} />
-            <p style={{ fontSize: 10, color: "#444441", letterSpacing: "0.15em", textTransform: "uppercase" }}>
-              Made with SF Invitation
-            </p>
           </div>
         </div>
 

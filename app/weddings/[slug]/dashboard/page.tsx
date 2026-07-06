@@ -3,6 +3,7 @@ import Link from "next/link"
 import WeddingAddGuestForm from "./WeddingAddGuestForm"
 import EditWeddingForm from "./EditWeddingForm"
 import PhotoUpload from "./PhotoUpload"
+import CSVImport from "./CSVImport"
 
 export default async function WeddingDashboardPage({
   params,
@@ -134,6 +135,8 @@ export default async function WeddingDashboardPage({
           photos={photos ?? []}
         />
 
+        <CSVImport weddingId={wedding.id} />
+
         {/* Add guest */}
         <div style={{ marginTop: 24 }}>
           <WeddingAddGuestForm weddingId={wedding.id} slug={slug} />
@@ -155,7 +158,7 @@ export default async function WeddingDashboardPage({
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ background: "#faf8f4", borderBottom: "1px solid #e4ddd0" }}>
-                  {["Guest", "Code", "Table", "Max", "Attending", "Tipe", "RSVP", "Link"].map(h => (
+                  {["Guest", "Code", "WA", "Table", "Max", "Attending", "Tipe", "RSVP", "Link"].map(h => (
                     <th key={h} style={{
                       textAlign: "left", padding: "10px 16px",
                       fontSize: 10, letterSpacing: "0.15em",
@@ -185,6 +188,28 @@ export default async function WeddingDashboardPage({
                       }}>
                         {guest.code}
                       </span>
+                    </td>
+                    <td style={{ padding: "14px 16px" }}>
+                      {guest.phone ? (
+                        <a
+                          href={`https://wa.me/62${guest.phone.replace(/^0/, "").replace(/\D/g, "")}?text=${encodeURIComponent(
+                          `Kepada Yth.\n${guest.greeting},\n\nBersama ini kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam acara pernikahan kami:\n\n👰🤵 *${wedding.partner1} & ${wedding.partner2}*\n📅 ${wedding.date}\n📍 ${wedding.venue}\n\nSebagai tanda kasih, kami telah menyiapkan undangan digital khusus untuk Bapak/Ibu/Saudara/i:\n\n🔗 ${`https://sfinvitation.id/invitation-page/${guest.code}`}\n\nMohon konfirmasi kehadiran melalui link undangan di atas.\n\nAtas kehadiran dan doa restu Bapak/Ibu/Saudara/i, kami mengucapkan terima kasih.\n\nSalam hangat,\n${wedding.partner1} & ${wedding.partner2}`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "inline-flex", alignItems: "center", gap: 4,
+                          background: "#25D366", color: "#fff",
+                          padding: "4px 10px", fontSize: 11,
+                          textDecoration: "none", fontWeight: 600,
+                          letterSpacing: "0.05em"
+                        }}
+                      >
+                        WA ↗
+                      </a>
+                      ) : (
+                        <span style={{ color: "#b4b2a9", fontSize: 12 }}>—</span>
+                      )}
                     </td>
                     <td style={{ padding: "14px 16px", color: "#888780", fontSize: 12 }}>
                       {guest.table_number ?? "—"}
@@ -234,7 +259,7 @@ export default async function WeddingDashboardPage({
                 ))}
                 {(!guests || guests.length === 0) && (
                   <tr>
-                    <td colSpan={8} style={{
+                    <td colSpan={9} style={{
                       padding: "40px", textAlign: "center",
                       color: "#888780", fontSize: 13
                     }}>

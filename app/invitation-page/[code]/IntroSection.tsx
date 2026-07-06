@@ -80,7 +80,8 @@ export default function IntroSection({
           fontFamily: "'Sloop', cursive",
           fontSize: 64, fontWeight: 400,
           color: "#5F5F5F", lineHeight: 1,
-          marginBottom: 16
+          marginBottom: align === "left" ? 16 : 30,
+          marginTop: align === "left" ? 0 :90
         }}>
           {name}
         </h1>

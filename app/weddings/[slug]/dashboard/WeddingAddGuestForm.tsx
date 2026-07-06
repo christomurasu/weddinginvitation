@@ -26,6 +26,7 @@ export default function WeddingAddGuestForm({
   const [form, setForm] = useState({
     name: "",
     greeting: "",
+    phone: "",
     table_number: "",
     max_attendees: "1",
     note: "",
@@ -41,6 +42,7 @@ export default function WeddingAddGuestForm({
       code,
       name: form.name,
       greeting: form.greeting || `Dear ${form.name}`,
+      phone: form.phone || null,
       table_number: form.table_number,
       max_attendees: parseInt(form.max_attendees) || 1,
       note: form.note,
@@ -48,7 +50,7 @@ export default function WeddingAddGuestForm({
     })
     setGeneratedLink(`https://sfinvitation.id/invitation-page/${code}`)
     setForm({
-      name: "", greeting: "", table_number: "",
+      name: "", greeting: "", phone: "", table_number: "",
       max_attendees: "1", note: "", invitation_type: "full"
     })
     setLoading(false)
@@ -92,27 +94,45 @@ export default function WeddingAddGuestForm({
 
       <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
         <div style={{ flex: 1 }}>
+          <label style={labelStyle}>Nomor HP (WhatsApp)</label>
+          <div style={{ display: "flex", alignItems: "center", border: "1px solid #e4ddd0", background: "#fdf8ee" }}>
+            <span style={{
+              padding: "10px 12px", fontSize: 13, color: "#888780",
+              borderRight: "1px solid #e4ddd0", whiteSpace: "nowrap"
+            }}>
+              +62
+            </span>
+            <input
+              style={{ ...inputStyle, border: "none", flex: 1 }}
+              type="tel"
+              value={form.phone}
+              onChange={e => setForm({ ...form, phone: e.target.value.replace(/\D/g, "") })}
+              placeholder="8123456789" />
+          </div>
+        </div>
+        <div style={{ flex: 1 }}>
           <label style={labelStyle}>Table Number</label>
           <input style={inputStyle} type="text" value={form.table_number}
             onChange={e => setForm({ ...form, table_number: e.target.value })}
             placeholder="e.g. Table 3" />
         </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
         <div style={{ flex: 1 }}>
           <label style={labelStyle}>Max Attendees</label>
           <input style={inputStyle} type="number" value={form.max_attendees}
             min="1" max="20"
             onChange={e => setForm({ ...form, max_attendees: e.target.value })} />
         </div>
+        <div style={{ flex: 1 }}>
+          <label style={labelStyle}>Personal Note (optional)</label>
+          <input style={inputStyle} type="text" value={form.note}
+            onChange={e => setForm({ ...form, note: e.target.value })}
+            placeholder="e.g. Vegetarian meal arranged" />
+        </div>
       </div>
 
-      <div style={{ marginBottom: 16 }}>
-        <label style={labelStyle}>Personal Note (optional)</label>
-        <input style={inputStyle} type="text" value={form.note}
-          onChange={e => setForm({ ...form, note: e.target.value })}
-          placeholder="e.g. Vegetarian meal arranged for you" />
-      </div>
-
-      {/* Toggle tipe undangan */}
       <div style={{ marginBottom: 20 }}>
         <label style={labelStyle}>Tipe Undangan</label>
         <div style={{ display: "flex", gap: 8 }}>
