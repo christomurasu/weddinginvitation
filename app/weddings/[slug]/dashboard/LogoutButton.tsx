@@ -16,8 +16,8 @@ export default function LogoutButton() {
       style={{
         position: "absolute", right: 24, top: "50%",
         transform: "translateY(-50%)",
-        background: "transparent", border: "1px solid #444441",
-        color: "#888780", padding: "6px 14px",
+        background: "transparent", border: "1px solid #888780",
+        color: "#e8d5a3", padding: "6px 14px",
         fontSize: 10, letterSpacing: "0.12em",
         textTransform: "uppercase", cursor: "pointer",
         fontFamily: "inherit"

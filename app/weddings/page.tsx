@@ -1,5 +1,6 @@
 import { supabase } from "../lib/supabase"
 import Link from "next/link"
+import LogoutButton from "./[slug]/dashboard/LogoutButton"
 
 export default async function WeddingsPage() {
   const { data: weddings } = await supabase
@@ -13,8 +14,9 @@ export default async function WeddingsPage() {
       {/* Header */}
       <div style={{
         background: "#2c2c2a", padding: "40px 32px",
-        textAlign: "center"
+        textAlign: "center", position: "relative"
       }}>
+        <LogoutButton />
         <p style={{
           color: "#e8d5a3", fontSize: 11,
           letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 10
