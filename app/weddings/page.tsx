@@ -56,7 +56,7 @@ export default async function WeddingsPage() {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {weddings?.map(w => {
-            const guestCount = (w.guests as any)?.[0]?.count ?? 0
+            const guestCount = (w.guests as { count: number }[])?.[0]?.count ?? 0
             return (
               <div key={w.id} style={{
                 background: "#fff", border: "1px solid #e4ddd0",

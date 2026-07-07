@@ -5,6 +5,7 @@ import EditWeddingForm from "./EditWeddingForm"
 import PhotoUpload from "./PhotoUpload"
 import CSVImport from "./CSVImport"
 import LogoutButton from "./LogoutButton"
+import GuestTable from "./GuestTable"
 
 export default async function WeddingDashboardPage({
   params,
@@ -147,130 +148,15 @@ export default async function WeddingDashboardPage({
         </div>
 
         {/* Guest table */}
-        <div style={{ background: "#fff", border: "1px solid #e4ddd0", marginTop: 24 }}>
-          <div style={{ padding: "16px 24px", borderBottom: "1px solid #f0ebe3" }}>
-            <p style={{
-              fontSize: 10, letterSpacing: "0.2em",
-              textTransform: "uppercase", color: "#b8965a"
-            }}>
-              All Guests
-            </p>
-          </div>
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-              <thead>
-                <tr style={{ background: "#faf8f4", borderBottom: "1px solid #e4ddd0" }}>
-                  {["Guest", "Code", "WA", "Table", "Max", "Attending", "Tipe", "RSVP", "Link"].map(h => (
-                    <th key={h} style={{
-                      textAlign: "left", padding: "10px 16px",
-                      fontSize: 10, letterSpacing: "0.15em",
-                      textTransform: "uppercase", color: "#888780", fontWeight: 400
-                    }}>
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {guests?.map(guest => (
-                  <tr key={guest.id} style={{ borderBottom: "1px solid #f5f0e8" }}>
-                    <td style={{ padding: "14px 16px" }}>
-                      <p style={{ fontWeight: 500, color: "#2c2c2a", marginBottom: 2 }}>
-                        {guest.name}
-                      </p>
-                      <p style={{ fontSize: 11, color: "#888780" }}>
-                        {guest.greeting}
-                      </p>
-                    </td>
-                    <td style={{ padding: "14px 16px" }}>
-                      <span style={{
-                        fontFamily: "monospace", fontSize: 11,
-                        background: "#fdf8ee", color: "#8a6d3b",
-                        border: "1px solid #e8d5a3", padding: "2px 8px"
-                      }}>
-                        {guest.code}
-                      </span>
-                    </td>
-                    <td style={{ padding: "14px 16px" }}>
-                      {guest.phone ? (
-                        <a
-                          href={`https://wa.me/62${guest.phone.replace(/^0/, "").replace(/\D/g, "")}?text=${encodeURIComponent(waMessage(guest))}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{
-                            display: "inline-flex", alignItems: "center", gap: 4,
-                            background: "#25D366", color: "#fff",
-                            padding: "4px 10px", fontSize: 11,
-                            textDecoration: "none", fontWeight: 600,
-                            letterSpacing: "0.05em"
-                          }}
-                        >
-                          WA ↗
-                        </a>
-                      ) : (
-                        <span style={{ color: "#b4b2a9", fontSize: 12 }}>—</span>
-                      )}
-                    </td>
-                    <td style={{ padding: "14px 16px", color: "#888780", fontSize: 12 }}>
-                      {guest.table_number ?? "—"}
-                    </td>
-                    <td style={{ padding: "14px 16px", color: "#888780", fontSize: 12, textAlign: "center" }}>
-                      {guest.max_attendees ?? 1}
-                    </td>
-                    <td style={{ padding: "14px 16px", textAlign: "center" }}>
-                      {guest.rsvp === "confirmed" ? (
-                        <span style={{ color: "#3b6d11", fontSize: 13, fontWeight: 500 }}>
-                          {guest.actual_attendees ?? 1}
-                        </span>
-                      ) : (
-                        <span style={{ color: "#b4b2a9", fontSize: 12 }}>—</span>
-                      )}
-                    </td>
-                    <td style={{ padding: "14px 16px" }}>
-                      <span style={{
-                        fontSize: 10, padding: "3px 8px",
-                        background: guest.invitation_type === "ceremony" ? "#faeeda" : "#e6f1fb",
-                        color: guest.invitation_type === "ceremony" ? "#854f0b" : "#185fa5",
-                        letterSpacing: "0.08em", textTransform: "uppercase"
-                      }}>
-                        {guest.invitation_type === "ceremony" ? "Pemberkatan" : "Full"}
-                      </span>
-                    </td>
-                    <td style={{ padding: "14px 16px" }}>
-                      <span style={{
-                        fontSize: 11, padding: "3px 10px",
-                        background: guest.rsvp === "confirmed" ? "#eaf3de"
-                          : guest.rsvp === "declined" ? "#fcebeb" : "#f5f0e8",
-                        color: guest.rsvp === "confirmed" ? "#3b6d11"
-                          : guest.rsvp === "declined" ? "#a32d2d" : "#888780"
-                      }}>
-                        {guest.rsvp}
-                      </span>
-                    </td>
-                    <td style={{ padding: "14px 16px" }}>
-                      <Link
-                        href={`/invitation-page/${guest.code}`}
-                        style={{ fontSize: 12, color: "#b8965a", textDecoration: "none" }}
-                      >
-                        View →
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-                {(!guests || guests.length === 0) && (
-                  <tr>
-                    <td colSpan={9} style={{
-                      padding: "40px", textAlign: "center",
-                      color: "#888780", fontSize: 13
-                    }}>
-                      No guests yet. Add your first guest above.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <GuestTable
+          guests={guests ?? []}
+          wedding={{
+            partner1: wedding.partner1,
+            partner2: wedding.partner2,
+            date: wedding.date,
+            venue: wedding.venue,
+          }}
+        />
 
       </div>
     </div>
