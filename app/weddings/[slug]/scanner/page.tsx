@@ -2,6 +2,37 @@
 import { useEffect, useRef, useState, use } from "react"
 import { supabase } from "../../../lib/supabase"
 import Link from "next/link"
+import jsQR from "jsqr"
+
+type ScanMode = "ceremony" | "reception"
+
+interface Guest {
+  id: string
+  name: string
+  greeting: string
+  code: string
+  rsvp: string
+  ceremony_rsvp: string
+  ceremony_adults: number
+  ceremony_kids: number
+  reception_rsvp: string
+  reception_adults: number
+  reception_kids: number
+  table_number: string | null
+  note: string | null
+  scanned: boolean
+  actual_attendees: number
+  max_attendees: number
+  invitation_type: string
+  weddings?: { partner1: string; partner2: string; slug: string }
+}
+
+interface Wedding {
+  id: string
+  partner1: string
+  partner2: string
+  slug: string
+}
 
 export default function WeddingScannerPage({
   params,
@@ -13,18 +44,29 @@ export default function WeddingScannerPage({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [scanning, setScanning] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [guest, setGuest] = useState<any>(null)
-  const [wedding, setWedding] = useState<any>(null)
+  const [guest, setGuest] = useState<Guest | null>(null)
+  const [wedding, setWedding] = useState<Wedding | null>(null)
   const [error, setError] = useState("")
   const [confirming, setConfirming] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
   const [nameSearch, setNameSearch] = useState("")
-  const [nameResults, setNameResults] = useState<any[]>([])
-  const intervalRef = useRef<any>(null)
+  const [nameResults, setNameResults] = useState<Guest[]>([])
+  const [mode, setMode] = useState<ScanMode>("ceremony")
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  function stopCamera() {
+    if (videoRef.current?.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream
+      stream.getTracks().forEach(t => t.stop())
+      videoRef.current.srcObject = null
+    }
+    if (intervalRef.current) clearInterval(intervalRef.current)
+    setScanning(false)
+  }
 
   useEffect(() => {
     supabase.from("weddings").select("*").eq("slug", slug).single()
-      .then(({ data }) => setWedding(data))
+      .then(({ data }) => setWedding(data as Wedding))
     return () => stopCamera()
   }, [slug])
 
@@ -39,23 +81,12 @@ export default function WeddingScannerPage({
         setScanning(true)
         startScanning()
       }
-    } catch (e) {
+    } catch {
       setError("Camera permission denied.")
     }
   }
 
-  function stopCamera() {
-    if (videoRef.current?.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream
-      stream.getTracks().forEach(t => t.stop())
-      videoRef.current.srcObject = null
-    }
-    if (intervalRef.current) clearInterval(intervalRef.current)
-    setScanning(false)
-  }
-
   function startScanning() {
-    const jsQR = require("jsqr")
     intervalRef.current = setInterval(() => {
       if (!videoRef.current || !canvasRef.current) return
       const video = videoRef.current
@@ -68,7 +99,7 @@ export default function WeddingScannerPage({
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
       const code = jsQR(imageData.data, imageData.width, imageData.height)
       if (code?.data) {
-        clearInterval(intervalRef.current)
+        if (intervalRef.current) clearInterval(intervalRef.current)
         stopCamera()
         lookupGuest(code.data)
       }
@@ -80,42 +111,30 @@ export default function WeddingScannerPage({
     setError("")
     setGuest(null)
     setConfirmed(false)
-    const { data, error } = await supabase
+    const { data, error: err } = await supabase
       .from("guests")
       .select("*, weddings(partner1, partner2, slug)")
       .eq("code", code)
       .single()
     setLoading(false)
-    if (error || !data) {
+    if (err || !data) {
       setError(`No guest found for code: ${code}`)
       return
     }
-    if (data.weddings?.slug !== slug) {
+    const g = data as Guest
+    if (g.weddings?.slug !== slug) {
       setError(`This QR belongs to a different wedding.`)
       return
     }
-    setGuest(data)
+    setGuest(g)
   }
 
   async function confirmPresence() {
     if (!guest) return
     setConfirming(true)
-    await supabase
-      .from("guests")
-      .update({ scanned: true })
-      .eq("code", guest.code)
+    await supabase.from("guests").update({ scanned: true }).eq("code", guest.code)
     setConfirming(false)
     setConfirmed(true)
-  }
-
-  async function updateAttendees(value: number) {
-    if (!guest) return
-    const newVal = Math.min(Math.max(1, value), guest.max_attendees ?? 1)
-    await supabase
-      .from("guests")
-      .update({ actual_attendees: newVal })
-      .eq("code", guest.code)
-    setGuest({ ...guest, actual_attendees: newVal })
   }
 
   function resetScanner() {
@@ -134,12 +153,28 @@ export default function WeddingScannerPage({
     if (!wedding) return
     const { data } = await supabase
       .from("guests")
-      .select("id, name, greeting, code, rsvp, table_number, note, scanned, actual_attendees, max_attendees")
+      .select("*")
       .eq("wedding_id", wedding.id)
       .ilike("name", `%${value}%`)
       .limit(5)
-    setNameResults(data ?? [])
+    setNameResults((data ?? []) as Guest[])
   }
+
+  const isConfirmedForMode = guest
+    ? mode === "ceremony" ? guest.ceremony_rsvp === "confirmed" : guest.reception_rsvp === "confirmed"
+    : false
+
+  const adultsForMode = guest
+    ? mode === "ceremony" ? guest.ceremony_adults : guest.reception_adults
+    : 0
+
+  const kidsForMode = guest
+    ? mode === "ceremony" ? guest.ceremony_kids : guest.reception_kids
+    : 0
+
+  const wrongType = guest
+    ? mode === "reception" && guest.invitation_type === "ceremony"
+    : false
 
   const rowStyle = {
     display: "flex", justifyContent: "space-between",
@@ -168,15 +203,44 @@ export default function WeddingScannerPage({
         }}>
           ← Dashboard
         </Link>
-        <p style={{
-          color: "#e8d5a3", fontSize: 11,
-          letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 6
-        }}>
+        <p style={{ color: "#e8d5a3", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 6 }}>
           {wedding?.partner1} & {wedding?.partner2}
         </p>
         <h1 style={{ color: "#fff", fontSize: 24, fontWeight: 300 }}>
           Guest Scanner
         </h1>
+      </div>
+
+      {/* Mode Toggle */}
+      <div style={{ display: "flex", borderBottom: "1px solid #444441" }}>
+        <button
+          onClick={() => { setMode("ceremony"); setGuest(null); setError(""); setConfirmed(false) }}
+          style={{
+            flex: 1, padding: "14px",
+            background: mode === "ceremony" ? "#535A36" : "transparent",
+            color: mode === "ceremony" ? "#fff" : "#888780",
+            border: "none", borderRight: "1px solid #444441",
+            fontFamily: "inherit", fontSize: 12,
+            letterSpacing: "0.12em", textTransform: "uppercase",
+            cursor: "pointer", fontWeight: mode === "ceremony" ? 700 : 400
+          }}
+        >
+          Pemberkatan
+        </button>
+        <button
+          onClick={() => { setMode("reception"); setGuest(null); setError(""); setConfirmed(false) }}
+          style={{
+            flex: 1, padding: "14px",
+            background: mode === "reception" ? "#535A36" : "transparent",
+            color: mode === "reception" ? "#fff" : "#888780",
+            border: "none",
+            fontFamily: "inherit", fontSize: 12,
+            letterSpacing: "0.12em", textTransform: "uppercase",
+            cursor: "pointer", fontWeight: mode === "reception" ? 700 : 400
+          }}
+        >
+          Resepsi
+        </button>
       </div>
 
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "28px 24px" }}>
@@ -242,24 +306,19 @@ export default function WeddingScannerPage({
 
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
               <div style={{ flex: 1, height: 1, background: "#444441" }} />
-              <p style={{ color: "#888780", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-                Or search manually
-              </p>
+              <p style={{ color: "#888780", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" }}>Or search manually</p>
               <div style={{ flex: 1, height: 1, background: "#444441" }} />
             </div>
 
             <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-              <input id="manual-code" type="text" placeholder="Enter code e.g. INV-AB1234"
+              <input id="manual-code" type="text" placeholder="INV-XXXXXX"
                 style={{
                   flex: 1, background: "#1a1a18", border: "1px solid #444441",
                   color: "#fff", padding: "10px 12px", fontSize: 13,
-                  fontFamily: "monospace", outline: "none"
+                  fontFamily: "monospace", outline: "none", textTransform: "uppercase"
                 }}
                 onKeyDown={e => {
-                  if (e.key === "Enter") {
-                    const input = e.currentTarget
-                    if (input.value) lookupGuest(input.value.trim().toUpperCase())
-                  }
+                  if (e.key === "Enter") lookupGuest(e.currentTarget.value.trim().toUpperCase())
                 }}
               />
               <button onClick={() => {
@@ -286,10 +345,7 @@ export default function WeddingScannerPage({
                 }}
               />
               {nameResults.length > 0 && (
-                <div style={{
-                  background: "#1a1a18", border: "1px solid #444441",
-                  borderTop: "none", maxHeight: 220, overflowY: "auto"
-                }}>
+                <div style={{ background: "#1a1a18", border: "1px solid #444441", borderTop: "none", maxHeight: 220, overflowY: "auto" }}>
                   {nameResults.map(g => (
                     <div key={g.id}
                       onClick={() => { setNameSearch(""); setNameResults([]); lookupGuest(g.code) }}
@@ -298,17 +354,12 @@ export default function WeddingScannerPage({
                         borderBottom: "1px solid #2c2c2a",
                         display: "flex", justifyContent: "space-between", alignItems: "center"
                       }}
-                      onMouseEnter={e => (e.currentTarget.style.background = "#2c2c2a")}
-                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                     >
                       <div>
                         <p style={{ color: "#fff", fontSize: 13, marginBottom: 2 }}>{g.name}</p>
                         <p style={{ color: "#888780", fontSize: 11 }}>{g.greeting}</p>
                       </div>
-                      <span style={{
-                        fontFamily: "monospace", fontSize: 10, color: "#b8965a",
-                        background: "#2c2c2a", padding: "2px 8px", border: "1px solid #444441"
-                      }}>
+                      <span style={{ fontFamily: "monospace", fontSize: 10, color: "#b8965a", background: "#2c2c2a", padding: "2px 8px", border: "1px solid #444441" }}>
                         {g.code}
                       </span>
                     </div>
@@ -326,10 +377,7 @@ export default function WeddingScannerPage({
         )}
 
         {error && (
-          <div style={{
-            background: "#3d1f1f", border: "1px solid #a32d2d",
-            padding: "24px", textAlign: "center", marginBottom: 16
-          }}>
+          <div style={{ background: "#3d1f1f", border: "1px solid #a32d2d", padding: "24px", textAlign: "center", marginBottom: 16 }}>
             <p style={{ color: "#f09595", fontSize: 14, marginBottom: 16 }}>{error}</p>
             <button onClick={resetScanner} style={{
               background: "transparent", color: "#888780",
@@ -346,18 +394,20 @@ export default function WeddingScannerPage({
           <div>
             <div style={{
               background: "#1a1a18",
-              border: `1px solid ${confirmed ? "#3b6d11" : guest.scanned ? "#854f0b" : guest.rsvp === "confirmed" ? "#b8965a" : "#a32d2d"}`,
+              border: `1px solid ${confirmed ? "#3b6d11" : wrongType ? "#a32d2d" : !isConfirmedForMode ? "#a32d2d" : guest.scanned ? "#854f0b" : "#b8965a"}`,
               padding: "28px 24px", marginBottom: 14
             }}>
               <div style={{ marginBottom: 18, textAlign: "center" }}>
                 {confirmed ? (
                   <span style={{ background: "#1a3d1a", color: "#97c459", fontSize: 10, padding: "4px 14px", letterSpacing: "0.15em", textTransform: "uppercase" }}>✓ Checked In</span>
+                ) : wrongType ? (
+                  <span style={{ background: "#3d1f1f", color: "#f09595", fontSize: 10, padding: "4px 14px", letterSpacing: "0.15em", textTransform: "uppercase" }}>Pemberkatan Saja</span>
+                ) : !isConfirmedForMode ? (
+                  <span style={{ background: "#3d1f1f", color: "#f09595", fontSize: 10, padding: "4px 14px", letterSpacing: "0.15em", textTransform: "uppercase" }}>Belum Konfirmasi {mode === "ceremony" ? "Pemberkatan" : "Resepsi"}</span>
                 ) : guest.scanned ? (
                   <span style={{ background: "#3d2a1a", color: "#ef9f27", fontSize: 10, padding: "4px 14px", letterSpacing: "0.15em", textTransform: "uppercase" }}>⚠ Already Scanned</span>
-                ) : guest.rsvp === "confirmed" ? (
-                  <span style={{ background: "#1a2a3d", color: "#85b7eb", fontSize: 10, padding: "4px 14px", letterSpacing: "0.15em", textTransform: "uppercase" }}>RSVP Confirmed</span>
                 ) : (
-                  <span style={{ background: "#3d1f1f", color: "#f09595", fontSize: 10, padding: "4px 14px", letterSpacing: "0.15em", textTransform: "uppercase" }}>Not Confirmed</span>
+                  <span style={{ background: "#1a2a3d", color: "#85b7eb", fontSize: 10, padding: "4px 14px", letterSpacing: "0.15em", textTransform: "uppercase" }}>Siap Check-in</span>
                 )}
               </div>
 
@@ -368,44 +418,20 @@ export default function WeddingScannerPage({
 
               <div>
                 <div style={rowStyle}>
+                  <span style={labelStyle}>Tipe Undangan</span>
+                  <span style={valueStyle}>{guest.invitation_type === "ceremony" ? "Pemberkatan Saja" : "Full"}</span>
+                </div>
+                <div style={rowStyle}>
                   <span style={labelStyle}>Table</span>
                   <span style={valueStyle}>{guest.table_number ?? "—"}</span>
                 </div>
                 <div style={rowStyle}>
-                  <span style={labelStyle}>Max allowed</span>
-                  <span style={valueStyle}>{guest.max_attendees ?? 1}</span>
+                  <span style={labelStyle}>Dewasa</span>
+                  <span style={{ ...valueStyle, color: "#b8965a" }}>{adultsForMode}</span>
                 </div>
                 <div style={{ ...rowStyle, borderBottom: "none" }}>
-                  <span style={labelStyle}>Attending</span>
-                  {!confirmed && !guest.scanned && guest.rsvp === "confirmed" ? (
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      <button onClick={() => updateAttendees((guest.actual_attendees ?? 1) - 1)}
-                        style={{
-                          width: 28, height: 28, background: "transparent",
-                          border: "1px solid #444441", color: "#888780", fontSize: 18,
-                          cursor: (guest.actual_attendees ?? 1) <= 1 ? "not-allowed" : "pointer",
-                          opacity: (guest.actual_attendees ?? 1) <= 1 ? 0.3 : 1,
-                          fontFamily: "inherit", display: "flex",
-                          alignItems: "center", justifyContent: "center"
-                        }}>−</button>
-                      <span style={{ color: "#b8965a", fontSize: 22, fontWeight: 300, minWidth: 24, textAlign: "center" }}>
-                        {guest.actual_attendees ?? 1}
-                      </span>
-                      <button onClick={() => updateAttendees((guest.actual_attendees ?? 1) + 1)}
-                        style={{
-                          width: 28, height: 28, background: "transparent",
-                          border: "1px solid #444441", color: "#888780", fontSize: 18,
-                          cursor: (guest.actual_attendees ?? 1) >= (guest.max_attendees ?? 1) ? "not-allowed" : "pointer",
-                          opacity: (guest.actual_attendees ?? 1) >= (guest.max_attendees ?? 1) ? 0.3 : 1,
-                          fontFamily: "inherit", display: "flex",
-                          alignItems: "center", justifyContent: "center"
-                        }}>+</button>
-                    </div>
-                  ) : (
-                    <span style={{ ...valueStyle, color: "#b8965a" }}>
-                      {guest.actual_attendees ?? 1} {(guest.actual_attendees ?? 1) === 1 ? "person" : "people"}
-                    </span>
-                  )}
+                  <span style={labelStyle}>Anak</span>
+                  <span style={{ ...valueStyle, color: "#b8965a" }}>{kidsForMode}</span>
                 </div>
               </div>
 
@@ -416,7 +442,7 @@ export default function WeddingScannerPage({
               )}
             </div>
 
-            {!confirmed && !guest.scanned && guest.rsvp === "confirmed" && (
+            {!confirmed && !wrongType && isConfirmedForMode && !guest.scanned && (
               <button onClick={confirmPresence} disabled={confirming} style={{
                 width: "100%", background: "#3b6d11", color: "#fff",
                 border: "none", padding: "15px", fontSize: 12,
@@ -425,26 +451,32 @@ export default function WeddingScannerPage({
                 opacity: confirming ? 0.7 : 1,
                 fontFamily: "inherit", marginBottom: 10
               }}>
-                {confirming ? "Confirming..." : `✓ Confirm · ${guest.actual_attendees ?? 1} ${(guest.actual_attendees ?? 1) === 1 ? "person" : "people"}`}
+                {confirming ? "Confirming..." : `✓ Check-in · ${adultsForMode} Dewasa${kidsForMode > 0 ? ` · ${kidsForMode} Anak` : ""}`}
               </button>
             )}
 
             {confirmed && (
               <div style={{ background: "#1a3d1a", border: "1px solid #3b6d11", padding: "16px", textAlign: "center", marginBottom: 10 }}>
                 <p style={{ color: "#97c459", fontSize: 14, marginBottom: 4 }}>✓ Guest successfully checked in</p>
-                <p style={{ color: "#3b6d11", fontSize: 12 }}>{guest.actual_attendees ?? 1} {(guest.actual_attendees ?? 1) === 1 ? "person" : "people"} admitted</p>
+                <p style={{ color: "#3b6d11", fontSize: 12 }}>{adultsForMode} Dewasa{kidsForMode > 0 ? ` · ${kidsForMode} Anak` : ""}</p>
               </div>
             )}
 
             {guest.scanned && !confirmed && (
               <div style={{ background: "#3d2a1a", border: "1px solid #854f0b", padding: "16px", textAlign: "center", marginBottom: 10 }}>
-                <p style={{ color: "#ef9f27", fontSize: 13 }}>This guest was already scanned. Please verify their identity.</p>
+                <p style={{ color: "#ef9f27", fontSize: 13 }}>Tamu ini sudah di-scan sebelumnya. Verifikasi identitas.</p>
               </div>
             )}
 
-            {guest.rsvp !== "confirmed" && (
+            {wrongType && (
               <div style={{ background: "#3d1f1f", border: "1px solid #a32d2d", padding: "16px", textAlign: "center", marginBottom: 10 }}>
-                <p style={{ color: "#f09595", fontSize: 13 }}>Guest has not confirmed RSVP. Check with coordinator.</p>
+                <p style={{ color: "#f09595", fontSize: 13 }}>Tamu ini hanya diundang ke Pemberkatan, bukan Resepsi.</p>
+              </div>
+            )}
+
+            {!isConfirmedForMode && !wrongType && (
+              <div style={{ background: "#3d1f1f", border: "1px solid #a32d2d", padding: "16px", textAlign: "center", marginBottom: 10 }}>
+                <p style={{ color: "#f09595", fontSize: 13 }}>Tamu belum konfirmasi kehadiran untuk {mode === "ceremony" ? "Pemberkatan" : "Resepsi"}.</p>
               </div>
             )}
 
@@ -458,7 +490,6 @@ export default function WeddingScannerPage({
             </button>
           </div>
         )}
-
       </div>
     </div>
   )

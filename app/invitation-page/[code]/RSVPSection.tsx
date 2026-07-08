@@ -90,13 +90,13 @@ export default function RSVPSection({ guestCode, guestGreeting, isCeremonyOnly, 
   receptionRsvp: string; receptionAdults: number; receptionKids: number; lang?: Lang
 }) {
   const tr = t[lang]
-  const [showQR, setShowQR] = useState(false)
 
   // Track confirmed state from DB saves
   const [cConfirmed, setCConfirmed] = useState(ceremonyRsvp === "confirmed")
   const [rConfirmed, setRConfirmed] = useState(receptionRsvp === "confirmed")
 
   const hasConfirmed = cConfirmed || (!isCeremonyOnly && rConfirmed)
+  const [showQR, setShowQR] = useState(hasConfirmed)
 
   return (
     <div style={{ width: "100%" }}>
