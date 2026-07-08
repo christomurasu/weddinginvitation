@@ -1,579 +1,260 @@
 "use client"
-import { useEffect, useRef, useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { supabase } from "../lib/supabase"
+import Link from "next/link"
 
-export default function ScannerPage() {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+type ScanMode = "ceremony" | "reception"
+
+interface ScanResult {
+  status: "success" | "already_scanned" | "not_confirmed" | "not_found" | "wrong_type"
+  guest?: {
+    name: string
+    invitation_type: string
+    ceremony_rsvp: string
+    ceremony_adults: number
+    ceremony_kids: number
+    reception_rsvp: string
+    reception_adults: number
+    reception_kids: number
+    scanned: boolean
+  }
+}
+
+export default function ScannerPage({ params }: { params: { slug: string } }) {
+  const [mode, setMode] = useState<ScanMode>("ceremony")
   const [scanning, setScanning] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [guest, setGuest] = useState<any>(null)
-  const [error, setError] = useState("")
-  const [confirming, setConfirming] = useState(false)
-  const [confirmed, setConfirmed] = useState(false)
-  const [nameSearch, setNameSearch] = useState("")
-  const [nameResults, setNameResults] = useState<any[]>([])
-  const intervalRef = useRef<any>(null)
-
-  async function startCamera() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" }
-      })
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        videoRef.current.play()
-        setScanning(true)
-        startScanning()
-      }
-    } catch (e) {
-      setError("Camera permission denied. Please allow camera access.")
-    }
-  }
-
-  function stopCamera() {
-    if (videoRef.current?.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream
-      stream.getTracks().forEach(t => t.stop())
-      videoRef.current.srcObject = null
-    }
-    if (intervalRef.current) clearInterval(intervalRef.current)
-    setScanning(false)
-  }
-
-  function startScanning() {
-    const jsQR = require("jsqr")
-    intervalRef.current = setInterval(() => {
-      if (!videoRef.current || !canvasRef.current) return
-      const video = videoRef.current
-      const canvas = canvasRef.current
-      const ctx = canvas.getContext("2d")
-      if (!ctx || video.readyState !== video.HAVE_ENOUGH_DATA) return
-      canvas.width = video.videoWidth
-      canvas.height = video.videoHeight
-      ctx.drawImage(video, 0, 0)
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-      const code = jsQR(imageData.data, imageData.width, imageData.height)
-      if (code?.data) {
-        clearInterval(intervalRef.current)
-        stopCamera()
-        lookupGuest(code.data)
-      }
-    }, 300)
-  }
-
-  async function lookupGuest(code: string) {
-    setLoading(true)
-    setError("")
-    setGuest(null)
-    setConfirmed(false)
-    const { data, error } = await supabase
-      .from("guests")
-      .select("*, weddings(partner1, partner2)")
-      .eq("code", code)
-      .single()
-    setLoading(false)
-    if (error || !data) {
-      setError(`No guest found for code: ${code}`)
-      return
-    }
-    setGuest(data)
-  }
-
-  async function confirmPresence() {
-    if (!guest) return
-    setConfirming(true)
-    await supabase
-      .from("guests")
-      .update({ scanned: true })
-      .eq("code", guest.code)
-    setConfirming(false)
-    setConfirmed(true)
-  }
-
-  async function updateAttendees(value: number) {
-    if (!guest) return
-    const newVal = Math.min(Math.max(1, value), guest.max_attendees ?? 1)
-    await supabase
-      .from("guests")
-      .update({ actual_attendees: newVal })
-      .eq("code", guest.code)
-    setGuest({ ...guest, actual_attendees: newVal })
-  }
-
-  function resetScanner() {
-    setGuest(null)
-    setError("")
-    setConfirmed(false)
-    setScanning(false)
-    setNameSearch("")
-    setNameResults([])
-    setTimeout(() => startCamera(), 500)
-  }
-
-  async function handleNameSearch(value: string) {
-    setNameSearch(value)
-    if (value.trim().length < 2) {
-      setNameResults([])
-      return
-    }
-    const { data } = await supabase
-      .from("guests")
-      .select("id, name, greeting, code, rsvp, table_number, seats, note, scanned, actual_attendees, max_attendees")
-      .ilike("name", `%${value}%`)
-      .limit(5)
-    setNameResults(data ?? [])
-  }
+  const [result, setResult] = useState<ScanResult | null>(null)
+  const [manualCode, setManualCode] = useState("")
+  const [processing, setProcessing] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    return () => stopCamera()
-  }, [])
+    if (scanning && inputRef.current) inputRef.current.focus()
+  }, [scanning])
 
-  const rowStyle = {
-    display: "flex", justifyContent: "space-between",
-    alignItems: "center", padding: "10px 0",
-    borderBottom: "1px solid #2c2c2a"
+  async function processCode(code: string) {
+    if (!code.trim() || processing) return
+    setProcessing(true)
+    setResult(null)
+
+    const { data: guest } = await supabase
+      .from("guests")
+      .select("*")
+      .eq("code", code.trim().toUpperCase())
+      .single()
+
+    if (!guest) {
+      setResult({ status: "not_found" })
+      setProcessing(false)
+      setManualCode("")
+      return
+    }
+
+    if (mode === "ceremony") {
+      if (guest.invitation_type === "reception_only") {
+        setResult({ status: "wrong_type", guest })
+      } else if (guest.ceremony_rsvp !== "confirmed") {
+        setResult({ status: "not_confirmed", guest })
+      } else if (guest.scanned) {
+        setResult({ status: "already_scanned", guest })
+      } else {
+        await supabase.from("guests").update({ scanned: true }).eq("code", code.trim().toUpperCase())
+        setResult({ status: "success", guest: { ...guest, scanned: true } })
+      }
+    } else {
+      if (guest.invitation_type === "ceremony") {
+        setResult({ status: "wrong_type", guest })
+      } else if (guest.reception_rsvp !== "confirmed") {
+        setResult({ status: "not_confirmed", guest })
+      } else {
+        await supabase.from("guests").update({ scanned: true }).eq("code", code.trim().toUpperCase())
+        setResult({ status: "success", guest: { ...guest, scanned: true } })
+      }
+    }
+
+    setProcessing(false)
+    setManualCode("")
   }
-  const labelStyle = {
-    fontSize: 10, letterSpacing: "0.15em",
-    textTransform: "uppercase" as const, color: "#444441"
+
+  function handleManualSubmit() {
+    processCode(manualCode)
   }
-  const valueStyle = {
-    fontSize: 14, color: "#fff", fontWeight: 300
+
+  function handleReset() {
+    setResult(null)
+    setManualCode("")
+    if (inputRef.current) inputRef.current.focus()
+  }
+
+  const resultColor = {
+    success: "#3b6d11",
+    already_scanned: "#b8965a",
+    not_confirmed: "#a32d2d",
+    not_found: "#a32d2d",
+    wrong_type: "#a32d2d",
+  }
+
+  const resultMessage = {
+    success: "✓ Check-in Berhasil",
+    already_scanned: "⚠ Sudah Di-scan Sebelumnya",
+    not_confirmed: "✗ Belum Konfirmasi Kehadiran",
+    not_found: "✗ Kode Tidak Ditemukan",
+    wrong_type: "✗ Tipe Undangan Tidak Sesuai",
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#2c2c2a" }}>
+    <div style={{ minHeight: "100dvh", background: "#faf7f2", display: "flex", flexDirection: "column" }}>
 
       {/* Header */}
-      <div style={{
-        padding: "32px 24px", textAlign: "center",
-        borderBottom: "1px solid #444441"
-      }}>
-        <p style={{
-          color: "#e8d5a3", fontSize: 11,
-          letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 8
-        }}>
-          Wedding Day
+      <div style={{ background: "#2c2c2a", padding: "20px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Link href={`/weddings/${params.slug}/dashboard`} style={{ color: "#888780", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", textDecoration: "none" }}>
+          ← Dashboard
+        </Link>
+        <p style={{ color: "#e8d5a3", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+          Scanner
         </p>
-        <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 300 }}>
-          Guest Scanner
-        </h1>
+        <div style={{ width: 80 }} />
       </div>
 
-      <div style={{ maxWidth: 480, margin: "0 auto", padding: "32px 24px" }}>
+      {/* Mode Toggle */}
+      <div style={{ display: "flex", margin: "24px 24px 0" }}>
+        <button
+          onClick={() => { setMode("ceremony"); setResult(null) }}
+          style={{
+            flex: 1, padding: "14px",
+            background: mode === "ceremony" ? "#535A36" : "#fff",
+            color: mode === "ceremony" ? "#fff" : "#888780",
+            border: "1px solid #e4ddd0", borderRight: "none",
+            fontFamily: "inherit", fontSize: 12,
+            letterSpacing: "0.12em", textTransform: "uppercase",
+            cursor: "pointer", fontWeight: mode === "ceremony" ? 700 : 400
+          }}
+        >
+          Pemberkatan
+        </button>
+        <button
+          onClick={() => { setMode("reception"); setResult(null) }}
+          style={{
+            flex: 1, padding: "14px",
+            background: mode === "reception" ? "#535A36" : "#fff",
+            color: mode === "reception" ? "#fff" : "#888780",
+            border: "1px solid #e4ddd0",
+            fontFamily: "inherit", fontSize: 12,
+            letterSpacing: "0.12em", textTransform: "uppercase",
+            cursor: "pointer", fontWeight: mode === "reception" ? 700 : 400
+          }}
+        >
+          Resepsi
+        </button>
+      </div>
 
-        {/* Camera + search */}
-        {!guest && !loading && (
-          <div>
-            {/* Camera box */}
-            <div style={{
-              background: "#1a1a18", border: "1px solid #444441",
-              aspectRatio: "1", display: "flex",
-              alignItems: "center", justifyContent: "center",
-              marginBottom: 16, position: "relative", overflow: "hidden"
-            }}>
-              <video
-                ref={videoRef}
-                style={{
-                  width: "100%", height: "100%",
-                  objectFit: "cover",
-                  display: scanning ? "block" : "none"
-                }}
-                playsInline muted
-              />
-              <canvas ref={canvasRef} style={{ display: "none" }} />
+      <div style={{ padding: "24px", flex: 1, display: "flex", flexDirection: "column", gap: 16 }}>
 
-              {scanning && (
-                <div style={{
-                  position: "absolute",
-                  top: "50%", left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: 200, height: 200,
-                  border: "2px solid #b8965a",
-                  pointerEvents: "none"
-                }}>
-                  {[
-                    { top: -2, left: -2, borderWidth: "3px 0 0 3px" },
-                    { top: -2, right: -2, borderWidth: "3px 3px 0 0" },
-                    { bottom: -2, left: -2, borderWidth: "0 0 3px 3px" },
-                    { bottom: -2, right: -2, borderWidth: "0 3px 3px 0" },
-                  ].map((corner, i) => (
-                    <div key={i} style={{
-                      position: "absolute", width: 20, height: 20,
-                      borderColor: "#b8965a", borderStyle: "solid", ...corner
-                    }} />
-                  ))}
-                </div>
-              )}
-
-              {!scanning && (
-                <div style={{ textAlign: "center" }}>
-                  <p style={{ color: "#444441", fontSize: 48, lineHeight: 1, marginBottom: 8 }}>◻</p>
-                  <p style={{ color: "#888780", fontSize: 12, letterSpacing: "0.1em" }}>
-                    Camera inactive
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {!scanning ? (
-              <button onClick={startCamera} style={{
-                width: "100%", background: "#b8965a", color: "#fff",
-                border: "none", padding: "14px", fontSize: 11,
-                letterSpacing: "0.2em", textTransform: "uppercase",
-                cursor: "pointer", fontFamily: "inherit", marginBottom: 20
-              }}>
-                Start Camera
-              </button>
-            ) : (
-              <button onClick={stopCamera} style={{
-                width: "100%", background: "transparent", color: "#888780",
-                border: "1px solid #444441", padding: "14px", fontSize: 11,
-                letterSpacing: "0.2em", textTransform: "uppercase",
-                cursor: "pointer", fontFamily: "inherit", marginBottom: 20
-              }}>
-                Stop Camera
-              </button>
-            )}
-
-            {/* Divider */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-              <div style={{ flex: 1, height: 1, background: "#444441" }} />
-              <p style={{ color: "#888780", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-                Or search manually
-              </p>
-              <div style={{ flex: 1, height: 1, background: "#444441" }} />
-            </div>
-
-            {/* Code input */}
-            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-              <input
-                id="manual-code"
-                type="text"
-                placeholder="Enter code e.g. INV-AB1234"
-                style={{
-                  flex: 1, background: "#1a1a18", border: "1px solid #444441",
-                  color: "#fff", padding: "10px 12px", fontSize: 13,
-                  fontFamily: "monospace", outline: "none"
-                }}
-                onKeyDown={e => {
-                  if (e.key === "Enter") {
-                    const input = e.currentTarget
-                    if (input.value) lookupGuest(input.value.trim().toUpperCase())
-                  }
-                }}
-              />
-              <button
-                onClick={() => {
-                  const input = document.getElementById("manual-code") as HTMLInputElement
-                  if (input?.value) lookupGuest(input.value.trim().toUpperCase())
-                }}
-                style={{
-                  background: "#2c2c2a", color: "#e8d5a3",
-                  border: "1px solid #444441", padding: "10px 20px",
-                  fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase",
-                  cursor: "pointer", fontFamily: "inherit"
-                }}
-              >
-                Check
-              </button>
-            </div>
-
-            {/* Name search */}
-            <div style={{ position: "relative" }}>
-              <input
-                type="text"
-                placeholder="Or search by guest name..."
-                value={nameSearch}
-                onChange={e => handleNameSearch(e.target.value)}
-                style={{
-                  width: "100%", background: "#1a1a18",
-                  border: "1px solid #444441", color: "#fff",
-                  padding: "10px 12px", fontSize: 13,
-                  outline: "none", fontFamily: "inherit"
-                }}
-              />
-              {nameResults.length > 0 && (
-                <div style={{
-                  background: "#1a1a18", border: "1px solid #444441",
-                  borderTop: "none", maxHeight: 220, overflowY: "auto"
-                }}>
-                  {nameResults.map(g => (
-                    <div
-                      key={g.id}
-                      onClick={() => {
-                        setNameSearch("")
-                        setNameResults([])
-                        lookupGuest(g.code)
-                      }}
-                      style={{
-                        padding: "12px 14px", cursor: "pointer",
-                        borderBottom: "1px solid #2c2c2a",
-                        display: "flex", justifyContent: "space-between",
-                        alignItems: "center"
-                      }}
-                      onMouseEnter={e => (e.currentTarget.style.background = "#2c2c2a")}
-                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-                    >
-                      <div>
-                        <p style={{ color: "#fff", fontSize: 13, marginBottom: 2 }}>{g.name}</p>
-                        <p style={{ color: "#888780", fontSize: 11 }}>{g.greeting}</p>
-                      </div>
-                      <div style={{ textAlign: "right" }}>
-                        <span style={{
-                          fontFamily: "monospace", fontSize: 10,
-                          color: "#b8965a", background: "#2c2c2a",
-                          padding: "2px 8px", border: "1px solid #444441",
-                          display: "block", marginBottom: 4
-                        }}>
-                          {g.code}
-                        </span>
-                        <span style={{
-                          fontSize: 9, padding: "2px 6px",
-                          background: g.rsvp === "confirmed" ? "#1a3d1a" : "#3d1f1f",
-                          color: g.rsvp === "confirmed" ? "#97c459" : "#f09595",
-                          letterSpacing: "0.1em", textTransform: "uppercase"
-                        }}>
-                          {g.rsvp}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Loading */}
-        {loading && (
-          <div style={{ textAlign: "center", padding: "60px 0" }}>
-            <p style={{ color: "#888780", fontSize: 12, letterSpacing: "0.1em" }}>
-              Looking up guest...
-            </p>
-          </div>
-        )}
-
-        {/* Error */}
-        {error && (
-          <div style={{
-            background: "#3d1f1f", border: "1px solid #a32d2d",
-            padding: "24px", textAlign: "center", marginBottom: 16
-          }}>
-            <p style={{ color: "#f09595", fontSize: 14, marginBottom: 16 }}>{error}</p>
-            <button onClick={resetScanner} style={{
-              background: "transparent", color: "#888780",
-              border: "1px solid #444441", padding: "10px 24px",
-              fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase",
-              cursor: "pointer", fontFamily: "inherit"
-            }}>
-              Try Again
-            </button>
-          </div>
-        )}
-
-        {/* Guest card */}
-        {guest && !loading && (
-          <div>
-            <div style={{
-              background: "#1a1a18",
-              border: `1px solid ${confirmed ? "#3b6d11" : guest.scanned ? "#854f0b" : guest.rsvp === "confirmed" ? "#b8965a" : "#a32d2d"}`,
-              padding: "28px 24px", marginBottom: 16
-            }}>
-
-              {/* Status badge */}
-              <div style={{ marginBottom: 20, textAlign: "center" }}>
-                {confirmed ? (
-                  <span style={{
-                    background: "#1a3d1a", color: "#97c459",
-                    fontSize: 10, padding: "4px 14px",
-                    letterSpacing: "0.15em", textTransform: "uppercase"
-                  }}>
-                    ✓ Checked In
-                  </span>
-                ) : guest.scanned ? (
-                  <span style={{
-                    background: "#3d2a1a", color: "#ef9f27",
-                    fontSize: 10, padding: "4px 14px",
-                    letterSpacing: "0.15em", textTransform: "uppercase"
-                  }}>
-                    ⚠ Already Scanned
-                  </span>
-                ) : guest.rsvp === "confirmed" ? (
-                  <span style={{
-                    background: "#1a2a3d", color: "#85b7eb",
-                    fontSize: 10, padding: "4px 14px",
-                    letterSpacing: "0.15em", textTransform: "uppercase"
-                  }}>
-                    RSVP Confirmed
-                  </span>
-                ) : (
-                  <span style={{
-                    background: "#3d1f1f", color: "#f09595",
-                    fontSize: 10, padding: "4px 14px",
-                    letterSpacing: "0.15em", textTransform: "uppercase"
-                  }}>
-                    Not Confirmed
-                  </span>
-                )}
-              </div>
-
-              {/* Name */}
-              <div style={{ textAlign: "center", marginBottom: 24 }}>
-                <p style={{
-                  color: "#e8d5a3", fontSize: 24,
-                  fontWeight: 300, marginBottom: 4
-                }}>
-                  {guest.name}
-                </p>
-                <p style={{ color: "#888780", fontSize: 12 }}>
-                  {guest.greeting}
-                </p>
-              </div>
-
-              {/* Details rows */}
-              <div style={{ marginBottom: 8 }}>
-                <div style={rowStyle}>
-                  <span style={labelStyle}>Table</span>
-                  <span style={valueStyle}>{guest.table_number ?? "—"}</span>
-                </div>
-                <div style={rowStyle}>
-                  <span style={labelStyle}>Max allowed</span>
-                  <span style={valueStyle}>{guest.max_attendees ?? 1}</span>
-                </div>
-                <div style={{ ...rowStyle, borderBottom: "none" }}>
-                  <span style={labelStyle}>Attending</span>
-                  {/* Attendee adjuster */}
-                  {!confirmed && !guest.scanned && guest.rsvp === "confirmed" ? (
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      <button
-                        onClick={() => updateAttendees((guest.actual_attendees ?? 1) - 1)}
-                        style={{
-                          width: 28, height: 28,
-                          background: "transparent",
-                          border: "1px solid #444441",
-                          color: "#888780", fontSize: 18,
-                          cursor: (guest.actual_attendees ?? 1) <= 1 ? "not-allowed" : "pointer",
-                          opacity: (guest.actual_attendees ?? 1) <= 1 ? 0.3 : 1,
-                          fontFamily: "inherit",
-                          display: "flex", alignItems: "center", justifyContent: "center"
-                        }}
-                      >
-                        −
-                      </button>
-                      <span style={{ color: "#b8965a", fontSize: 22, fontWeight: 300, minWidth: 24, textAlign: "center" }}>
-                        {guest.actual_attendees ?? 1}
-                      </span>
-                      <button
-                        onClick={() => updateAttendees((guest.actual_attendees ?? 1) + 1)}
-                        style={{
-                          width: 28, height: 28,
-                          background: "transparent",
-                          border: "1px solid #444441",
-                          color: "#888780", fontSize: 18,
-                          cursor: (guest.actual_attendees ?? 1) >= (guest.max_attendees ?? 1) ? "not-allowed" : "pointer",
-                          opacity: (guest.actual_attendees ?? 1) >= (guest.max_attendees ?? 1) ? 0.3 : 1,
-                          fontFamily: "inherit",
-                          display: "flex", alignItems: "center", justifyContent: "center"
-                        }}
-                      >
-                        +
-                      </button>
-                    </div>
-                  ) : (
-                    <span style={{ ...valueStyle, color: "#b8965a" }}>
-                      {guest.actual_attendees ?? 1} {(guest.actual_attendees ?? 1) === 1 ? "person" : "people"}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Personal note */}
-              {guest.note && (
-                <div style={{
-                  marginTop: 16, padding: "12px 14px",
-                  background: "#2c2c2a", borderLeft: "2px solid #b8965a"
-                }}>
-                  <p style={{ color: "#888780", fontSize: 11, fontStyle: "italic" }}>
-                    {guest.note}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Confirm button */}
-            {!confirmed && !guest.scanned && guest.rsvp === "confirmed" && (
-              <button
-                onClick={confirmPresence}
-                disabled={confirming}
-                style={{
-                  width: "100%", background: "#3b6d11", color: "#fff",
-                  border: "none", padding: "16px", fontSize: 12,
-                  letterSpacing: "0.2em", textTransform: "uppercase",
-                  cursor: confirming ? "not-allowed" : "pointer",
-                  opacity: confirming ? 0.7 : 1,
-                  fontFamily: "inherit", marginBottom: 10
-                }}
-              >
-                {confirming ? "Confirming..." : `✓ Confirm · ${guest.actual_attendees ?? 1} ${(guest.actual_attendees ?? 1) === 1 ? "person" : "people"}`}
-              </button>
-            )}
-
-            {/* Success */}
-            {confirmed && (
-              <div style={{
-                background: "#1a3d1a", border: "1px solid #3b6d11",
-                padding: "16px", textAlign: "center", marginBottom: 10
-              }}>
-                <p style={{ color: "#97c459", fontSize: 14, marginBottom: 4 }}>
-                  ✓ Guest successfully checked in
-                </p>
-                <p style={{ color: "#3b6d11", fontSize: 12 }}>
-                  {guest.actual_attendees ?? 1} {(guest.actual_attendees ?? 1) === 1 ? "person" : "people"} admitted
-                </p>
-              </div>
-            )}
-
-            {/* Already scanned */}
-            {guest.scanned && !confirmed && (
-              <div style={{
-                background: "#3d2a1a", border: "1px solid #854f0b",
-                padding: "16px", textAlign: "center", marginBottom: 10
-              }}>
-                <p style={{ color: "#ef9f27", fontSize: 13 }}>
-                  This guest was already scanned. Please verify their identity.
-                </p>
-              </div>
-            )}
-
-            {/* Not confirmed */}
-            {guest.rsvp !== "confirmed" && (
-              <div style={{
-                background: "#3d1f1f", border: "1px solid #a32d2d",
-                padding: "16px", textAlign: "center", marginBottom: 10
-              }}>
-                <p style={{ color: "#f09595", fontSize: 13 }}>
-                  Guest has not confirmed RSVP. Check with coordinator.
-                </p>
-              </div>
-            )}
-
-            {/* Scan next */}
-            <button
-              onClick={resetScanner}
+        {/* Manual Input */}
+        <div style={{ background: "#fff", border: "1px solid #e4ddd0", padding: "20px" }}>
+          <p style={{ fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "#888780", marginBottom: 12 }}>
+            Masukkan Kode Tamu
+          </p>
+          <div style={{ display: "flex", gap: 8 }}>
+            <input
+              ref={inputRef}
+              type="text"
+              value={manualCode}
+              onChange={e => setManualCode(e.target.value.toUpperCase())}
+              onKeyDown={e => e.key === "Enter" && handleManualSubmit()}
+              placeholder="INV-XXXXXX"
               style={{
-                width: "100%", background: "transparent", color: "#888780",
-                border: "1px solid #444441", padding: "13px", fontSize: 11,
-                letterSpacing: "0.2em", textTransform: "uppercase",
-                cursor: "pointer", fontFamily: "inherit"
+                flex: 1, border: "1px solid #e4ddd0",
+                padding: "10px 12px", fontSize: 14,
+                fontFamily: "monospace", color: "#2c2c2a",
+                background: "#fdf8ee", outline: "none",
+                letterSpacing: "0.1em", textTransform: "uppercase"
+              }}
+            />
+            <button
+              onClick={handleManualSubmit}
+              disabled={!manualCode.trim() || processing}
+              style={{
+                background: !manualCode.trim() || processing ? "#888780" : "#2c2c2a",
+                color: "#fff", border: "none",
+                padding: "10px 20px", fontSize: 11,
+                letterSpacing: "0.15em", textTransform: "uppercase",
+                cursor: !manualCode.trim() || processing ? "not-allowed" : "pointer",
+                fontFamily: "inherit"
               }}
             >
-              Scan Next Guest
+              {processing ? "..." : "Scan"}
+            </button>
+          </div>
+        </div>
+
+        {/* Result */}
+        {result && (
+          <div style={{
+            background: "#fff", border: `2px solid ${resultColor[result.status]}`,
+            padding: "24px"
+          }}>
+            <p style={{
+              fontSize: 18, fontWeight: 700,
+              color: resultColor[result.status],
+              marginBottom: 16, textAlign: "center"
+            }}>
+              {resultMessage[result.status]}
+            </p>
+
+            {result.guest && (
+              <div style={{ borderTop: "1px solid #f0ebe3", paddingTop: 16 }}>
+                <p style={{ fontSize: 16, fontWeight: 600, color: "#2c2c2a", marginBottom: 8 }}>
+                  {result.guest.name}
+                </p>
+
+                {result.status === "success" && mode === "ceremony" && (
+                  <div style={{ display: "flex", gap: 16, marginBottom: 8 }}>
+                    <div style={{ background: "#eaf3de", padding: "8px 16px", textAlign: "center", flex: 1 }}>
+                      <p style={{ fontSize: 24, fontWeight: 700, color: "#3b6d11" }}>{result.guest.ceremony_adults}</p>
+                      <p style={{ fontSize: 10, color: "#888780", textTransform: "uppercase", letterSpacing: "0.1em" }}>Dewasa</p>
+                    </div>
+                    <div style={{ background: "#eaf3de", padding: "8px 16px", textAlign: "center", flex: 1 }}>
+                      <p style={{ fontSize: 24, fontWeight: 700, color: "#3b6d11" }}>{result.guest.ceremony_kids}</p>
+                      <p style={{ fontSize: 10, color: "#888780", textTransform: "uppercase", letterSpacing: "0.1em" }}>Anak</p>
+                    </div>
+                  </div>
+                )}
+
+                {result.status === "success" && mode === "reception" && (
+                  <div style={{ display: "flex", gap: 16, marginBottom: 8 }}>
+                    <div style={{ background: "#eaf3de", padding: "8px 16px", textAlign: "center", flex: 1 }}>
+                      <p style={{ fontSize: 24, fontWeight: 700, color: "#3b6d11" }}>{result.guest.reception_adults}</p>
+                      <p style={{ fontSize: 10, color: "#888780", textTransform: "uppercase", letterSpacing: "0.1em" }}>Dewasa</p>
+                    </div>
+                    <div style={{ background: "#eaf3de", padding: "8px 16px", textAlign: "center", flex: 1 }}>
+                      <p style={{ fontSize: 24, fontWeight: 700, color: "#3b6d11" }}>{result.guest.reception_kids}</p>
+                      <p style={{ fontSize: 10, color: "#888780", textTransform: "uppercase", letterSpacing: "0.1em" }}>Anak</p>
+                    </div>
+                  </div>
+                )}
+
+                <p style={{ fontSize: 11, color: "#888780", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                  {result.guest.invitation_type === "ceremony" ? "Pemberkatan Saja" : "Pemberkatan + Resepsi"}
+                </p>
+              </div>
+            )}
+
+            <button
+              onClick={handleReset}
+              style={{
+                width: "100%", marginTop: 16,
+                background: "#2c2c2a", color: "#fff",
+                border: "none", padding: "12px",
+                fontFamily: "inherit", fontSize: 11,
+                letterSpacing: "0.15em", textTransform: "uppercase",
+                cursor: "pointer"
+              }}
+            >
+              Scan Berikutnya
             </button>
           </div>
         )}
-
       </div>
     </div>
   )

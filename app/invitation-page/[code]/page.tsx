@@ -36,7 +36,7 @@ export default async function InvitationPage({
 
   if (error || !guest) {
     return (
-      <div style={{ minHeight: "100vh", background: "#faf7f2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ minHeight: "100dvh", background: "#faf7f2", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center" }}>
           <p style={{ color: "#888780", fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase" }}>Invitation not found</p>
           <p style={{ color: "#b4b2a9", fontSize: 11, marginTop: 8 }}>{code}</p>
@@ -75,11 +75,11 @@ export default async function InvitationPage({
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
         :root { --vh: 1vh; }
-        html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-        body { background: ${bgStyle}; display: flex; justify-content: center; align-items: flex-start; }
-        #invitation-wrapper { width: 100%; max-width: 480px; height: calc(var(--vh, 1vh) * 100); overflow-y: scroll; scroll-snap-type: y mandatory; box-shadow: 0 0 60px rgba(0,0,0,0.3); position: relative; -webkit-overflow-scrolling: touch; }
-        .snap-section { scroll-snap-align: start; scroll-snap-stop: always; height: calc(var(--vh, 1vh) * 100); width: 100%; display: flex; flex-direction: column; position: relative; overflow: hidden; flex-shrink: 0; }
-        .snap-section-auto { scroll-snap-align: start; scroll-snap-stop: always; min-height: calc(var(--vh, 1vh) * 100); width: 100%; display: flex; flex-direction: column; position: relative; flex-shrink: 0; overflow-y: auto; }
+        html, body { margin: 0; padding: 0; height: 100dvh; overflow: hidden; }
+        body { background: ${bgStyle}; display: flex; justify-content: center; align-items: flex-start; min-height: 100dvh; }
+        #invitation-wrapper { width: 100%; max-width: 480px; height: 100dvh; overflow-y: scroll; scroll-snap-type: y mandatory; box-shadow: 0 0 60px rgba(0,0,0,0.3); position: relative; -webkit-overflow-scrolling: touch; }
+        .snap-section { scroll-snap-align: start; scroll-snap-stop: always; height: 100dvh; width: 100%; display: flex; flex-direction: column; position: relative; overflow: hidden; flex-shrink: 0; }
+        .snap-section-auto { scroll-snap-align: start; scroll-snap-stop: always; min-height: 100dvh; width: 100%; display: flex; flex-direction: column; position: relative; flex-shrink: 0; overflow-y: auto; }
       `}</style>
 
       <div id="invitation-wrapper">
