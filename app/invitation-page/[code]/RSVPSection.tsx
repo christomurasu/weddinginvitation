@@ -16,27 +16,24 @@ function Counter({ label, value, onChange, textColor, max }: {
         <button
           onClick={() => onChange(Math.max(0, value - 1))}
           style={{ width: 32, height: 32, background: "transparent", border: "none", borderRight: "1px solid rgba(0,0,0,0.1)", color: "#5F5F5F", fontSize: 16, cursor: "pointer" }}
-        >
-          −
-        </button>
+        >−</button>
         <p style={{ flex: 1, textAlign: "center", fontFamily: "'Poppins', sans-serif", fontSize: 14, color: "#5F5F5F" }}>
           {value}
         </p>
         <button
           onClick={() => { if (value < max) onChange(value + 1) }}
           style={{ width: 32, height: 32, background: "transparent", border: "none", borderLeft: "1px solid rgba(0,0,0,0.1)", color: "#5F5F5F", fontSize: 16, cursor: "pointer" }}
-        >
-          +
-        </button>
+        >+</button>
       </div>
     </div>
   )
 }
 
-function RSVPCard({ title, bgColor, titleColor, guestCode, field, maxAttendees, initialRsvp, initialAdults, initialKids, lang }: {
+function RSVPCard({ title, bgColor, titleColor, guestCode, field, maxAttendees, initialRsvp, initialAdults, initialKids, lang, onConfirmed }: {
   title: string; bgColor: string; titleColor: string; guestCode: string
   field: "ceremony" | "reception"; maxAttendees: number
   initialRsvp: string; initialAdults: number; initialKids: number; lang: Lang
+  onConfirmed: (confirmed: boolean) => void
 }) {
   const [rsvp, setRsvp] = useState(initialRsvp)
   const [adults, setAdults] = useState(initialAdults)
@@ -46,8 +43,13 @@ function RSVPCard({ title, bgColor, titleColor, guestCode, field, maxAttendees, 
 
   async function save(newRsvp: string, newAdults: number, newKids: number) {
     setSaving(true)
-    await supabase.from("guests").update({ [`${field}_rsvp`]: newRsvp, [`${field}_adults`]: newAdults, [`${field}_kids`]: newKids }).eq("code", guestCode)
+    await supabase.from("guests").update({
+      [`${field}_rsvp`]: newRsvp,
+      [`${field}_adults`]: newAdults,
+      [`${field}_kids`]: newKids,
+    }).eq("code", guestCode)
     setSaving(false)
+    onConfirmed(newRsvp === "confirmed")
   }
 
   function handleYes() {
@@ -89,7 +91,12 @@ export default function RSVPSection({ guestCode, guestGreeting, isCeremonyOnly, 
 }) {
   const tr = t[lang]
   const [showQR, setShowQR] = useState(false)
-  const hasConfirmed = ceremonyRsvp === "confirmed" || (!isCeremonyOnly && receptionRsvp === "confirmed")
+
+  // Track confirmed state from DB saves
+  const [cConfirmed, setCConfirmed] = useState(ceremonyRsvp === "confirmed")
+  const [rConfirmed, setRConfirmed] = useState(receptionRsvp === "confirmed")
+
+  const hasConfirmed = cConfirmed || (!isCeremonyOnly && rConfirmed)
 
   return (
     <div style={{ width: "100%" }}>
@@ -111,14 +118,14 @@ export default function RSVPSection({ guestCode, guestGreeting, isCeremonyOnly, 
             title={tr.holyMatrimony} bgColor="#f2d857" titleColor="#5F5F5F"
             guestCode={guestCode} field="ceremony" maxAttendees={maxAttendees}
             initialRsvp={ceremonyRsvp} initialAdults={ceremonyAdults} initialKids={ceremonyKids}
-            lang={lang}
+            lang={lang} onConfirmed={setCConfirmed}
           />
           {!isCeremonyOnly && (
             <RSVPCard
               title={tr.reception} bgColor="#c6294b" titleColor="#F4F1EA"
               guestCode={guestCode} field="reception" maxAttendees={maxAttendees}
               initialRsvp={receptionRsvp} initialAdults={receptionAdults} initialKids={receptionKids}
-              lang={lang}
+              lang={lang} onConfirmed={setRConfirmed}
             />
           )}
           {hasConfirmed && (
