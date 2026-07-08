@@ -14,37 +14,44 @@ function calcTimeLeft(targetDate: string) {
 }
 
 export default function CountdownBanner({ targetDate, lang = "en" }: { targetDate: string; lang?: Lang }) {
-  const [timeLeft, setTimeLeft] = useState<{ days: number; hours: number; minutes: number; seconds: number } | null>(null)
+  const [timeLeft, setTimeLeft] = useState(() => calcTimeLeft(targetDate))
 
   useEffect(() => {
     const timer = setInterval(() => setTimeLeft(calcTimeLeft(targetDate)), 1000)
     return () => clearInterval(timer)
   }, [targetDate])
 
-  if (!timeLeft) return null
-
   const tr = t[lang]
 
   return (
     <div style={{
       width: "100%",
-      height: "calc(var(--vh, 1vh) * 100 * 126 / 844)",
+      height: "calc(126dvh / 844 * 100)",
       marginTop: 24,
       background: "#535A36",
       display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center",
-      flexShrink: 0
+      flexShrink: 0,
+      overflow: "hidden",
+      padding: "0 12px"
     }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap');
         @font-face { font-family: 'Sloop'; src: url('/fonts/Sloop-ScriptThree.ttf') format('truetype'); }
       `}</style>
 
-      <p style={{ fontFamily: "'Sloop', cursive", fontWeight: 400, fontSize: 35, color: "#F4F1EA", textAlign: "center", marginBottom: 12 }}>
+      <p style={{
+        fontFamily: "'Sloop', cursive", fontWeight: 400,
+        fontSize: "clamp(18px, 4dvh, 35px)",
+        color: "#F4F1EA", textAlign: "center",
+        marginBottom: "clamp(6px, 1.2dvh, 12px)",
+        lineHeight: 1.2,
+        width: "100%"
+      }}>
         {tr.countingDays}
       </p>
 
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: "clamp(8px, 2dvh, 16px)" }}>
         {[
           { value: timeLeft.days,    label: tr.days },
           { value: timeLeft.hours,   label: tr.hours },
@@ -52,16 +59,28 @@ export default function CountdownBanner({ targetDate, lang = "en" }: { targetDat
           { value: timeLeft.seconds, label: tr.sec },
         ].map((item, i) => (
           <div key={item.label} style={{ display: "flex", alignItems: "flex-start" }}>
-            <div style={{ textAlign: "center", minWidth: 44 }}>
-              <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: 25, color: "#F4F1EA", lineHeight: 1 }}>
+            <div style={{ textAlign: "center", minWidth: "clamp(30px, 5dvh, 44px)" }}>
+              <p style={{
+                fontFamily: "'Poppins', sans-serif", fontWeight: 400,
+                fontSize: "clamp(14px, 3dvh, 25px)",
+                color: "#F4F1EA", lineHeight: 1, margin: 0
+              }}>
                 {String(item.value).padStart(2, "0")}
               </p>
-              <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: 11, color: "#F4F1EA", marginTop: 2 }}>
+              <p style={{
+                fontFamily: "'Poppins', sans-serif", fontWeight: 400,
+                fontSize: "clamp(8px, 1.2dvh, 11px)",
+                color: "#F4F1EA", marginTop: 2
+              }}>
                 {item.label}
               </p>
             </div>
             {i < 3 && (
-              <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: 25, color: "#F4F1EA", margin: "0 4px" }}>:</p>
+              <p style={{
+                fontFamily: "'Poppins', sans-serif", fontWeight: 400,
+                fontSize: "clamp(14px, 3dvh, 25px)",
+                color: "#F4F1EA", margin: "0 2px"
+              }}>:</p>
             )}
           </div>
         ))}

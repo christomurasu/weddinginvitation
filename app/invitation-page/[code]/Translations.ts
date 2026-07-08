@@ -41,7 +41,7 @@ export const t = {
     firstDaughterOf: "Putri dari",
     // CountdownBanner
     countingDays: "Menghitung hari menuju pernikahan",
-    days: "Hari", hours: "Jam", min: "Mnt", sec: "Dtk",
+    days: "Hari", hours: "Jam", min: "Menit", sec: "Detik",
     // Section labels
     holyMatrimony: "Pemberkatan Nikah",
     reception: "Resepsi",
