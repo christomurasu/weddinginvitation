@@ -145,8 +145,8 @@ export default async function InvitationPage({
               <div style={{ margin: "0 35px", aspectRatio: "325 / 194", background: "#ede5d8", flexShrink: 0 }} />
             )}
             <div style={{ padding: "16px 28px 32px", textAlign: "center", overflowY: "auto" }}>
-              <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 16, color: "#5F5F5F", marginBottom: 6 }}>{wedding.ceremony_venue}</p>
-              <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: 15, color: "#5F5F5F", lineHeight: 1.5, marginBottom: 16 }}>{wedding.ceremony_address}</p>
+              <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(12px, 2dvh, 16px)", color: "#5F5F5F", marginBottom: "clamp(4px, 0.8dvh, 6px)" }}>{wedding.ceremony_venue}</p>
+              <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 1.8dvh, 15px)", color: "#5F5F5F", lineHeight: 1.5, marginBottom: "clamp(8px, 1.5dvh, 16px)" }}>{wedding.ceremony_address}</p>
               <DateMapsRow dayName={dayName} day={dayNumber} monthYear={monthYear} time={wedding.ceremony_time} mapsUrl={wedding.ceremony_maps_url} lang={lang} />
             </div>
           </div>
@@ -166,8 +166,8 @@ export default async function InvitationPage({
                 <div style={{ margin: "0 35px", aspectRatio: "325 / 220", background: "#ede5d8", flexShrink: 0 }} />
               )}
               <div style={{ padding: "16px 28px 32px", textAlign: "center", overflowY: "auto" }}>
-                <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 16, color: "#5F5F5F", marginBottom: 6 }}>{wedding.reception_venue}</p>
-                <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: 15, color: "#5F5F5F", lineHeight: 1.5, marginBottom: 16 }}>{wedding.reception_address}</p>
+                <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(12px, 2dvh, 16px)", color: "#5F5F5F", marginBottom: "clamp(4px, 0.8dvh, 6px)" }}>{wedding.reception_venue}</p>
+                <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 1.8dvh, 15px)", color: "#5F5F5F", lineHeight: 1.5, marginBottom: "clamp(8px, 1.5dvh, 16px)" }}>{wedding.reception_address}</p>
                 <DateMapsRow dayName={dayName} day={dayNumber} monthYear={monthYear} time={wedding.reception_time} mapsUrl={wedding.reception_maps_url} lang={lang} />
               </div>
             </div>
@@ -208,7 +208,7 @@ export default async function InvitationPage({
               lang={lang}
             />
             <div style={{ marginTop: 8 }}>
-              <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 20, color: "#5F5F5F", textAlign: "center", marginBottom: 16 }}>
+              <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(14px, 2.5dvh, 20px)", color: "#5F5F5F", textAlign: "center", marginBottom: 16 }}>
                 {tr.wishes}
               </p>
               <WishForm weddingId={wedding.id} guestName={guest.name} lang={lang} />

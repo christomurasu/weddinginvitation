@@ -13,17 +13,9 @@ function Counter({ label, value, onChange, textColor, max }: {
         {label}
       </p>
       <div style={{ display: "flex", alignItems: "center", background: "#fdf8ee", border: "1px solid rgba(0,0,0,0.15)" }}>
-        <button
-          onClick={() => onChange(Math.max(0, value - 1))}
-          style={{ width: 32, height: 32, background: "transparent", border: "none", borderRight: "1px solid rgba(0,0,0,0.1)", color: "#5F5F5F", fontSize: 16, cursor: "pointer" }}
-        >−</button>
-        <p style={{ flex: 1, textAlign: "center", fontFamily: "'Poppins', sans-serif", fontSize: 14, color: "#5F5F5F" }}>
-          {value}
-        </p>
-        <button
-          onClick={() => { if (value < max) onChange(value + 1) }}
-          style={{ width: 32, height: 32, background: "transparent", border: "none", borderLeft: "1px solid rgba(0,0,0,0.1)", color: "#5F5F5F", fontSize: 16, cursor: "pointer" }}
-        >+</button>
+        <button onClick={() => onChange(Math.max(0, value - 1))} style={{ width: 32, height: 32, background: "transparent", border: "none", borderRight: "1px solid rgba(0,0,0,0.1)", color: "#5F5F5F", fontSize: 16, cursor: "pointer" }}>−</button>
+        <p style={{ flex: 1, textAlign: "center", fontFamily: "'Poppins', sans-serif", fontSize: 14, color: "#5F5F5F", margin: 0 }}>{value}</p>
+        <button onClick={() => { if (value < max) onChange(value + 1) }} style={{ width: 32, height: 32, background: "transparent", border: "none", borderLeft: "1px solid rgba(0,0,0,0.1)", color: "#5F5F5F", fontSize: 16, cursor: "pointer" }}>+</button>
       </div>
     </div>
   )
@@ -90,11 +82,8 @@ export default function RSVPSection({ guestCode, guestGreeting, isCeremonyOnly, 
   receptionRsvp: string; receptionAdults: number; receptionKids: number; lang?: Lang
 }) {
   const tr = t[lang]
-
-  // Track confirmed state from DB saves
   const [cConfirmed, setCConfirmed] = useState(ceremonyRsvp === "confirmed")
   const [rConfirmed, setRConfirmed] = useState(receptionRsvp === "confirmed")
-
   const hasConfirmed = cConfirmed || (!isCeremonyOnly && rConfirmed)
   const [showQR, setShowQR] = useState(hasConfirmed)
 
@@ -102,13 +91,13 @@ export default function RSVPSection({ guestCode, guestGreeting, isCeremonyOnly, 
     <div style={{ width: "100%" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');`}</style>
 
-      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 20, color: "#5F5F5F", textAlign: "center", marginBottom: 16 }}>
+      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(14px, 2.5dvh, 20px)", color: "#5F5F5F", textAlign: "center", marginBottom: 16 }}>
         {tr.rsvpTitle}
       </p>
-      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: 14, color: "#5F5F5F", marginBottom: 4 }}>
+      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 1.8dvh, 14px)", color: "#5F5F5F", marginBottom: 4 }}>
         {tr.dearGuest}, <span style={{ fontWeight: 700 }}>{guestGreeting}</span>
       </p>
-      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: 14, color: "#5F5F5F", marginBottom: 20, lineHeight: 1.5 }}>
+      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 1.8dvh, 14px)", color: "#5F5F5F", marginBottom: 20, lineHeight: 1.5 }}>
         {tr.rsvpSubtitle}
       </p>
 
@@ -133,12 +122,10 @@ export default function RSVPSection({ guestCode, guestGreeting, isCeremonyOnly, 
               onClick={() => setShowQR(true)}
               style={{
                 width: "100%", marginTop: 8,
-                background: "#535A36", color: "#F4F1EA",
-                border: "none", padding: "14px",
-                fontFamily: "'Poppins', sans-serif",
-                fontWeight: 700, fontSize: 13,
-                letterSpacing: "0.08em", textTransform: "uppercase",
-                cursor: "pointer"
+                background: "#535A36", color: "#F4F1EA", border: "none",
+                padding: "14px", fontFamily: "'Poppins', sans-serif",
+                fontWeight: 700, fontSize: "clamp(10px, 1.8dvh, 13px)",
+                letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer"
               }}
             >
               {lang === "id" ? "Tampilkan Kode Check-in" : "Show Check-in Code"}
@@ -146,23 +133,7 @@ export default function RSVPSection({ guestCode, guestGreeting, isCeremonyOnly, 
           )}
         </>
       ) : (
-        <>
-          <QRCodeDisplay code={guestCode} />
-          <button
-            onClick={() => setShowQR(false)}
-            style={{
-              width: "100%", marginTop: 16,
-              background: "transparent", color: "#888780",
-              border: "1px solid rgba(0,0,0,0.1)", padding: "12px",
-              fontFamily: "'Poppins', sans-serif",
-              fontWeight: 400, fontSize: 12,
-              letterSpacing: "0.08em", textTransform: "uppercase",
-              cursor: "pointer"
-            }}
-          >
-            {lang === "id" ? "← Kembali ke RSVP" : "← Back to RSVP"}
-          </button>
-        </>
+        <QRCodeDisplay code={guestCode} />
       )}
     </div>
   )
