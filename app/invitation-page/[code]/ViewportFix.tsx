@@ -9,7 +9,11 @@ export default function ViewportFix() {
     }
     setVh()
     window.addEventListener("resize", setVh)
-    return () => window.removeEventListener("resize", setVh)
+    window.addEventListener("orientationchange", () => setTimeout(setVh, 100))
+    return () => {
+      window.removeEventListener("resize", setVh)
+      window.removeEventListener("orientationchange", setVh)
+    }
   }, [])
 
   return null
