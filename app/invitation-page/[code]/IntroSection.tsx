@@ -39,9 +39,11 @@ export default function IntroSection({
           </>
         )}
         <h1 style={{
-          fontFamily: "'Sloop', cursive", fontSize: 64, fontWeight: 400,
-          color: "#5F5F5F", lineHeight: 1, marginBottom: 16,
-          marginTop: align === "left" ? -40 : 20
+          fontFamily: "'Sloop', cursive",
+          fontSize: 64, fontWeight: 400,
+          color: "#5F5F5F", lineHeight: 1,
+          marginBottom: align === "left" ? 16 : 30,
+          marginTop: align === "left" ? 0 :90
         }}>
           {name}
         </h1>
@@ -65,7 +67,16 @@ export default function IntroSection({
               <img src={stampUrl} alt="Stamp" style={{ position: "absolute", top: 0, left: 0, width: stampSize, height: stampSize, objectFit: "contain", transform: "translate(-50%, -50%) rotate(-10deg)", zIndex: 2 }} />
             )}
             {stampUrl && align === "right" && (
-              <img src={stampUrl} alt="Stamp" style={{ position: "absolute", bottom: 40, right: -40, width: stampSize, height: stampSize, objectFit: "contain", transform: "rotate(10deg)", zIndex: 2 }} />
+                <img src={stampUrl} alt="Stamp"
+                style={{
+                  position: "absolute",
+                  bottom: 30, right: 0,
+                  width: stampSize, height: stampSize,
+                  objectFit: "contain",
+                  transform: "translate(50%, 50%) rotate(10deg)",
+                  zIndex: 2
+                }} />
+
             )}
             <p style={{ position: "absolute", top: -24, right: align === "left" ? 0 : "auto", left: align === "right" ? 0 : "auto", fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontStyle: "italic", fontSize: 14, color: "#5F5F5F", whiteSpace: "nowrap", zIndex: 2 }}>
               {roleLabel}
