@@ -43,12 +43,27 @@ export default async function WeddingDashboardPage({
     .eq("wedding_id", wedding.id)
     .order("order_index", { ascending: true })
 
-  const total          = guests?.length ?? 0
-  const confirmed      = guests?.filter(g => g.rsvp === "confirmed").length ?? 0
-  const pending        = guests?.filter(g => g.rsvp === "pending").length ?? 0
-  const declined       = guests?.filter(g => g.rsvp === "declined").length ?? 0
-  const totalAttendees = guests?.filter(g => g.rsvp === "confirmed")
-                                .reduce((a, g) => a + (g.actual_attendees ?? 1), 0) ?? 0
+  const total = guests?.length ?? 0
+
+  const confirmed = guests?.filter(g =>
+    g.ceremony_rsvp === "confirmed" || g.reception_rsvp === "confirmed"
+  ).length ?? 0
+
+  const pending = guests?.filter(g =>
+    g.ceremony_rsvp === "pending" &&
+    (g.invitation_type === "ceremony" || g.reception_rsvp === "pending")
+  ).length ?? 0
+
+  const declined = guests?.filter(g =>
+    g.ceremony_rsvp === "declined" &&
+    (g.invitation_type === "ceremony" || g.reception_rsvp === "declined")
+  ).length ?? 0
+
+  const totalAttendees = guests?.reduce((sum, g) => {
+    const c = g.ceremony_rsvp === "confirmed" ? (g.ceremony_adults ?? 0) + (g.ceremony_kids ?? 0) : 0
+    const r = g.reception_rsvp === "confirmed" ? (g.reception_adults ?? 0) + (g.reception_kids ?? 0) : 0
+    return sum + Math.max(c, r)
+  }, 0) ?? 0
 
   const stats = [
     { label: "Invitations", value: total,          color: "#b8965a" },
@@ -57,9 +72,6 @@ export default async function WeddingDashboardPage({
     { label: "Declined",    value: declined,       color: "#a32d2d" },
     { label: "Attending",   value: totalAttendees, color: "#b8965a" },
   ]
-
-  const waMessage = (guest: { greeting: string; code: string }) =>
-    `Kepada Yth.\n${guest.greeting},\n\nBersama ini kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam acara pernikahan kami:\n\n${wedding.partner1} & ${wedding.partner2}\n${wedding.date}\n${wedding.venue}\n\nSebagai tanda kasih, kami telah menyiapkan undangan digital khusus untuk Bapak/Ibu/Saudara/i:\n\nhttps://sfinvitation.id/invitation-page/${guest.code}\n\nMohon konfirmasi kehadiran melalui link undangan di atas.\n\nAtas kehadiran dan doa restu Bapak/Ibu/Saudara/i, kami mengucapkan terima kasih.\n\nSalam hangat,\n${wedding.partner1} & ${wedding.partner2}`
 
   return (
     <div style={{ minHeight: "100vh", background: "#faf7f2" }}>

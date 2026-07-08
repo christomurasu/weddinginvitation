@@ -22,6 +22,9 @@ interface Guest {
   reception_adults: number
   reception_kids: number
   language: string
+  scanned: boolean
+  scanned_ceremony: boolean
+  scanned_reception: boolean
 }
 
 export default function GuestTable({
@@ -84,6 +87,13 @@ export default function GuestTable({
     fontSize: 10, padding: "2px 8px", letterSpacing: "0.06em", textTransform: "uppercase" as const
   })
 
+  const scannedBadge = (scanned: boolean) => ({
+    display: "inline-block",
+    background: scanned ? "#eaf3de" : "#f5f0e8",
+    color: scanned ? "#3b6d11" : "#b4b2a9",
+    fontSize: 10, padding: "2px 8px", letterSpacing: "0.05em"
+  })
+
   return (
     <div style={{ background: "#fff", border: "1px solid #e4ddd0", marginTop: 24 }}>
       <div style={{ padding: "16px 24px", borderBottom: "1px solid #f0ebe3", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -91,25 +101,11 @@ export default function GuestTable({
           All Guests ({guests.length})
         </p>
         <div style={{ display: "flex", gap: 8 }}>
-          <button
-            onClick={() => router.refresh()}
-            style={{
-              background: "transparent", color: "#888780",
-              border: "1px solid #e4ddd0", padding: "7px 14px",
-              fontSize: 10, letterSpacing: "0.15em",
-              textTransform: "uppercase", cursor: "pointer",
-              fontFamily: "inherit"
-            }}
-          >
+          <button onClick={() => router.refresh()} style={{ background: "transparent", color: "#888780", border: "1px solid #e4ddd0", padding: "7px 14px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer", fontFamily: "inherit" }}>
             ↻ Refresh
           </button>
           {selected.size > 0 && (
-            <button onClick={handleDelete} disabled={deleting} style={{
-              background: "#a32d2d", color: "#fff", border: "none",
-              padding: "7px 16px", fontSize: 10, letterSpacing: "0.15em",
-              textTransform: "uppercase", cursor: deleting ? "not-allowed" : "pointer",
-              fontFamily: "inherit", opacity: deleting ? 0.6 : 1
-            }}>
+            <button onClick={handleDelete} disabled={deleting} style={{ background: "#a32d2d", color: "#fff", border: "none", padding: "7px 16px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", cursor: deleting ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: deleting ? 0.6 : 1 }}>
               {deleting ? "Menghapus..." : `Hapus ${selected.size} Tamu`}
             </button>
           )}
@@ -123,7 +119,7 @@ export default function GuestTable({
               <th style={{ padding: "10px 16px", width: 40 }}>
                 <input type="checkbox" checked={allSelected} onChange={toggleAll} style={{ cursor: "pointer", width: 14, height: 14 }} />
               </th>
-              {["Guest", "Code", "WA", "Table", "Max", "C-RSVP", "R-RSVP", "Bahasa", "Link"].map(h => (
+              {["Guest", "Code", "WA", "Table", "Max", "C-RSVP", "R-RSVP", "Hadir P", "Hadir R", "Bahasa", "Link"].map(h => (
                 <th key={h} style={{ textAlign: "left", padding: "10px 16px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "#888780", fontWeight: 400 }}>
                   {h}
                 </th>
@@ -132,7 +128,12 @@ export default function GuestTable({
           </thead>
           <tbody>
             {guests.map(guest => (
-              <tr key={guest.id} style={{ borderBottom: "1px solid #f5f0e8", background: selected.has(guest.id) ? "#fef9ec" : "transparent" }}>
+              <tr key={guest.id} style={{
+                borderBottom: "1px solid #f5f0e8",
+                background: selected.has(guest.id) ? "#fef9ec"
+                  : (guest.scanned_ceremony || guest.scanned_reception) ? "#f0fdf4"
+                  : "transparent"
+              }}>
                 <td style={{ padding: "14px 16px" }}>
                   <input type="checkbox" checked={selected.has(guest.id)} onChange={() => toggleOne(guest.id)} style={{ cursor: "pointer", width: 14, height: 14 }} />
                 </td>
@@ -156,21 +157,13 @@ export default function GuestTable({
                     <span style={{ color: "#b4b2a9", fontSize: 12 }}>—</span>
                   )}
                 </td>
-                <td style={{ padding: "14px 16px", color: "#888780", fontSize: 12 }}>
-                  {guest.table_number ?? "—"}
-                </td>
-                <td style={{ padding: "14px 16px", color: "#888780", fontSize: 12, textAlign: "center" }}>
-                  {guest.max_attendees ?? 1}
-                </td>
+                <td style={{ padding: "14px 16px", color: "#888780", fontSize: 12 }}>{guest.table_number ?? "—"}</td>
+                <td style={{ padding: "14px 16px", color: "#888780", fontSize: 12, textAlign: "center" }}>{guest.max_attendees ?? 1}</td>
                 <td style={{ padding: "14px 16px" }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                    <span style={rsvpBadge(guest.ceremony_rsvp ?? "pending")}>
-                      {guest.ceremony_rsvp ?? "pending"}
-                    </span>
+                    <span style={rsvpBadge(guest.ceremony_rsvp ?? "pending")}>{guest.ceremony_rsvp ?? "pending"}</span>
                     {guest.ceremony_rsvp === "confirmed" && (
-                      <span style={{ fontSize: 10, color: "#888780" }}>
-                        {guest.ceremony_adults}D {guest.ceremony_kids}A
-                      </span>
+                      <span style={{ fontSize: 10, color: "#888780" }}>{guest.ceremony_adults}D {guest.ceremony_kids}A</span>
                     )}
                   </div>
                 </td>
@@ -179,15 +172,25 @@ export default function GuestTable({
                     <span style={{ color: "#b4b2a9", fontSize: 11 }}>—</span>
                   ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                      <span style={rsvpBadge(guest.reception_rsvp ?? "pending")}>
-                        {guest.reception_rsvp ?? "pending"}
-                      </span>
+                      <span style={rsvpBadge(guest.reception_rsvp ?? "pending")}>{guest.reception_rsvp ?? "pending"}</span>
                       {guest.reception_rsvp === "confirmed" && (
-                        <span style={{ fontSize: 10, color: "#888780" }}>
-                          {guest.reception_adults}D {guest.reception_kids}A
-                        </span>
+                        <span style={{ fontSize: 10, color: "#888780" }}>{guest.reception_adults}D {guest.reception_kids}A</span>
                       )}
                     </div>
+                  )}
+                </td>
+                <td style={{ padding: "14px 16px" }}>
+                  <span style={scannedBadge(guest.scanned_ceremony)}>
+                    {guest.scanned_ceremony ? "✓ Hadir" : "—"}
+                  </span>
+                </td>
+                <td style={{ padding: "14px 16px" }}>
+                  {guest.invitation_type === "ceremony" ? (
+                    <span style={{ color: "#b4b2a9", fontSize: 10 }}>N/A</span>
+                  ) : (
+                    <span style={scannedBadge(guest.scanned_reception)}>
+                      {guest.scanned_reception ? "✓ Hadir" : "—"}
+                    </span>
                   )}
                 </td>
                 <td style={{ padding: "14px 16px" }}>
@@ -195,14 +198,7 @@ export default function GuestTable({
                     {["en", "id"].map(lang => (
                       <button key={lang} onClick={() => handleLanguageChange(guest.id, lang)}
                         disabled={updatingLang === guest.id}
-                        style={{
-                          padding: "3px 8px", fontSize: 10, fontFamily: "inherit",
-                          cursor: "pointer", letterSpacing: "0.08em", textTransform: "uppercase",
-                          border: "1px solid #e4ddd0",
-                          background: guest.language === lang ? "#2c2c2a" : "#fdf8ee",
-                          color: guest.language === lang ? "#fff" : "#888780",
-                          opacity: updatingLang === guest.id ? 0.5 : 1
-                        }}>
+                        style={{ padding: "3px 8px", fontSize: 10, fontFamily: "inherit", cursor: "pointer", letterSpacing: "0.08em", textTransform: "uppercase", border: "1px solid #e4ddd0", background: guest.language === lang ? "#2c2c2a" : "#fdf8ee", color: guest.language === lang ? "#fff" : "#888780", opacity: updatingLang === guest.id ? 0.5 : 1 }}>
                         {lang}
                       </button>
                     ))}
@@ -217,7 +213,7 @@ export default function GuestTable({
             ))}
             {guests.length === 0 && (
               <tr>
-                <td colSpan={10} style={{ padding: "40px", textAlign: "center", color: "#888780", fontSize: 13 }}>
+                <td colSpan={12} style={{ padding: "40px", textAlign: "center", color: "#888780", fontSize: 13 }}>
                   No guests yet. Add your first guest above.
                 </td>
               </tr>
