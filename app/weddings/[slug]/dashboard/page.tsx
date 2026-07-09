@@ -167,6 +167,16 @@ export default async function WeddingDashboardPage({
             partner2: wedding.partner2,
             date: wedding.date,
             venue: wedding.venue,
+            groom_father: wedding.groom_father,
+            groom_mother: wedding.groom_mother,
+            bride_father: wedding.bride_father,
+            bride_mother: wedding.bride_mother,
+            ceremony_venue: wedding.ceremony_venue,
+            ceremony_time: wedding.ceremony_time,
+            ceremony_maps_url: wedding.ceremony_maps_url,
+            reception_venue: wedding.reception_venue,
+            reception_time: wedding.reception_time,
+            reception_maps_url: wedding.reception_maps_url,
           }}
         />
 

@@ -122,9 +122,15 @@ export default function RSVPSection({ guestCode, guestGreeting, isCeremonyOnly, 
       <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 1.8dvh, 14px)", color: "#5F5F5F", marginBottom: 4 }}>
         {tr.dearGuest}, <span style={{ fontWeight: 700 }}>{guestGreeting}</span>
       </p>
-      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 1.8dvh, 14px)", color: "#5F5F5F", marginBottom: 20, lineHeight: 1.5 }}>
+      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 1.8dvh, 14px)", color: "#5F5F5F", marginBottom: 4}}>
         {tr.rsvpSubtitle}
       </p>
+
+      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 1.8dvh, 14px)", color: "#5F5F5F", marginBottom: 20, lineHeight: 1.5 }}>
+        <span style={{ fontWeight: 700 }}>Valid for {maxAttendees} {maxAttendees === 1 ? "person" : "persons"}</span>
+      </p>
+
+      
 
       {!showQR ? (
         <>

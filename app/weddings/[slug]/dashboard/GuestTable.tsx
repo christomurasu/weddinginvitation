@@ -27,12 +27,29 @@ interface Guest {
   scanned_reception: boolean
 }
 
+interface Wedding {
+  partner1: string
+  partner2: string
+  date: string
+  venue: string
+  groom_father: string | null
+  groom_mother: string | null
+  bride_father: string | null
+  bride_mother: string | null
+  ceremony_venue: string | null
+  ceremony_time: string | null
+  ceremony_maps_url: string | null
+  reception_venue: string | null
+  reception_time: string | null
+  reception_maps_url: string | null
+}
+
 export default function GuestTable({
   guests: initialGuests,
   wedding,
 }: {
   guests: Guest[]
-  wedding: { partner1: string; partner2: string; date: string; venue: string }
+  wedding: Wedding
 }) {
   const router = useRouter()
   const [guests, setGuests] = useState(initialGuests)
@@ -78,8 +95,15 @@ export default function GuestTable({
     setUpdatingLang(null)
   }
 
-  const waMessage = (guest: Guest) =>
-    `Kepada Yth.\n${guest.greeting},\n\nBersama ini kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam acara pernikahan kami:\n\n${wedding.partner1} & ${wedding.partner2}\n${wedding.date}\n${wedding.venue}\n\nSebagai tanda kasih, kami telah menyiapkan undangan digital khusus untuk Bapak/Ibu/Saudara/i:\n\nhttps://sfinvitation.id/invitation-page/${guest.code}\n\nMohon konfirmasi kehadiran melalui link undangan di atas.\n\nAtas kehadiran dan doa restu Bapak/Ibu/Saudara/i, kami mengucapkan terima kasih.\n\nSalam hangat,\n${wedding.partner1} & ${wedding.partner2}`
+  const waMessage = (guest: Guest) => {
+    const link = `https://sfinvitation.id/invitation-page/${guest.code}`
+
+    if (guest.language === "id") {
+      return `Kepada Yth. Bapak/Ibu\n${guest.greeting},\n\nAnda diundang untuk hadir dalam:\nPernikahan ${wedding.partner1} & ${wedding.partner2}\n\nOrang tua yang terhormat,\n${wedding.groom_father ?? ""} & ${wedding.groom_mother ?? ""}\ndan\n${wedding.bride_father ?? ""} & ${wedding.bride_mother ?? ""}\n\n${wedding.venue}\n\nPEMBERKATAN PERNIKAHAN\n${wedding.date}\nPukul ${wedding.ceremony_time ?? ""}\n${wedding.ceremony_venue ?? ""}\n${wedding.ceremony_maps_url ?? ""}\n\nRESEPSI\n${wedding.date}\nPukul ${wedding.reception_time ?? ""}\n${wedding.reception_venue ?? ""}\n${wedding.reception_maps_url ?? ""}\n\nSilakan klik link di bawah untuk konfirmasi kehadiran:\n${link}\n\nHormat kami,\n${wedding.partner1} & ${wedding.partner2}\n\nPerfect Moment Organizer\nIvan - 085103949090\nRSVP by SF Invitation`
+    }
+
+    return `Dear Mr. & Mrs. ${guest.greeting},\n\nYou are invited to:\nThe Wedding of ${wedding.partner1} & ${wedding.partner2}\n\nBlessed Parents,\n${wedding.groom_father ?? ""} & ${wedding.groom_mother ?? ""}\nand\n${wedding.bride_father ?? ""} & ${wedding.bride_mother ?? ""}\n\n${wedding.venue}\n\nHOLY MATRIMONY\n${wedding.date}\nAt ${wedding.ceremony_time ?? ""}\n${wedding.ceremony_venue ?? ""}\n${wedding.ceremony_maps_url ?? ""}\n\nRECEPTION\n${wedding.date}\nAt ${wedding.reception_time ?? ""}\n${wedding.reception_venue ?? ""}\n${wedding.reception_maps_url ?? ""}\n\nPlease click the button below to start RSVP:\n${link}\n\n${wedding.partner1} & ${wedding.partner2}\n\nPerfect Moment Organizer\nIvan - 085103949090\nRSVP by SF Invitation`
+  }
 
   const rsvpBadge = (rsvp: string) => ({
     background: rsvp === "confirmed" ? "#eaf3de" : rsvp === "declined" ? "#fcebeb" : "#f5f0e8",
@@ -180,17 +204,13 @@ export default function GuestTable({
                   )}
                 </td>
                 <td style={{ padding: "14px 16px" }}>
-                  <span style={scannedBadge(guest.scanned_ceremony)}>
-                    {guest.scanned_ceremony ? "✓ Hadir" : "—"}
-                  </span>
+                  <span style={scannedBadge(guest.scanned_ceremony)}>{guest.scanned_ceremony ? "✓ Hadir" : "—"}</span>
                 </td>
                 <td style={{ padding: "14px 16px" }}>
                   {guest.invitation_type === "ceremony" ? (
                     <span style={{ color: "#b4b2a9", fontSize: 10 }}>N/A</span>
                   ) : (
-                    <span style={scannedBadge(guest.scanned_reception)}>
-                      {guest.scanned_reception ? "✓ Hadir" : "—"}
-                    </span>
+                    <span style={scannedBadge(guest.scanned_reception)}>{guest.scanned_reception ? "✓ Hadir" : "—"}</span>
                   )}
                 </td>
                 <td style={{ padding: "14px 16px" }}>
