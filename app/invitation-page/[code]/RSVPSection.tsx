@@ -9,7 +9,7 @@ function Counter({ label, value, onChange, textColor, max }: {
 }) {
   return (
     <div style={{ flex: 1 }}>
-      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: 13, color: textColor, textAlign: "center", marginBottom: 6 }}>
+      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(10px, 1.5dvh, 13px)", color: textColor, textAlign: "center", marginBottom: 6 }}>
         {label}
       </p>
       <div style={{ display: "flex", alignItems: "center", background: "#fdf8ee", border: "1px solid rgba(0,0,0,0.15)" }}>
@@ -21,48 +21,51 @@ function Counter({ label, value, onChange, textColor, max }: {
   )
 }
 
-function RSVPCard({ title, bgColor, titleColor, guestCode, field, maxAttendees, initialRsvp, initialAdults, initialKids, lang, onConfirmed }: {
-  title: string; bgColor: string; titleColor: string; guestCode: string
+function RSVPCard({ title, bgColor, titleColor, field, maxAttendees, initialRsvp, initialAdults, initialKids, lang, onChange }: {
+  title: string; bgColor: string; titleColor: string
   field: "ceremony" | "reception"; maxAttendees: number
   initialRsvp: string; initialAdults: number; initialKids: number; lang: Lang
-  onConfirmed: (confirmed: boolean) => void
+  onChange: (rsvp: string, adults: number, kids: number) => void
 }) {
   const [rsvp, setRsvp] = useState(initialRsvp)
   const [adults, setAdults] = useState(initialAdults)
   const [kids, setKids] = useState(initialKids)
-  const [saving, setSaving] = useState(false)
   const tr = t[lang]
 
-  async function save(newRsvp: string, newAdults: number, newKids: number) {
-    setSaving(true)
-    await supabase.from("guests").update({
-      [`${field}_rsvp`]: newRsvp,
-      [`${field}_adults`]: newAdults,
-      [`${field}_kids`]: newKids,
-    }).eq("code", guestCode)
-    setSaving(false)
-    onConfirmed(newRsvp === "confirmed")
-  }
-
   function handleYes() {
+    const newAdults = adults + kids === 0 && maxAttendees > 0 ? 1 : adults
+    const newKids = adults + kids === 0 && maxAttendees > 0 ? 0 : kids
     setRsvp("confirmed")
-    if (adults + kids === 0 && maxAttendees > 0) { setAdults(1); save("confirmed", 1, 0) }
-    else save("confirmed", adults, kids)
+    setAdults(newAdults)
+    onChange("confirmed", newAdults, newKids)
   }
-  function handleNo() { setRsvp("declined"); setAdults(0); setKids(0); save("declined", 0, 0) }
-  function handleAdults(v: number) { if (v + kids > maxAttendees) return; setAdults(v); save(rsvp, v, kids) }
-  function handleKids(v: number) { if (adults + v > maxAttendees) return; setKids(v); save(rsvp, adults, v) }
+  function handleNo() {
+    setRsvp("declined")
+    setAdults(0)
+    setKids(0)
+    onChange("declined", 0, 0)
+  }
+  function handleAdults(v: number) {
+    if (v + kids > maxAttendees) return
+    setAdults(v)
+    onChange(rsvp, v, kids)
+  }
+  function handleKids(v: number) {
+    if (adults + v > maxAttendees) return
+    setKids(v)
+    onChange(rsvp, adults, v)
+  }
 
   return (
-    <div style={{ background: bgColor, padding: "12px 12px 14px", marginBottom: 20 }}>
-      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 15, color: titleColor, textAlign: "center", marginBottom: 8 }}>
+    <div style={{ background: bgColor, padding: "clamp(8px, 1.5dvh, 12px) clamp(8px, 1.5dvh, 12px) clamp(10px, 1.8dvh, 14px)", marginBottom: "clamp(12px, 2dvh, 20px)" }}>
+      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(12px, 2dvh, 15px)", color: titleColor, textAlign: "center", marginBottom: "clamp(6px, 1dvh, 8px)" }}>
         {title}
       </p>
       <div style={{ display: "flex", gap: 10, marginBottom: rsvp === "confirmed" ? 10 : 0 }}>
-        <button onClick={handleYes} disabled={saving} style={{ flex: 1, padding: "11px", background: rsvp === "confirmed" ? "#535A36" : "rgba(0,0,0,0.15)", color: "#fff", border: "none", fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 14, cursor: saving ? "not-allowed" : "pointer" }}>
+        <button onClick={handleYes} style={{ flex: 1, padding: "clamp(8px, 1.5dvh, 11px)", background: rsvp === "confirmed" ? "#535A36" : "rgba(0,0,0,0.15)", color: "#fff", border: "none", fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(12px, 1.8dvh, 14px)", cursor: "pointer" }}>
           {tr.yes}
         </button>
-        <button onClick={handleNo} disabled={saving} style={{ flex: 1, padding: "11px", background: rsvp === "declined" ? "#555" : "rgba(0,0,0,0.15)", color: "#fff", border: "none", fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 14, cursor: saving ? "not-allowed" : "pointer" }}>
+        <button onClick={handleNo} style={{ flex: 1, padding: "clamp(8px, 1.5dvh, 11px)", background: rsvp === "declined" ? "#555" : "rgba(0,0,0,0.15)", color: "#fff", border: "none", fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(12px, 1.8dvh, 14px)", cursor: "pointer" }}>
           {tr.no}
         </button>
       </div>
@@ -82,10 +85,32 @@ export default function RSVPSection({ guestCode, guestGreeting, isCeremonyOnly, 
   receptionRsvp: string; receptionAdults: number; receptionKids: number; lang?: Lang
 }) {
   const tr = t[lang]
-  const [cConfirmed, setCConfirmed] = useState(ceremonyRsvp === "confirmed")
-  const [rConfirmed, setRConfirmed] = useState(receptionRsvp === "confirmed")
-  const hasConfirmed = cConfirmed || (!isCeremonyOnly && rConfirmed)
-  const [showQR, setShowQR] = useState(hasConfirmed)
+
+  // Local state — belum ke database
+  const [cState, setCState] = useState({ rsvp: ceremonyRsvp, adults: ceremonyAdults, kids: ceremonyKids })
+  const [rState, setRState] = useState({ rsvp: receptionRsvp, adults: receptionAdults, kids: receptionKids })
+
+  const alreadyConfirmed = ceremonyRsvp === "confirmed" || (!isCeremonyOnly && receptionRsvp === "confirmed")
+  const [showQR, setShowQR] = useState(alreadyConfirmed)
+  const [saving, setSaving] = useState(false)
+
+  const hasConfirmed = cState.rsvp === "confirmed" || (!isCeremonyOnly && rState.rsvp === "confirmed")
+
+  async function handleShowQR() {
+    setSaving(true)
+    await supabase.from("guests").update({
+      ceremony_rsvp: cState.rsvp,
+      ceremony_adults: cState.adults,
+      ceremony_kids: cState.kids,
+      ...(!isCeremonyOnly ? {
+        reception_rsvp: rState.rsvp,
+        reception_adults: rState.adults,
+        reception_kids: rState.kids,
+      } : {})
+    }).eq("code", guestCode)
+    setSaving(false)
+    setShowQR(true)
+  }
 
   return (
     <div style={{ width: "100%" }}>
@@ -105,30 +130,35 @@ export default function RSVPSection({ guestCode, guestGreeting, isCeremonyOnly, 
         <>
           <RSVPCard
             title={tr.holyMatrimony} bgColor="#f2d857" titleColor="#5F5F5F"
-            guestCode={guestCode} field="ceremony" maxAttendees={maxAttendees}
-            initialRsvp={ceremonyRsvp} initialAdults={ceremonyAdults} initialKids={ceremonyKids}
-            lang={lang} onConfirmed={setCConfirmed}
+            field="ceremony" maxAttendees={maxAttendees}
+            initialRsvp={cState.rsvp} initialAdults={cState.adults} initialKids={cState.kids}
+            lang={lang}
+            onChange={(rsvp, adults, kids) => setCState({ rsvp, adults, kids })}
           />
           {!isCeremonyOnly && (
             <RSVPCard
               title={tr.reception} bgColor="#c6294b" titleColor="#F4F1EA"
-              guestCode={guestCode} field="reception" maxAttendees={maxAttendees}
-              initialRsvp={receptionRsvp} initialAdults={receptionAdults} initialKids={receptionKids}
-              lang={lang} onConfirmed={setRConfirmed}
+              field="reception" maxAttendees={maxAttendees}
+              initialRsvp={rState.rsvp} initialAdults={rState.adults} initialKids={rState.kids}
+              lang={lang}
+              onChange={(rsvp, adults, kids) => setRState({ rsvp, adults, kids })}
             />
           )}
           {hasConfirmed && (
             <button
-              onClick={() => setShowQR(true)}
+              onClick={handleShowQR}
+              disabled={saving}
               style={{
                 width: "100%", marginTop: 8,
-                background: "#535A36", color: "#F4F1EA", border: "none",
+                background: saving ? "#888780" : "#535A36",
+                color: "#F4F1EA", border: "none",
                 padding: "14px", fontFamily: "'Poppins', sans-serif",
                 fontWeight: 700, fontSize: "clamp(10px, 1.8dvh, 13px)",
-                letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer"
+                letterSpacing: "0.08em", textTransform: "uppercase",
+                cursor: saving ? "not-allowed" : "pointer"
               }}
             >
-              {lang === "id" ? "Tampilkan Kode Check-in" : "Show Check-in Code"}
+              {saving ? "..." : lang === "id" ? "Tampilkan Kode Check-in" : "Show Check-in Code"}
             </button>
           )}
         </>
