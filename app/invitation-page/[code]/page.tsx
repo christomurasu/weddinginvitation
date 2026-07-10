@@ -10,6 +10,7 @@ import IntroSection from "./IntroSection"
 import DateMapsRow from "./DateMapsRow"
 import type { Metadata } from "next"
 import { t, Lang } from "./Translations"
+import FaviconSetter from "./FavIconSetter"
 
 export async function generateMetadata({
   params,
@@ -54,7 +55,7 @@ export default async function InvitationPage({
 
   const isCeremonyOnly = guest.invitation_type === "ceremony"
 
-  const bgStyle = wedding.cover_photo_url ? `url('${wedding.cover_photo_url}') center/cover no-repeat fixed` : "#d6cfc6"
+  const bgStyle = wedding.cover_photo_url ? `url('${wedding.cover_photo_url}') center/cover no-repeat` : "#d6cfc6"
   const sectionBg = wedding.cover_photo_url
     ? { backgroundImage: `url('${wedding.cover_photo_url}')`, backgroundSize: "100% 100%", backgroundRepeat: "no-repeat" as const }
     : { background: "#f5f0e8" }
@@ -70,16 +71,60 @@ export default async function InvitationPage({
   return (
     <>
       <ViewportFix />
+      {wedding.logo_url && <FaviconSetter url={wedding.logo_url} />}
       {wedding.music_url && <MusicPlayer musicUrl={wedding.music_url} />}
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
-        :root { --vh: 1vh; }
-        html, body { margin: 0; padding: 0; height: 100dvh; overflow: hidden; }
-        body { background: ${bgStyle}; display: flex; justify-content: center; align-items: flex-start; min-height: 100dvh; }
-        #invitation-wrapper { width: 100%; max-width: 480px; height: 100dvh; overflow-y: scroll; scroll-snap-type: y mandatory; box-shadow: 0 0 60px rgba(0,0,0,0.3); position: relative; -webkit-overflow-scrolling: touch; }
-        .snap-section { scroll-snap-align: start; scroll-snap-stop: always; height: 100dvh; width: 100%; display: flex; flex-direction: column; position: relative; overflow: hidden; flex-shrink: 0; }
-        .snap-section-auto { scroll-snap-align: start; scroll-snap-stop: always; min-height: 100dvh; width: 100%; display: flex; flex-direction: column; position: relative; flex-shrink: 0; overflow-y: auto; }
+
+        html, body {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          overflow: hidden;
+        }
+
+        body {
+          background: ${bgStyle};
+          display: flex;
+          justify-content: center;
+          align-items: flex-start;
+        }
+
+        #invitation-wrapper {
+          width: 100%;
+          max-width: 480px;
+          height: 100dvh;
+          overflow-y: scroll;
+          scroll-snap-type: y mandatory;
+          box-shadow: 0 0 60px rgba(0,0,0,0.3);
+          position: relative;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .snap-section {
+          scroll-snap-align: start;
+          scroll-snap-stop: always;
+          height: 100dvh;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          position: relative;
+          overflow: hidden;
+          flex-shrink: 0;
+        }
+
+        .snap-section-auto {
+          scroll-snap-align: start;
+          scroll-snap-stop: always;
+          min-height: 100dvh;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          position: relative;
+          flex-shrink: 0;
+          overflow-y: auto;
+        }
       `}</style>
 
       <div id="invitation-wrapper">
@@ -131,43 +176,79 @@ export default async function InvitationPage({
           </div>
         )}
 
+        {/* Holy Matrimony */}
         <div className="snap-section" style={sectionBg}>
-          <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <div style={{ height: "100dvh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
             {wedding.wedding_date_iso && <CountdownBanner targetDate={wedding.wedding_date_iso} lang={lang} />}
-            <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 18, color: "#5F5F5F", textAlign: "center", padding: "16px 28px 12px" }}>
+            <p style={{
+              fontFamily: "'Poppins', sans-serif", fontWeight: 700,
+              fontSize: "clamp(14px, 2.5dvh, 18px)",
+              color: "#5F5F5F", textAlign: "center",
+              padding: "1.5dvh 28px 1dvh"
+            }}>
               {tr.holyMatrimony}
             </p>
             {wedding.ceremony_image_url ? (
-              <div style={{ margin: "0 35px", aspectRatio: "325 / 194", position: "relative", overflow: "hidden", flexShrink: 0 }}>
+              <div style={{ margin: "0 35px", aspectRatio: "325 / 150", position: "relative", overflow: "hidden", flexShrink: 0 }}>
                 <img src={wedding.ceremony_image_url} alt="Gereja" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               </div>
             ) : (
-              <div style={{ margin: "0 35px", aspectRatio: "325 / 194", background: "#ede5d8", flexShrink: 0 }} />
+              <div style={{ margin: "0 35px", aspectRatio: "325 / 150", background: "#ede5d8", flexShrink: 0 }} />
             )}
-            <div style={{ padding: "16px 28px 32px", textAlign: "center", overflowY: "auto" }}>
-              <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(12px, 2dvh, 16px)", color: "#5F5F5F", marginBottom: "clamp(4px, 0.8dvh, 6px)" }}>{wedding.ceremony_venue}</p>
-              <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 1.8dvh, 15px)", color: "#5F5F5F", lineHeight: 1.5, marginBottom: "clamp(8px, 1.5dvh, 16px)" }}>{wedding.ceremony_address}</p>
+            <div style={{ padding: "1dvh 28px 2dvh", textAlign: "center", overflowY: "auto" }}>
+              <p style={{
+                fontFamily: "'Poppins', sans-serif", fontWeight: 700,
+                fontSize: "clamp(13px, 2dvh, 16px)",
+                color: "#5F5F5F", marginBottom: "0.5dvh"
+              }}>
+                {wedding.ceremony_venue}
+              </p>
+              <p style={{
+                fontFamily: "'Poppins', sans-serif", fontWeight: 400,
+                fontSize: "clamp(11px, 1.8dvh, 15px)",
+                color: "#5F5F5F", lineHeight: 1.5, marginBottom: "1.5dvh"
+              }}>
+                {wedding.ceremony_address}
+              </p>
               <DateMapsRow dayName={dayName} day={dayNumber} monthYear={monthYear} time={wedding.ceremony_time} mapsUrl={wedding.ceremony_maps_url} lang={lang} />
             </div>
           </div>
         </div>
 
+        {/* Reception */}
         {!isCeremonyOnly && (
           <div className="snap-section" style={sectionBg}>
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-              <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 18, color: "#5F5F5F", textAlign: "center", padding: "16px 28px 12px" }}>
+            <div style={{ height: "100dvh", display: "flex", flexDirection: "column", justifyContent: "center", overflow: "hidden" }}>
+              <p style={{
+                fontFamily: "'Poppins', sans-serif", fontWeight: 700,
+                fontSize: "clamp(14px, 2.5dvh, 18px)",
+                color: "#5F5F5F", textAlign: "center",
+                padding: "1.5dvh 28px 1dvh"
+              }}>
                 {tr.reception}
               </p>
               {wedding.reception_image_url ? (
-                <div style={{ margin: "0 35px", aspectRatio: "325 / 220", position: "relative", overflow: "hidden", flexShrink: 0 }}>
+                <div style={{ margin: "0 35px", aspectRatio: "325 / 150", position: "relative", overflow: "hidden", flexShrink: 0 }}>
                   <img src={wedding.reception_image_url} alt="Venue Resepsi" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
               ) : (
-                <div style={{ margin: "0 35px", aspectRatio: "325 / 220", background: "#ede5d8", flexShrink: 0 }} />
+                <div style={{ margin: "0 35px", aspectRatio: "325 / 150", background: "#ede5d8", flexShrink: 0 }} />
               )}
-              <div style={{ padding: "16px 28px 32px", textAlign: "center", overflowY: "auto" }}>
-                <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(12px, 2dvh, 16px)", color: "#5F5F5F", marginBottom: "clamp(4px, 0.8dvh, 6px)" }}>{wedding.reception_venue}</p>
-                <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 1.8dvh, 15px)", color: "#5F5F5F", lineHeight: 1.5, marginBottom: "clamp(8px, 1.5dvh, 16px)" }}>{wedding.reception_address}</p>
+              <div style={{ padding: "1dvh 28px 2dvh", textAlign: "center", overflowY: "auto" }}>
+                <p style={{
+                  fontFamily: "'Poppins', sans-serif", fontWeight: 700,
+                  fontSize: "clamp(13px, 2dvh, 16px)",
+                  color: "#5F5F5F", marginBottom: "0.5dvh"
+                }}>
+                  {wedding.reception_venue}
+                </p>
+                <p style={{
+                  fontFamily: "'Poppins', sans-serif", fontWeight: 400,
+                  fontSize: "clamp(11px, 1.8dvh, 15px)",
+                  color: "#5F5F5F", lineHeight: 1.5, marginBottom: "1.5dvh"
+                }}>
+                  {wedding.reception_address}
+                </p>
                 <DateMapsRow dayName={dayName} day={dayNumber} monthYear={monthYear} time={wedding.reception_time} mapsUrl={wedding.reception_maps_url} lang={lang} />
               </div>
             </div>
@@ -218,7 +299,7 @@ export default async function InvitationPage({
 
         <div className="snap-section" style={sectionBg}>
           <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "40px 0" }}>
-            <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 20, color: "#5F5F5F", letterSpacing: "0.05em", textAlign: "center", marginBottom: 20 }}>
+            <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(14px, 2.5dvh, 20px)", color: "#5F5F5F", letterSpacing: "0.05em", textAlign: "center", marginBottom: 20 }}>
               {tr.wishesTitle}
             </p>
             <div style={{ margin: "0 25px", background: "#F4F1EA", flex: 1, overflowY: "auto", padding: "16px" }}>
