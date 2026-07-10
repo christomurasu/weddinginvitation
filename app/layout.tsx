@@ -3,14 +3,11 @@ import "./globals.css"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sfinvitation.id"),
-
   title: "SF Invitation",
   description: "Digital Wedding Invitations",
-
   icons: {
     icon: "https://ervlyplqjeszzmetmcsl.supabase.co/storage/v1/object/public/wedding-photos/96fdd251-193e-46f5-9c3d-0b1db3b20f5a/logo_url-1782405949522.png",
   },
-
   openGraph: {
     title: "SF Invitation",
     description: "Digital Wedding Invitations",
@@ -19,21 +16,18 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://ervlyplqjeszzmetmcsl.supabase.co/storage/v1/object/public/wedding-photos/96fdd251-193e-46f5-9c3d-0b1db3b20f5a/logo_url-1782405949522.png",
-        width: 1200,
-        height: 630,
+        url: "/SF_for_link.png",
+        width: 1080,
+        height: 1080,
         alt: "SF Invitation",
       },
     ],
   },
-
   twitter: {
     card: "summary_large_image",
     title: "SF Invitation",
     description: "Digital Wedding Invitations",
-    images: [
-      "https://ervlyplqjeszzmetmcsl.supabase.co/storage/v1/object/public/wedding-photos/96fdd251-193e-46f5-9c3d-0b1db3b20f5a/logo_url-1782405949522.png",
-    ],
+    images: ["/SF_for_link.png"],
   },
 }
 
