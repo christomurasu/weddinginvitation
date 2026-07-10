@@ -18,11 +18,18 @@ export async function generateMetadata({
   params: Promise<{ code: string }>
 }): Promise<Metadata> {
   const { code } = await params
-  const { data: guest } = await supabase.from("guests").select("weddings(logo_url, partner1, partner2)").eq("code", code).single()
-  const wedding = guest?.weddings as { logo_url?: string; partner1?: string; partner2?: string } | undefined
+  const { data: guest } = await supabase.from("guests").select("weddings(logo_url, partner1, partner2, couple_photo_url)").eq("code", code).single()
+  const wedding = guest?.weddings as { logo_url?: string; partner1?: string; partner2?: string; couple_photo_url?: string } | undefined
   return {
     title: wedding ? `${wedding.partner1} & ${wedding.partner2}` : "SF Invitation",
-    icons: wedding?.logo_url ? { icon: wedding.logo_url } : undefined,
+    icons: {
+      icon: wedding?.logo_url ?? "/favicon.ico",
+      apple: wedding?.logo_url ?? "/favicon.ico",
+    },
+    openGraph: {
+      title: wedding ? `${wedding.partner1} & ${wedding.partner2}` : "SF Invitation",
+      images: wedding?.couple_photo_url ? [{ url: wedding.couple_photo_url }] : [],
+    }
   }
 }
 
