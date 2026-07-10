@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/SF_for_link.png",
+        url: "/SF_for_link.jpg",
         width: 1080,
         height: 1080,
         alt: "SF Invitation",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SF Invitation",
     description: "Digital Wedding Invitations",
-    images: ["/SF_for_link.png"],
+    images: ["/SF_for_link.jpg"],
   },
 }
 
