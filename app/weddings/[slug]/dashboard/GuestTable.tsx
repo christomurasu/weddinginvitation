@@ -99,13 +99,13 @@ export default function GuestTable({
     const link = `https://sfinvitation.id/invitation-page/${guest.code}`
 
     if (guest.language === "id") {
-      const ceremony = `PEMBERKATAN PERNIKAHAN\n${wedding.date}\nPukul ${wedding.ceremony_time ?? ""}\n${wedding.ceremony_venue ?? ""}\n${wedding.ceremony_maps_url ?? ""}`
-      const reception = guest.invitation_type === "full" ? `\n\nRESEPSI\n${wedding.date}\nPukul ${wedding.reception_time ?? ""}\n${wedding.reception_venue ?? ""}\n${wedding.reception_maps_url ?? ""}` : ""
+      const ceremony = `PEMBERKATAN PERNIKAHAN\n${wedding.ceremony_time ?? ""}\n${wedding.ceremony_venue ?? ""}`
+      const reception = guest.invitation_type === "full" ? `\n\nRESEPSI\n${wedding.reception_time ?? ""}\n${wedding.reception_venue ?? ""}` : ""
       return `Kepada Yth. Bapak/Ibu\n${guest.greeting},\n\nAnda diundang untuk hadir dalam:\n*Pernikahan ${wedding.partner1} & ${wedding.partner2}*\n\nOrang tua yang terhormat,\n*${wedding.groom_father ?? ""} & ${wedding.groom_mother ?? ""}*\n_dan_\n*${wedding.bride_father ?? ""} & ${wedding.bride_mother ?? ""}*\n\n${ceremony}${reception}\n\nSilakan klik link di bawah untuk konfirmasi kehadiran:\n${link}\n\nHarap simpan *QR Code yang telah anda dapatkan saat RSVP* dan tunjukkan pada saat Check In. \n\nHormat kami,\n${wedding.partner1} & ${wedding.partner2}\n\nPerfect Moment Organizer\nIvan - 085103949090\nRSVP by SF Invitation`
     }
 
-    const ceremony = `HOLY MATRIMONY\n${wedding.date}\nAt ${wedding.ceremony_time ?? ""}\n${wedding.ceremony_venue ?? ""}\n${wedding.ceremony_maps_url ?? ""}`
-    const reception = guest.invitation_type === "full" ? `\n\nRECEPTION\n${wedding.date}\nAt ${wedding.reception_time ?? ""}\n${wedding.reception_venue ?? ""}\n${wedding.reception_maps_url ?? ""}` : ""
+    const ceremony = `HOLY MATRIMONY\n${wedding.ceremony_time ?? ""}\n${wedding.ceremony_venue ?? ""}`
+    const reception = guest.invitation_type === "full" ? `\n\nRECEPTION\n${wedding.reception_time ?? ""}\n${wedding.reception_venue ?? ""}` : ""
     return `Dear Mr. & Mrs. ${guest.greeting},\n\nYou are invited to:\nThe Wedding of *${wedding.partner1} & ${wedding.partner2}*\n\nBlessed Parents,\n*${wedding.groom_father ?? ""} & ${wedding.groom_mother ?? ""}*\n_and_\n*${wedding.bride_father ?? ""} & ${wedding.bride_mother ?? ""}*\n\n${ceremony}${reception}\n\nPlease click the button below to start RSVP:\n${link}\n\nPlease save this *QR Code from your RSVP* and present it at Check In.\n\nBest Regards,\n${wedding.partner1} & ${wedding.partner2}\n\nPerfect Moment Organizer\nIvan - 085103949090\nRSVP by SF Invitation`
   }
 
