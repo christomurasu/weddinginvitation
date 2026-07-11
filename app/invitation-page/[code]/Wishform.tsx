@@ -52,7 +52,7 @@ export default function WishForm({
     <div>
       {/* QR Popup */}
       {showPopup && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 9999999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <div style={{ background: "#faf7f2", padding: 32, maxWidth: 360, width: "100%", textAlign: "center" }}>
             <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 14, color: "#5F5F5F", marginBottom: 8, letterSpacing: "0.05em", textTransform: "uppercase" }}>
               {lang === "id" ? "RSVP Berhasil!" : "RSVP Confirmed!"}
