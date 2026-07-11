@@ -189,7 +189,7 @@ export default async function InvitationPage({
             {wedding.wedding_date_iso && <CountdownBanner targetDate={wedding.wedding_date_iso} lang={lang} />}
             <p style={{
               fontFamily: "'Poppins', sans-serif", fontWeight: 700,
-              fontSize: "clamp(14px, 2.5dvh, 18px)",
+              fontSize: "clamp(14px, 3dvh, 18px)",
               color: "#5F5F5F", textAlign: "center",
               padding: "1.5dvh 28px 1dvh"
             }}>
@@ -205,7 +205,7 @@ export default async function InvitationPage({
             <div style={{ padding: "1dvh 28px 2dvh", textAlign: "center", overflowY: "auto" }}>
               <p style={{
                 fontFamily: "'Poppins', sans-serif", fontWeight: 700,
-                fontSize: "clamp(13px, 2dvh, 16px)",
+                fontSize: "clamp(13px, 3dvh, 16px)",
                 color: "#5F5F5F", marginBottom: "0.5dvh"
               }}>
                 {wedding.ceremony_venue}
@@ -228,7 +228,7 @@ export default async function InvitationPage({
             <div style={{ height: "100dvh", display: "flex", flexDirection: "column", justifyContent: "center", overflow: "hidden" }}>
               <p style={{
                 fontFamily: "'Poppins', sans-serif", fontWeight: 700,
-                fontSize: "clamp(14px, 2.5dvh, 18px)",
+                fontSize: "clamp(14px, 4dvh, 18px)",
                 color: "#5F5F5F", textAlign: "center",
                 padding: "1.5dvh 28px 1dvh"
               }}>
@@ -244,14 +244,14 @@ export default async function InvitationPage({
               <div style={{ padding: "1dvh 28px 2dvh", textAlign: "center", overflowY: "auto" }}>
                 <p style={{
                   fontFamily: "'Poppins', sans-serif", fontWeight: 700,
-                  fontSize: "clamp(13px, 2dvh, 16px)",
+                  fontSize: "clamp(13px, 3dvh, 16px)",
                   color: "#5F5F5F", marginBottom: "0.5dvh"
                 }}>
                   {wedding.reception_venue}
                 </p>
                 <p style={{
                   fontFamily: "'Poppins', sans-serif", fontWeight: 400,
-                  fontSize: "clamp(11px, 1.8dvh, 15px)",
+                  fontSize: "clamp(11px, 2dvh, 15px)",
                   color: "#5F5F5F", lineHeight: 1.5, marginBottom: "1.5dvh"
                 }}>
                   {wedding.reception_address}
