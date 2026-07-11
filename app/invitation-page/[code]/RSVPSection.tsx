@@ -27,9 +27,10 @@ function RSVPCard({ title, bgColor, titleColor, field, maxAttendees, initialRsvp
   initialRsvp: string; initialAdults: number; initialKids: number; lang: Lang
   onChange: (rsvp: string, adults: number, kids: number) => void
 }) {
-  const [rsvp, setRsvp] = useState(initialRsvp)
-  const [adults, setAdults] = useState(initialAdults)
-  const [kids, setKids] = useState(initialKids)
+  
+  const [rsvp, setRsvp] = useState(initialRsvp === "pending" ? "confirmed" : initialRsvp)
+  const [adults, setAdults] = useState(initialRsvp === "pending" ? 1 : initialAdults)
+  const [kids, setKids] = useState(initialRsvp === "pending" ? 0 : initialKids)
   const tr = t[lang]
 
   function handleYes() {
@@ -62,10 +63,10 @@ function RSVPCard({ title, bgColor, titleColor, field, maxAttendees, initialRsvp
         {title}
       </p>
       <div style={{ display: "flex", gap: 10, marginBottom: rsvp === "confirmed" ? 10 : 0 }}>
-        <button onClick={handleYes} style={{ flex: 1, padding: "clamp(8px, 1.5dvh, 11px)", background: rsvp === "confirmed" ? "#535A36" : "rgba(0,0,0,0.15)", color: "#fff", border: "none", fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(12px, 1.8dvh, 14px)", cursor: "pointer" }}>
+        <button onClick={handleYes} style={{ flex: 1, padding: "clamp(8px, 1.2dvh, 11px)", background: rsvp === "declined" ? "#888" : "#535A36", color: "#fff", border: "none", fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(12px, 1.8dvh, 14px)", cursor: "pointer" }}>
           {tr.yes}
         </button>
-        <button onClick={handleNo} style={{ flex: 1, padding: "clamp(8px, 1.5dvh, 11px)", background: rsvp === "declined" ? "#555" : "rgba(0,0,0,0.15)", color: "#fff", border: "none", fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(12px, 1.8dvh, 14px)", cursor: "pointer" }}>
+        <button onClick={handleNo} style={{ flex: 1, padding: "clamp(8px, 1.2dvh, 11px)", background: rsvp === "declined" ? "#535A36" : "#888", color: "#fff", border: "none", fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(12px, 1.8dvh, 14px)", cursor: "pointer" }}>
           {tr.no}
         </button>
       </div>

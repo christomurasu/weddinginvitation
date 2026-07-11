@@ -39,18 +39,18 @@ export default function WishForm({
 
   return (
     <div>
-      <div style={{ marginBottom: 14 }}>
+      <div style={{ marginBottom: 2 }}>
         <textarea
           value={message}
           onChange={e => setMessage(e.target.value)}
           placeholder={tr.wishPlaceholder}
-          rows={3}
+          rows={1}
           style={{
             width: "100%", background: "#fdf8ee",
             border: "1px solid rgba(0,0,0,0.15)",
-            color: "#5F5F5F", padding: "10px 12px", fontSize: 14,
+            color: "#5F5F5F", padding: "10px 10px", fontSize: 12,
             outline: "none", fontFamily: "'Poppins', sans-serif",
-            fontStyle: "italic", resize: "vertical", lineHeight: 1.6
+            fontStyle: "italic", resize: "vertical", lineHeight: 1,
           }}
         />
       </div>
@@ -59,8 +59,8 @@ export default function WishForm({
         disabled={loading || !message.trim()}
         style={{
           width: "100%", background: "#535A36", color: "#fff", border: "none",
-          padding: "12px", fontSize: 13, fontFamily: "'Poppins', sans-serif",
-          fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase",
+          padding: "8px 12px", fontSize: 12, fontFamily: "'Poppins', sans-serif",
+          fontWeight: 700, letterSpacing: "0.05em",
           cursor: loading ? "not-allowed" : "pointer",
           opacity: loading || !message.trim() ? 0.5 : 1
         }}

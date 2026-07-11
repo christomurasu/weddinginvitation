@@ -60,8 +60,8 @@ export default function MusicPlayer({ musicUrl }: { musicUrl: string }) {
           position: "fixed",
           bottom: 24,
           right: 24,
-          width: 48,
-          height: 48,
+          width: 38,
+          height: 38,
           borderRadius: "50%",
           background: "rgba(44,44,42,0.88)",
           border: "1px solid rgba(184,150,90,0.5)",
@@ -79,12 +79,12 @@ export default function MusicPlayer({ musicUrl }: { musicUrl: string }) {
         title={playing ? "Pause musik" : "Play musik"}
       >
         {playing ? (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#e8d5a3">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
             <rect x="5" y="4" width="4" height="16" rx="1" />
             <rect x="15" y="4" width="4" height="16" rx="1" />
           </svg>
         ) : (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#e8d5a3">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
             <polygon points="6,4 20,12 6,20" />
           </svg>
         )}

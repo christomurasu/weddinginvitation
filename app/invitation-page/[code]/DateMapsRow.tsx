@@ -42,7 +42,8 @@ export default function DateMapsRow({
         <p style={{
           fontFamily: "'Poppins', sans-serif", fontWeight: 400,
           fontSize: "clamp(13px, 2.5dvh, 20px)",
-          color: "#5F5F5F", lineHeight: 1.3, margin: 0
+          color: "#5F5F5F", lineHeight: 1.3, margin: 0,
+          textAlign: "left"
         }}>
           {monthPart}<br />{yearPart}
         </p>
