@@ -212,7 +212,7 @@ export default async function InvitationPage({
               </p>
               <p style={{
                 fontFamily: "'Poppins', sans-serif", fontWeight: 400,
-                fontSize: "clamp(11px, 1.8dvh, 15px)",
+                fontSize: "clamp(11px, 2dvh, 15px)",
                 color: "#5F5F5F", lineHeight: 1.5, marginBottom: "1.5dvh"
               }}>
                 {wedding.ceremony_address}

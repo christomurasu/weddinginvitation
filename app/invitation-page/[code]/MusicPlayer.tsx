@@ -78,7 +78,16 @@ export default function MusicPlayer({ musicUrl }: { musicUrl: string }) {
         }}
         title={playing ? "Pause musik" : "Play musik"}
       >
-        {playing ? "⏸" : "▶"}
+        {playing ? (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#e8d5a3">
+            <rect x="5" y="4" width="4" height="16" rx="1" />
+            <rect x="15" y="4" width="4" height="16" rx="1" />
+          </svg>
+        ) : (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#e8d5a3">
+            <polygon points="6,4 20,12 6,20" />
+          </svg>
+        )}
       </button>
 
       {playing && (
