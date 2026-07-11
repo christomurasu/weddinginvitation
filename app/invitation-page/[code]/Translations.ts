@@ -26,7 +26,7 @@ export const t = {
     no: "No",
     // WishForm
     wishPlaceholder: "Leave wishes here.",
-    wishButton: "Send Wishes",
+    wishButton: "Save",
     wishSent: "Thank you for your wishes! 🤍",
     // Google Maps
     googleMaps: "Google Maps",
@@ -56,7 +56,7 @@ export const t = {
     no: "Tidak Hadir",
     // WishForm
     wishPlaceholder: "Tulis ucapan dan doa di sini.",
-    wishButton: "Kirim Ucapan",
+    wishButton: "Simpan",
     wishSent: "Terima kasih atas ucapan dan doa kamu! 🤍",
     // Google Maps
     googleMaps: "Google Maps",

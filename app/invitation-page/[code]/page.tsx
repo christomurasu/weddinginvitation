@@ -1,5 +1,4 @@
 import { supabase } from "../../lib/supabase"
-import RSVPSection from "./RSVPSection"
 import WishForm from "./Wishform"
 import CoverPage from "./CoverPage"
 import MusicPlayer from "./MusicPlayer"
@@ -282,7 +281,10 @@ export default async function InvitationPage({
                 <p style={{ color: "#2c2c2a", fontStyle: "italic", fontSize: 14, lineHeight: 1.7, fontFamily: "Georgia, serif" }}>{guest.note}</p>
               </div>
             )}
-            <RSVPSection
+            <WishForm
+              weddingId={wedding.id}
+              guestName={guest.name}
+              lang={lang}
               guestCode={code}
               guestGreeting={guest.greeting || "Honoured Guest"}
               isCeremonyOnly={isCeremonyOnly}
@@ -293,14 +295,7 @@ export default async function InvitationPage({
               receptionRsvp={guest.reception_rsvp ?? "pending"}
               receptionAdults={guest.reception_adults ?? 0}
               receptionKids={guest.reception_kids ?? 0}
-              lang={lang}
             />
-            <div style={{ marginTop: 8 }}>
-              <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(14px, 2.5dvh, 20px)", color: "#5F5F5F", textAlign: "center", marginBottom: 16 }}>
-                {tr.wishes}
-              </p>
-              <WishForm weddingId={wedding.id} guestName={guest.name} lang={lang} />
-            </div>
           </div>
         </div>
 
