@@ -10,6 +10,7 @@ import DateMapsRow from "./DateMapsRow"
 import type { Metadata } from "next"
 import { t, Lang } from "./Translations"
 import FaviconSetter from "./FavIconSetter"
+import RSVPPopup from "./RSVPPopUp"
 
 export async function generateMetadata({
   params,
@@ -60,6 +61,7 @@ export default async function InvitationPage({
   const wishes = (await supabase.from("wishes").select("*").eq("wedding_id", wedding.id).order("created_at", { ascending: false })).data ?? []
 
   const isCeremonyOnly = guest.invitation_type === "ceremony"
+  const alreadyConfirmed = guest.ceremony_rsvp === "confirmed" || (!isCeremonyOnly && guest.reception_rsvp === "confirmed")
 
   const bgStyle = wedding.cover_photo_url ? `url('${wedding.cover_photo_url}') center/cover no-repeat` : "#d6cfc6"
   const sectionBg = wedding.cover_photo_url
@@ -79,6 +81,7 @@ export default async function InvitationPage({
       <ViewportFix />
       {wedding.logo_url && <FaviconSetter url={wedding.logo_url} />}
       {wedding.music_url && <MusicPlayer musicUrl={wedding.music_url} />}
+      {/* {alreadyConfirmed && <RSVPPopup guestCode={code} lang={lang} onClose={() => {}} />} */}
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
