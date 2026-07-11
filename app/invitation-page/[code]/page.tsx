@@ -179,7 +179,7 @@ export default async function InvitationPage({
 
         {photoList[1] && (
           <div className="snap-section">
-            <img src={photoList[1].url} alt="Photo 2" style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", top: 0, left: 0 }} />
+            <img src={photoList[1].url} alt="Photo 2" style={{ width: "100%", height: "100%", objectFit: "contain", position: "absolute", top: 0, left: 0 }} />
           </div>
         )}
 
@@ -196,8 +196,8 @@ export default async function InvitationPage({
               {tr.holyMatrimony}
             </p>
             {wedding.ceremony_image_url ? (
-              <div style={{ margin: "0 35px", aspectRatio: "325 / 150", position: "relative", overflow: "hidden", flexShrink: 0 }}>
-                <img src={wedding.ceremony_image_url} alt="Gereja" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              <div style={{ margin: "0 35px", aspectRatio: "325 / 240", position: "relative", overflow: "hidden", flexShrink: 0 }}>
+                <img src={wedding.ceremony_image_url} alt="Gereja" style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
               </div>
             ) : (
               <div style={{ margin: "0 35px", aspectRatio: "325 / 150", background: "#ede5d8", flexShrink: 0 }} />
@@ -235,8 +235,8 @@ export default async function InvitationPage({
                 {tr.reception}
               </p>
               {wedding.reception_image_url ? (
-                <div style={{ margin: "0 35px", aspectRatio: "325 / 150", position: "relative", overflow: "hidden", flexShrink: 0 }}>
-                  <img src={wedding.reception_image_url} alt="Venue Resepsi" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                <div style={{ margin: "0 35px", aspectRatio: "325 / 280", position: "relative", overflow: "hidden", flexShrink: 0 }}>
+                  <img src={wedding.reception_image_url} alt="Venue Resepsi" style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
                 </div>
               ) : (
                 <div style={{ margin: "0 35px", aspectRatio: "325 / 150", background: "#ede5d8", flexShrink: 0 }} />
