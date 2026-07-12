@@ -68,7 +68,7 @@ export default function IntroSection({
                 width: "clamp(100px, 20dvh, 165px)" as unknown as number,
                 height: "clamp(100px, 20dvh, 165px)" as unknown as number,
                 objectFit: "contain",
-                transform: "translate(-50%, -50%) rotate(-10deg)", zIndex: 2
+                transform: "translate(-50%, -50%) rotate(-10deg)", zIndex: 1
               }} />
             )}
             {stampUrl && align === "right" && (
@@ -78,7 +78,7 @@ export default function IntroSection({
                 width: "clamp(100px, 20dvh, 165px)" as unknown as number,
                 height: "clamp(100px, 20dvh, 165px)" as unknown as number,
                 objectFit: "contain",
-                transform: "translate(50%, 50%) rotate(10deg)", zIndex: 2
+                transform: "translate(50%, 50%) rotate(10deg)", zIndex: 1
               }} />
             )}
             <p style={{
@@ -86,7 +86,7 @@ export default function IntroSection({
               right: align === "left" ? 0 : "auto",
               left: align === "right" ? 0 : "auto",
               fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontStyle: "italic",
-              fontSize: "clamp(11px, 1.6dvh, 14px)", color: "#5F5F5F", whiteSpace: "nowrap", zIndex: 2
+              fontSize: "clamp(11px, 1.6dvh, 14px)", color: "#5F5F5F", whiteSpace: "nowrap", zIndex: 1
             }}>
               {roleLabel}
             </p>
