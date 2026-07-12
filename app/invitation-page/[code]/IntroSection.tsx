@@ -46,10 +46,10 @@ export default function IntroSection({
         }}>
           {name}
         </h1>
-        <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: "clamp(12px, 3dvh, 15px)", color: "#5F5F5F", marginBottom: "0.5dvh" }}>
+        <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: "clamp(12px, 2.5dvh, 15px)", color: "#5F5F5F", marginBottom: "0.5dvh", marginTop: "0.5dvh" }}>
           {parentLabel}
         </p>
-        <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(12px, 3dvh, 15px)", color: "#5F5F5F", maxWidth: 260 }}>
+        <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(12px, 2.5dvh, 15px)", color: "#5F5F5F", maxWidth: 260 }}>
           {parentNames}
         </p>
       </div>
