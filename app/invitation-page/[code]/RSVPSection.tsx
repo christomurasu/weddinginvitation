@@ -108,10 +108,10 @@ const RSVPSection = forwardRef<RSVPSectionRef, {
       <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(14px, 2.5dvh, 20px)", color: "#5F5F5F", textAlign: "center", marginBottom: 16 }}>
         {tr.rsvpTitle}
       </p>
-      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 1.8dvh, 14px)", color: "#5F5F5F", marginBottom: 4 }}>
+      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 2.5dvh, 15px)", color: "#5F5F5F", marginBottom: 4 }}>
         {tr.dearGuest}, <span style={{ fontWeight: 700 }}>{guestGreeting}</span>
       </p>
-      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 1.8dvh, 14px)", color: "#5F5F5F", marginBottom: 4, lineHeight: 1.5 }}>
+      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 2.5dvh, 15px)", color: "#5F5F5F", marginBottom: 4, lineHeight: 1.5 }}>
         {tr.rsvpSubtitle}
       </p>
       <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(10px, 1.6dvh, 12px)", color: "#888780", marginBottom: 20 }}>
