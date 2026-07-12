@@ -1,10 +1,10 @@
 "use client"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { supabase } from "../../lib/supabase"
 import { useRouter } from "next/navigation"
 import { t, Lang } from "./Translations"
 import RSVPSection, { RSVPSectionRef } from "./RSVPSection"
-import RSVPPopup from "./RSVPPopUp" // 👈 Mengimpor langsung popup yang sudah ada
+import RSVPPopupWrapper from "./RSVPPopupWrapper"
 
 export default function WishForm({
   weddingId, guestName, lang = "en",
@@ -30,12 +30,21 @@ export default function WishForm({
   const rsvpRef = useRef<RSVPSectionRef>(null)
   const [message, setMessage] = useState("")
   const [loading, setLoading] = useState(false)
-  
-  // 👈 Fungsi dan State penampil popup dibuat di dalam file ini:
   const [showPopup, setShowPopup] = useState(
     ceremonyRsvp === "confirmed" || (!isCeremonyOnly && receptionRsvp === "confirmed")
   )
   const tr = t[lang]
+
+  useEffect(() => {
+    const wrapper = document.getElementById("invitation-wrapper")
+    if (!wrapper) return
+    if (showPopup) {
+      wrapper.style.overflowY = "hidden"
+    } else {
+      wrapper.style.overflowY = "scroll"
+    }
+    return () => { wrapper.style.overflowY = "scroll" }
+  }, [showPopup])
 
   async function handleSubmit() {
     setLoading(true)
@@ -46,23 +55,19 @@ export default function WishForm({
       router.refresh()
     }
     setLoading(false)
-    
-    // 👈 Memunculkan popup setelah rsvp/wishes tersimpan
     setShowPopup(true)
   }
 
   return (
     <div>
-      {/* 👈 Menampilkan RSVPPopup bawaan Anda di sini */}
       {showPopup && (
-        <RSVPPopup 
-          guestCode={guestCode} 
-          lang={lang} 
-          onClose={() => setShowPopup(false)} 
+        <RSVPPopupWrapper
+          guestCode={guestCode}
+          lang={lang}
+          onClose={() => setShowPopup(false)}
         />
       )}
 
-      {/* RSVP + Wish Form */}
       <RSVPSection
         ref={rsvpRef}
         guestCode={guestCode}

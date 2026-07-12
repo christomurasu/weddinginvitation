@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 export default function AlbumSection({
   bgUrl,
@@ -14,6 +14,17 @@ export default function AlbumSection({
 }) {
   const [showPopup, setShowPopup] = useState(false)
   const validPhotos = photos.filter(Boolean) as string[]
+
+  useEffect(() => {
+    const wrapper = document.getElementById("invitation-wrapper")
+    if (!wrapper) return
+    if (showPopup) {
+      wrapper.style.overflowY = "hidden"
+    } else {
+      wrapper.style.overflowY = "scroll"
+    }
+    return () => { wrapper.style.overflowY = "scroll" }
+  }, [showPopup])
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden" }}>
@@ -49,6 +60,7 @@ export default function AlbumSection({
           </div>
         )}
 
+        {/* Button See More */}
         {validPhotos.length > 0 && (
           <button
             onClick={() => setShowPopup(true)}

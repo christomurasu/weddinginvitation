@@ -12,7 +12,6 @@ import { t, Lang } from "./Translations"
 import FaviconSetter from "./FavIconSetter"
 import IntroAlbum from "./IntroAlbum"
 import AlbumSection from "./AlbumSection"
-import RSVPPopup from "./RSVPPopUp"
 
 export async function generateMetadata({
   params,
@@ -63,7 +62,6 @@ export default async function InvitationPage({
   const wishes = (await supabase.from("wishes").select("*").eq("wedding_id", wedding.id).order("created_at", { ascending: false })).data ?? []
 
   const isCeremonyOnly = guest.invitation_type === "ceremony"
-  const alreadyConfirmed = guest.ceremony_rsvp === "confirmed" || (!isCeremonyOnly && guest.reception_rsvp === "confirmed")
 
   const bgStyle = wedding.cover_photo_url ? `url('${wedding.cover_photo_url}') center/cover no-repeat` : "#d6cfc6"
   const sectionBg = wedding.cover_photo_url
