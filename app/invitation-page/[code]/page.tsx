@@ -83,7 +83,6 @@ export default async function InvitationPage({
       <ViewportFix />
       {wedding.logo_url && <FaviconSetter url={wedding.logo_url} />}
       {wedding.music_url && <MusicPlayer musicUrl={wedding.music_url} />}
-      {alreadyConfirmed && <RSVPPopup guestCode={code} lang={lang} />}
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
