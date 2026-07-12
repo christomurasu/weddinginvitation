@@ -43,7 +43,7 @@ export default function CoverPage({
       )}
 
       <div style={{
-        position: "relative", zIndex: 1,
+        position: "relative", zIndex: 0,
         display: "flex", flexDirection: "column",
         alignItems: "center", width: "100%"
       }}>
