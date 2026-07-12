@@ -347,9 +347,6 @@ export default async function InvitationPage({
               {wishes.length > 0 ? wishes.map((w: { id: string; guest_name: string; message: string; created_at: string }) => (
                 <div key={w.id} style={{ marginBottom: 12 }}>
                   <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontFamily: "'Poppins', sans-serif", fontSize: 11, color: "#888780" }}>
-                      {new Date(w.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-                    </span>
                     <span style={{ display: "inline-block", background: "#ffffff", padding: "6px 12px", fontFamily: "Georgia, serif", fontStyle: "italic", fontSize: 14, color: "#5F5F5F" }}>
                       {w.guest_name}
                     </span>
