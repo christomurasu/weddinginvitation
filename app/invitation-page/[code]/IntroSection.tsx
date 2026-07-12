@@ -29,8 +29,8 @@ export default function IntroSection({
         {showGreeting && (
           <>
             <p style={{ marginBottom: "0.8dvh" }}>
-              <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: "clamp(11px, 1.8dvh, 15px)", color: "#5F5F5F" }}>{tr.dearGuest} </span>
-              <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(11px, 1.8dvh, 15px)", color: "#5F5F5F" }}>{guestGreeting},</span>
+              <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: "clamp(11px, 2.5dvh, 15px)", color: "#5F5F5F" }}>{tr.dearGuest} </span>
+              <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(11px, 2.5dvh, 15px)", color: "#5F5F5F" }}>{guestGreeting},</span>
             </p>
             <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: "clamp(11px, 1.8dvh, 15px)", color: "#5F5F5F", marginBottom: "2dvh", maxWidth: 260 }}>
               {tr.invitedTo}
