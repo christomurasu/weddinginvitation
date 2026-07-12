@@ -12,6 +12,7 @@ import { t, Lang } from "./Translations"
 import FaviconSetter from "./FavIconSetter"
 import IntroAlbum from "./IntroAlbum"
 import AlbumSection from "./AlbumSection"
+import RSVPPopup from "./RSVPPopUp"
 
 export async function generateMetadata({
   params,
