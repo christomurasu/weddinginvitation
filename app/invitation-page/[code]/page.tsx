@@ -10,7 +10,8 @@ import DateMapsRow from "./DateMapsRow"
 import type { Metadata } from "next"
 import { t, Lang } from "./Translations"
 import FaviconSetter from "./FavIconSetter"
-import RSVPPopup from "./RSVPPopUp"
+import IntroAlbum from "./IntroAlbum"
+import AlbumSection from "./AlbumSection"
 
 export async function generateMetadata({
   params,
@@ -81,7 +82,7 @@ export default async function InvitationPage({
       <ViewportFix />
       {wedding.logo_url && <FaviconSetter url={wedding.logo_url} />}
       {wedding.music_url && <MusicPlayer musicUrl={wedding.music_url} />}
-      {/* {alreadyConfirmed && <RSVPPopup guestCode={code} lang={lang} onClose={() => {}} />} */}
+      {alreadyConfirmed && <RSVPPopup guestCode={code} lang={lang} />}
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
@@ -273,6 +274,35 @@ export default async function InvitationPage({
         {photoList[3] && (
           <div className="snap-section">
             <img src={photoList[3].url} alt="Photo 4" style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", top: 0, left: 0 }} />
+          </div>
+        )}
+
+         {/* Intro Album */}
+        {wedding.intro_bg_url && (
+          <div className="snap-section">
+            <IntroAlbum
+              bgUrl={wedding.intro_bg_url}
+              photoUrl={wedding.intro_polaroid_url}
+            />
+          </div>
+        )}
+
+        {/* Album Section */}
+        {wedding.album_bg_url && (
+          <div className="snap-section">
+            <AlbumSection
+              bgUrl={wedding.album_bg_url}
+              title={wedding.album_title}
+              stripUrl={wedding.album_strip_url}
+              photos={[
+                wedding.album_photo1_url,
+                wedding.album_photo2_url,
+                wedding.album_photo3_url,
+                wedding.album_photo4_url,
+                wedding.album_photo5_url,
+                wedding.album_photo6_url,
+              ]}
+            />
           </div>
         )}
 
