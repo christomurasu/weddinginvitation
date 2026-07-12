@@ -60,7 +60,8 @@ export default function IntroSection({
             width: "55%", aspectRatio: "231 / 280",
             marginRight: align === "left" ? 28 : 0,
             marginLeft: align === "right" ? 28 : 0,
-            marginBottom: "3dvh", marginTop: "2dvh", position: "relative"
+            marginBottom: "3dvh", marginTop: "2dvh", position: "relative", 
+            zIndex: 0
           }}>
             {stampUrl && align === "left" && (
               <img src={stampUrl} alt="Stamp" style={{

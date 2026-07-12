@@ -90,7 +90,7 @@ export default function CoverPage({
               style={{
                 position: "absolute", inset: 0,
                 width: "100%", height: "100%",
-                objectFit: "contain", zIndex: 2
+                objectFit: "contain", zIndex: 0
               }}
             />
           )}
@@ -120,7 +120,7 @@ export default function CoverPage({
       <div style={{
         position: "absolute", bottom: 24,
         left: 0, right: 0,
-        textAlign: "center", zIndex: 1
+        textAlign: "center", zIndex: 0
       }}>
         <p style={{
           fontSize: 10, color: "#b4b2a9",
