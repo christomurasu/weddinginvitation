@@ -277,7 +277,7 @@ export default async function InvitationPage({
           </div>
         )}
 
-         {/* Intro Album */}
+        {/* Intro Album */}
         {wedding.intro_bg_url && (
           <div className="snap-section">
             <IntroAlbum
@@ -301,6 +301,12 @@ export default async function InvitationPage({
                 wedding.album_photo4_url,
                 wedding.album_photo5_url,
                 wedding.album_photo6_url,
+                wedding.album_photo7_url,
+                wedding.album_photo8_url,
+                wedding.album_photo9_url,
+                wedding.album_photo10_url,
+                wedding.album_photo11_url,
+                wedding.album_photo12_url,
               ]}
             />
           </div>

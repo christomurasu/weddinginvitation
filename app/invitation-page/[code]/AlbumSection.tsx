@@ -23,7 +23,7 @@ export default function AlbumSection({
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }} />
       )}
 
-      {/* Content */}
+      {/* Content Utama */}
       <div style={{
         position: "relative", zIndex: 1,
         width: "100%", height: "100%",
@@ -33,7 +33,6 @@ export default function AlbumSection({
         paddingTop: "30px",
         gap: "2dvh"
       }}>
-        {/* Judul */}
         <p style={{
           fontFamily: "'Poppins', sans-serif", fontWeight: 700,
           fontSize: "clamp(13px, 2dvh, 18px)",
@@ -43,7 +42,6 @@ export default function AlbumSection({
           {title || "Our Gallery"}
         </p>
 
-        {/* Strip foto */}
         {stripUrl && (
           <div style={{ width: "100%", maxHeight: "95dvh", overflow: "hidden" }}>
             <img src={stripUrl} alt="Strip"
@@ -51,7 +49,6 @@ export default function AlbumSection({
           </div>
         )}
 
-        {/* Button See More */}
         {validPhotos.length > 0 && (
           <button
             onClick={() => setShowPopup(true)}
@@ -68,48 +65,108 @@ export default function AlbumSection({
           </button>
         )}
       </div>
-
-      {/* Popup */}
-      {/* Popup */}
+      
+      {/* FULLSCREEN NEW SECTION OVERLAY */}
 {showPopup && (
   <div style={{
-    position: "absolute", inset: 0, 
-    background: "rgba(0, 0, 0, 0.7)", 
-    zIndex: 9999, 
+    position: "fixed", /* Tetap fixed agar mengunci layar belakang */
+    inset: 0, 
+    background: "rgba(0, 0, 0, 0.5)", /* Overlay transparan tipis di luar area undangan */
+    zIndex: 99999, 
     display: "flex", 
-    flexDirection: "column",
-    justifyContent: "center", /* Memposisikan konten tepat di tengah secara vertikal */
-    overflowY: "auto",
-    padding: "25px"
+    justifyContent: "center", /* Memposisikan kontainer di tengah layar */
+    alignItems: "center"
   }}>
-    {/* Grid foto */}
+    
+    {/* Kontainer Utama Galeri (Ukurannya disamakan dengan undangan) */}
     <div style={{
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: 0,
-      background: "#222", 
-      width: "100%"
+      width: "100%",
+      maxWidth: "500px", /* SULP/Ukuran standar wrapper undangan mobile (bisa disesuaikan misal 450px atau 100% jika di HP) */
+      height: "100%", /* Mengisi penuh tinggi layar */
+      background: "rgba(0, 0, 0, 0.5)", 
+      display: "flex", 
+      flexDirection: "column",
+      boxSizing: "border-box",
+      position: "relative"
     }}>
-      {validPhotos.map((url, i) => (
-        <div key={i} style={{ overflow: "hidden", lineHeight: 0, margin: 0, padding: 0 }}>
-          <img src={url} alt={`Photo ${i + 1}`}
-            style={{ width: "100%", aspectRatio: "1 / 1", objectFit: "cover", display: "block" }} />
-        </div>
-      ))}
-    </div>
 
-    {/* Back button */}
-    <button
-      onClick={() => setShowPopup(false)}
-      style={{
-        width: "100%", background: "#c6294b", color: "#fff", border: "none",
-        padding: "16px", fontFamily: "'Poppins', sans-serif",
-        fontWeight: 700, fontSize: 14, cursor: "pointer",
-        letterSpacing: "0.05em", flexShrink: 0, marginTop: "20px"
-      }}
-    >
-      Back
-    </button>
+      {/* Header Section */}
+      <div style={{
+        padding: "20px",
+        textAlign: "center",
+        background: "#1a1a1a",
+        borderBottom: "1px solid #333"
+      }}>
+        <p style={{
+          margin: 0,
+          fontFamily: "'Poppins', sans-serif", fontWeight: 600,
+          fontSize: "14px", letterSpacing: "0.2em", color: "#fff",
+          textTransform: "uppercase"
+        }}>
+          {title || "Our Gallery"}
+        </p>
+      </div>
+
+      {/* Area Grid Scrollable */}
+      <div style={{
+        flex: 1,
+        overflowY: "auto",
+        width: "100%",
+        WebkitOverflowScrolling: "touch"
+      }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "2px", 
+          background: "#111"
+        }}>
+          {validPhotos.map((url, i) => (
+            <div 
+              key={i} 
+              style={{ 
+                width: "100%",
+                aspectRatio: "1 / 1", 
+                position: "relative",
+                overflow: "hidden"
+              }}
+            >
+              <img 
+                src={url} 
+                alt={`Photo ${i + 1}`}
+                style={{ 
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%", 
+                  height: "100%", 
+                  objectFit: "cover", 
+                  display: "block" 
+                }} 
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer Stick Button */}
+      <div style={{
+        padding: "15px 20px",
+        background: "#1a1a1a",
+        borderTop: "1px solid #333"
+      }}>
+        <button
+          onClick={() => setShowPopup(false)}
+          style={{
+            width: "100%", background: "#c6294b", color: "#fff", border: "none",
+            padding: "14px", fontFamily: "'Poppins', sans-serif",
+            fontWeight: 700, fontSize: 14, cursor: "pointer",
+            letterSpacing: "0.1em", borderRadius: "4px"
+          }}
+        >
+          Back to Invitation
+        </button>
+      </div>
+
+    </div>
   </div>
 )}
     </div>

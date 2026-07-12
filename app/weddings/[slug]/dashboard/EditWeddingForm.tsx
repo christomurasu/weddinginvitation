@@ -56,6 +56,12 @@ interface Wedding {
   album_photo4_url: string
   album_photo5_url: string
   album_photo6_url: string
+  album_photo7_url: string
+  album_photo8_url: string
+  album_photo9_url: string
+  album_photo10_url: string
+  album_photo11_url: string
+  album_photo12_url: string
 }
 
 type PhotoFieldType =
@@ -84,6 +90,12 @@ type PhotoFieldType =
   | "album_photo4_url"
   | "album_photo5_url"
   | "album_photo6_url"
+  | "album_photo7_url"
+  | "album_photo8_url"
+  | "album_photo9_url"
+  | "album_photo10_url"
+  | "album_photo11_url"
+  | "album_photo12_url"
 
 const PNG_FIELDS: PhotoFieldType[] = [
   "logo_url",
@@ -95,14 +107,20 @@ const PNG_FIELDS: PhotoFieldType[] = [
   "bride_stamp_url",
   "intro_bg_url",
   "intro_polaroid_url",
-  "album_bg_url",       // ← tambah
-  "album_strip_url",    // ← tambah
-  "album_photo1_url",   // ← tambah
-  "album_photo2_url",   // ← tambah
-  "album_photo3_url",   // ← tambah
-  "album_photo4_url",   // ← tambah
-  "album_photo5_url",   // ← tambah
-  "album_photo6_url",   // ← tambah
+  "album_bg_url",
+  "album_strip_url",
+  "album_photo1_url",
+  "album_photo2_url",
+  "album_photo3_url",
+  "album_photo4_url",
+  "album_photo5_url",
+  "album_photo6_url",
+  "album_photo7_url",
+  "album_photo8_url",
+  "album_photo9_url",
+  "album_photo10_url",
+  "album_photo11_url",
+  "album_photo12_url",
 ]
 
 function PhotoField({
@@ -229,6 +247,12 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
     album_photo4_url: wedding.album_photo4_url ?? "",
     album_photo5_url: wedding.album_photo5_url ?? "",
     album_photo6_url: wedding.album_photo6_url ?? "",
+    album_photo7_url: wedding.album_photo7_url ?? "",
+    album_photo8_url: wedding.album_photo8_url ?? "",
+    album_photo9_url: wedding.album_photo9_url ?? "",
+    album_photo10_url: wedding.album_photo10_url ?? "",
+    album_photo11_url: wedding.album_photo11_url ?? "",
+    album_photo12_url: wedding.album_photo12_url ?? "",
   })
 
   async function compressImage(file: File): Promise<Blob> {
@@ -355,6 +379,12 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
       album_photo4_url: form.album_photo4_url || null,
       album_photo5_url: form.album_photo5_url || null,
       album_photo6_url: form.album_photo6_url || null,
+      album_photo7_url: form.album_photo7_url || null,
+      album_photo8_url: form.album_photo8_url || null,
+      album_photo9_url: form.album_photo9_url || null,
+      album_photo10_url: form.album_photo10_url || null,
+      album_photo11_url: form.album_photo11_url || null,
+      album_photo12_url: form.album_photo12_url || null,
     }).eq("id", wedding.id)
     if (error) console.error("Save error:", error)
     setLoading(false)
@@ -547,7 +577,7 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
         value={form.album_strip_url} uploading={uploading} deleting={deleting}
         onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
       <p style={{ fontSize: 10, color: "#b8965a", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Foto Popup (6 foto)</p>
-      {(["album_photo1_url", "album_photo2_url", "album_photo3_url", "album_photo4_url", "album_photo5_url", "album_photo6_url"] as const).map((field, i) => (
+      {(["album_photo1_url", "album_photo2_url", "album_photo3_url", "album_photo4_url", "album_photo5_url", "album_photo6_url", "album_photo7_url", "album_photo8_url", "album_photo9_url", "album_photo10_url", "album_photo11_url", "album_photo12_url"] as const).map((field, i) => (
         <PhotoField key={field} label={`Foto ${i + 1}`} field={field}
           value={form[field]} uploading={uploading} deleting={deleting}
           onUpload={handlePhotoUpload} onDelete={handlePhotoDelete} />
