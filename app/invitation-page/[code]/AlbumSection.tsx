@@ -83,7 +83,7 @@ export default function AlbumSection({
       width: "100%",
       maxWidth: "500px", /* SULP/Ukuran standar wrapper undangan mobile (bisa disesuaikan misal 450px atau 100% jika di HP) */
       height: "100%", /* Mengisi penuh tinggi layar */
-      background: "rgba(0, 0, 0, 0.5)", 
+      background: "#faf7f2",
       display: "flex", 
       flexDirection: "column",
       boxSizing: "border-box",
@@ -94,13 +94,12 @@ export default function AlbumSection({
       <div style={{
         padding: "20px",
         textAlign: "center",
-        background: "#1a1a1a",
-        borderBottom: "1px solid #333"
+        background: "transparent"
       }}>
         <p style={{
           margin: 0,
           fontFamily: "'Poppins', sans-serif", fontWeight: 600,
-          fontSize: "14px", letterSpacing: "0.2em", color: "#fff",
+          fontSize: "14px", letterSpacing: "0.2em", color: "#5F5F5F",
           textTransform: "uppercase"
         }}>
           {title || "Our Gallery"}
@@ -150,7 +149,7 @@ export default function AlbumSection({
       {/* Footer Stick Button */}
       <div style={{
         padding: "15px 20px",
-        background: "#1a1a1a",
+        background: "#faf7f2",
         borderTop: "1px solid #333"
       }}>
         <button
