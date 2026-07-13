@@ -41,7 +41,7 @@ export default function RSVPPopup({
                 width: "100%", background: "#535A36", color: "#fff", border: "none",
                 padding: "12px", fontFamily: "'Poppins', sans-serif",
                 fontWeight: 700, fontSize: 12, cursor: "pointer",
-                letterSpacing: "0.05em", textTransform: "uppercase",
+                letterSpacing: "0.05em",
                 marginBottom: 10
               }}
             >
@@ -61,7 +61,7 @@ export default function RSVPPopup({
             border: "1px solid rgba(0,0,0,0.15)",
             padding: "12px", fontFamily: "'Poppins', sans-serif",
             fontWeight: 400, fontSize: 12, cursor: "pointer",
-            letterSpacing: "0.05em", textTransform: "uppercase"
+            letterSpacing: "0.05em"
           }}
         >
           {lang === "id" ? "Kembali ke Undangan" : "Back to Invitation"}
