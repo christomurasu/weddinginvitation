@@ -47,7 +47,7 @@ export default function CoverPage({
         position: "relative", zIndex: 0,
         display: "flex", flexDirection: "column",
         alignItems: "center", width: "100%",
-        transform: "translateY(-10%)"
+        transform: "translateY(-6%)"
       }}>
 
         {logoUrl && (
@@ -62,8 +62,8 @@ export default function CoverPage({
         )}
 
         <div style={{
-          width: "clamp(207px, 63vw, 299px)",
-          height: "clamp(207px, 63vw, 299px)",
+          width: "clamp(216px, 66vw, 312px)",
+          height: "clamp(216px, 66vw, 312px)",
           position: "relative",
           marginBottom: "clamp(24px, 5vh, 36px)",
           background: "transparent"
