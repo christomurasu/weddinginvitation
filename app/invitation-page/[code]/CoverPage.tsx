@@ -62,8 +62,8 @@ export default function CoverPage({
         )}
 
         <div style={{
-          width: "clamp(180px, 55vw, 260px)",
-          height: "clamp(180px, 55vw, 260px)",
+          width: "clamp(207px, 63vw, 299px)",
+          height: "clamp(207px, 63vw, 299px)",
           position: "relative",
           marginBottom: "clamp(24px, 5vh, 36px)",
           background: "transparent"
