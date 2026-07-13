@@ -92,14 +92,19 @@ export default function WishForm({
           style={{
             width: "100%", background: "#fdf8ee",
             border: "1px solid rgba(0,0,0,0.15)",
-            color: "#5F5F5F", padding: "10px 10px", fontSize: 12,
-            outline: "none", fontFamily: "'Poppins', sans-serif",
-            fontStyle: "italic", resize: "vertical", lineHeight: 1,
+            color: "#5F5F5F", padding: "10px 10px", fontSize: "clamp(10px, 2dvh, 12px)",
+            outline: "none", fontFamily: "'Poppins', sans-serif", 
+            resize: "vertical", lineHeight: 1,
             fontWeight: 400
           }}
         />
       </div>
-      <style>{`textarea::placeholder { font-weight: 400; font-style: italic; }`}</style>
+      <style>{`
+        textarea::placeholder {
+          font-weight: 400 !important;
+          opacity: 0.6;
+        }
+      `}</style>
 
       <button
         onClick={handleSubmit}
