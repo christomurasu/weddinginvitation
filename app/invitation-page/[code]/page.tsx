@@ -337,11 +337,11 @@ export default async function InvitationPage({
         </div>
 
         <div className="snap-section" style={sectionBg}>
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "40px 0" }}>
-            <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(14px, 2.5dvh, 20px)", color: "#5F5F5F", letterSpacing: "0.05em", textAlign: "center", marginBottom: 12 }}>
+          <div style={{ height: "100dvh", display: "flex", flexDirection: "column", padding: "40px 0" }}>
+            <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(14px, 2.5dvh, 20px)", color: "#5F5F5F", letterSpacing: "0.05em", textAlign: "center", marginBottom: 20, flexShrink: 0 }}>
               {tr.wishesTitle}
             </p>
-            <div style={{ margin: "0 25px", background: "#F4F1EA", flex: 1, overflowY: "auto", padding: "16px" }}>
+            <div style={{ margin: "0 25px", background: "#F4F1EA", flex: 1, minHeight: 0, overflowY: "auto", padding: "16px" }}>
               {wishes.length > 0 ? wishes.map((w: { id: string; guest_name: string; message: string; created_at: string }) => (
                 <div key={w.id} style={{ marginBottom: 12 }}>
                   <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 8 }}>
