@@ -29,10 +29,10 @@ export default function IntroSection({
         {showGreeting && (
           <>
             <p style={{ marginBottom: "0.8dvh" }}>
-              <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: "clamp(11px, 2.5dvh, 15px)", color: "#5F5F5F" }}>{tr.dearGuest} </span>
-              <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(11px, 2.5dvh, 15px)", color: "#5F5F5F" }}>{guestGreeting},</span>
+              <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: "clamp(11px, 2.3dvh, 15px)", color: "#5F5F5F" }}>{tr.dearGuest} </span>
+              <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(11px, 2.3dvh, 15px)", color: "#5F5F5F" }}>{guestGreeting},</span>
             </p>
-            <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: "clamp(11px, 2.5dvh, 15px)", color: "#5F5F5F", marginBottom: "2dvh", maxWidth: 260 }}>
+            <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: "clamp(11px, 2.3dvh, 15px)", color: "#5F5F5F", marginBottom: "2dvh", maxWidth: 260 }}>
               {tr.invitedTo}
             </p>
           </>
@@ -46,10 +46,10 @@ export default function IntroSection({
         }}>
           {name}
         </h1>
-        <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: "clamp(11px, 2.5dvh, 15px)", color: "#5F5F5F", marginBottom: "0.5dvh", marginTop: "0.5dvh" }}>
+        <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: "clamp(11px, 2.3dvh, 15px)", color: "#5F5F5F", marginBottom: "0.5dvh", marginTop: "0.5dvh" }}>
           {parentLabel}
         </p>
-        <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(11px, 2.5dvh, 15px)", color: "#5F5F5F", maxWidth: 260 }}>
+        <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(11px, 2.3dvh, 15px)", color: "#5F5F5F", maxWidth: 260 }}>
           {parentNames}
         </p>
       </div>
@@ -87,7 +87,7 @@ export default function IntroSection({
               right: align === "left" ? 0 : "auto",
               left: align === "right" ? 0 : "auto",
               fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontStyle: "italic",
-              fontSize: "clamp(11px, 1.6dvh, 14px)", color: "#5F5F5F", whiteSpace: "nowrap", zIndex: 1
+              fontSize: "clamp(11px, 2dvh, 14px)", color: "#5F5F5F", whiteSpace: "nowrap", zIndex: 1
             }}>
               {roleLabel}
             </p>
