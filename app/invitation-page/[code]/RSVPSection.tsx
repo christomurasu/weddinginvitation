@@ -114,8 +114,8 @@ const RSVPSection = forwardRef<RSVPSectionRef, {
       <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 2dvh, 15px)", color: "#5F5F5F", marginBottom: 4, lineHeight: 1.5 }}>
         {tr.rsvpSubtitle}
       </p>
-      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(10px, 1.6dvh, 12px)", color: "#888780", marginBottom: 20 }}>
-        Valid for {maxAttendees} {maxAttendees === 1 ? "person" : "persons"}
+      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(10px, 2dvh, 12px)", color: "#888780", marginBottom: 20 }}>
+        (Valid for {maxAttendees} {maxAttendees === 1 ? "person" : "persons"})
       </p>
 
       <RSVPCard

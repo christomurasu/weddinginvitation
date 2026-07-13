@@ -69,7 +69,7 @@ export default function AlbumSection({
               padding: "clamp(6px, 1dvh, 10px) clamp(24px, 5dvh, 40px)",
               fontFamily: "'Poppins', sans-serif", fontWeight: 700,
               fontSize: "clamp(11px, 1.8dvh, 13px)",
-              letterSpacing: "0.15em", textTransform: "uppercase",
+              letterSpacing: "0.15em",
               cursor: "pointer"
             }}
           >

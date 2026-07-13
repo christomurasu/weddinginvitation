@@ -338,7 +338,7 @@ export default async function InvitationPage({
 
         <div className="snap-section" style={sectionBg}>
           <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "40px 0" }}>
-            <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(14px, 2.5dvh, 20px)", color: "#5F5F5F", letterSpacing: "0.05em", textAlign: "center", marginBottom: 20 }}>
+            <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(14px, 2.5dvh, 20px)", color: "#5F5F5F", letterSpacing: "0.05em", textAlign: "center", marginBottom: 12 }}>
               {tr.wishesTitle}
             </p>
             <div style={{ margin: "0 25px", background: "#F4F1EA", flex: 1, overflowY: "auto", padding: "16px" }}>
@@ -360,13 +360,28 @@ export default async function InvitationPage({
               )}
             </div>
           </div>
+
+          <div style={{
+          textAlign: "center",
+          marginBottom: "12px"
+          }}>
+            <p style={{
+              fontFamily: "'Poppins', sans-serif",
+              fontSize: 12,
+              color: "#5F5F5F",
+              letterSpacing: "0.05em",
+              fontWeight: 700
+            }}>
+              was created by SF Invitation
+            </p>
+          </div>
         </div>
 
-        {photoList[4] && (
+        {/* {photoList[4] && (
           <div className="snap-section">
             <img src={photoList[4].url} alt="Photo 5" style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", top: 0, left: 0 }} />
           </div>
-        )}
+        )} */}
 
       </div>
     </>
