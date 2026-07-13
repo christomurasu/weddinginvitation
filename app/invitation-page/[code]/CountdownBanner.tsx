@@ -27,7 +27,7 @@ export default function CountdownBanner({ targetDate, lang = "en" }: { targetDat
     <div style={{
       width: "100%",
       height: "calc(126dvh / 844 * 100)",
-      marginTop: 24,
+      // marginTop: 24,
       background: "#535A36",
       display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center",
