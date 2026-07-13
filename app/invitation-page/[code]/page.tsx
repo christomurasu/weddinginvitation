@@ -359,23 +359,23 @@ export default async function InvitationPage({
                 </p>
               )}
             </div>
+            <div style={{
+              textAlign: "center",
+              marginTop: "12px",
+              marginBottom: "12px"
+              }}>
+                <p style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: 12,
+                  color: "#5F5F5F",
+                  letterSpacing: "0.05em",
+                  fontWeight: 700
+                }}>
+                  was created by SF Invitation
+                </p>
+              </div>
+            </div>
           </div>
-
-          <div style={{
-          textAlign: "center",
-          marginBottom: "12px"
-          }}>
-            <p style={{
-              fontFamily: "'Poppins', sans-serif",
-              fontSize: 12,
-              color: "#5F5F5F",
-              letterSpacing: "0.05em",
-              fontWeight: 700
-            }}>
-              was created by SF Invitation
-            </p>
-          </div>
-        </div>
 
         {/* {photoList[4] && (
           <div className="snap-section">
