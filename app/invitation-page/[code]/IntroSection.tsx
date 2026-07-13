@@ -42,7 +42,7 @@ export default function IntroSection({
           fontSize: "clamp(42px, 8dvh, 64px)", fontWeight: 400,
           color: "#5F5F5F", lineHeight: 1,
           marginBottom: align === "left" ? "1.5dvh" : "2.5dvh",
-          marginTop: align === "left" ? 0 : "10dvh"
+          marginTop: align === "left" ? 0 : "15dvh"
         }}>
           {name}
         </h1>
