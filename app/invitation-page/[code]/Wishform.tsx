@@ -50,7 +50,7 @@ export default function WishForm({
     setLoading(true)
     await rsvpRef.current?.save()
     if (message.trim()) {
-      await supabase.from("wishes").insert({ wedding_id: weddingId, guest_name: guestName, message })
+      await supabase.from("wishes").insert({ wedding_id: weddingId, guest_name: guestGreeting, message })
       setMessage("")
       router.refresh()
     }
