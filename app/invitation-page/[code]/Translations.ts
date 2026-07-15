@@ -33,7 +33,7 @@ export const t = {
   },
   id: {
     // IntroSection
-    dearGuest: "Kepada",
+    dearGuest: "Kepada Bapak/Ibu",
     invitedTo: "Kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam acara pernikahan",
     theGroom: "Mempelai Pria",
     theBride: "Mempelai Wanita",
