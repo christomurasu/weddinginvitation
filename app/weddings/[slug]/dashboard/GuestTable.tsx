@@ -56,6 +56,10 @@ export default function GuestTable({
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [deleting, setDeleting] = useState(false)
   const [updatingLang, setUpdatingLang] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
+  const pageSize = 20
+  const totalPages = Math.ceil(guests.length / pageSize)
+  const paginatedGuests = guests.slice((page - 1) * pageSize, page * pageSize)
 
   useEffect(() => {
     setGuests(initialGuests)
@@ -89,24 +93,23 @@ export default function GuestTable({
   }
 
   function handleExportCSV() {
-  const rows = [
-    ["Nama", "No HP", "Link Undangan", "Link WA"],
-    ...guests.map(g => [
-      g.name,
-      g.phone ?? "",
-      `https://sfinvitation.id/invitation-page/${g.code}`,
-      g.phone ? `https://wa.me/62${g.phone.replace(/^0/, "").replace(/\D/g, "")}?text=${encodeURIComponent(waMessage(g))}` : ""
-    ])
-  ]
-  const csv = rows.map(r => r.map(v => `"${v}"`).join(",")).join("\n")
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement("a")
-  a.href = url
-  a.download = "tamu.csv"
-  a.click()
-  URL.revokeObjectURL(url)
-}
+    const rows = [
+      ["Nama", "No HP", "Link Undangan"],
+      ...guests.map(g => [
+        g.name,
+        g.phone ?? "",
+        `https://sfinvitation.id/invitation-page/${g.code}`
+      ])
+    ]
+    const csv = rows.map(r => r.map(v => `"${v}"`).join(",")).join("\n")
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "tamu.csv"
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   async function handleLanguageChange(id: string, lang: string) {
     setUpdatingLang(id)
@@ -119,14 +122,10 @@ export default function GuestTable({
     const link = `https://sfinvitation.id/invitation-page/${guest.code}`
 
     if (guest.language === "id") {
-      const ceremony = `PEMBERKATAN PERNIKAHAN\n${wedding.ceremony_time ?? ""}\n${wedding.ceremony_venue ?? ""}`
-      const reception = guest.invitation_type === "full" ? `\n\nRESEPSI\n${wedding.reception_time ?? ""}\n${wedding.reception_venue ?? ""}` : ""
-      return `Kepada Yth. Bapak/Ibu\n${guest.greeting},\n _(kami mohon maaf bila ada kesalahan penulisan nama maupun gelar)_ \n\nDengan hormat, anda diundang pada acara:\n*Pernikahan ${wedding.partner1} & ${wedding.partner2}*\n\nBersama keluarga yang berbahagia,\n*${wedding.groom_father ?? ""} & ${wedding.groom_mother ?? ""}*\n_dan_\n*${wedding.bride_father ?? ""} & ${wedding.bride_mother ?? ""}*\n\n${ceremony}${reception}\n\nSilakan klik link di bawah untuk konfirmasi kehadiran:\n${link}\n\nHarap simpan *QR Code yang telah anda dapatkan saat RSVP* dan tunjukkan pada saat Check In. \n\nHormat kami,\n${wedding.partner1} & ${wedding.partner2}\n\nPerfect Moment Organizer\nIvan - 085103949090\nRSVP by SF Invitation`
+      return `Kepada Yth. Bapak/Ibu\n${guest.greeting},\n\nAnda diundang untuk hadir dalam:\nPernikahan ${wedding.partner1} & ${wedding.partner2}\n\nOrang tua yang terhormat,\n${wedding.groom_father ?? ""} & ${wedding.groom_mother ?? ""}\ndan\n${wedding.bride_father ?? ""} & ${wedding.bride_mother ?? ""}\n\n${wedding.venue}\n\nPEMBERKATAN PERNIKAHAN\n${wedding.date}\nPukul ${wedding.ceremony_time ?? ""}\n${wedding.ceremony_venue ?? ""}\n${wedding.ceremony_maps_url ?? ""}\n\nRESEPSI\n${wedding.date}\nPukul ${wedding.reception_time ?? ""}\n${wedding.reception_venue ?? ""}\n${wedding.reception_maps_url ?? ""}\n\nSilakan klik link di bawah untuk konfirmasi kehadiran:\n${link}\n\nHormat kami,\n${wedding.partner1} & ${wedding.partner2}\n\nPerfect Moment Organizer\nIvan - 085103949090\nRSVP by SF Invitation`
     }
 
-    const ceremony = `HOLY MATRIMONY\n${wedding.ceremony_time ?? ""}\n${wedding.ceremony_venue ?? ""}`
-    const reception = guest.invitation_type === "full" ? `\n\nRECEPTION\n${wedding.reception_time ?? ""}\n${wedding.reception_venue ?? ""}` : ""
-    return `Dear Mr. & Mrs. ${guest.greeting},\n _(we apologize if there are any errors in writing names or titles)_\n\nYou are respectfully invited to the event:\nThe Wedding of *${wedding.partner1} & ${wedding.partner2}*\n\nBlessed Parents,\n*${wedding.groom_father ?? ""} & ${wedding.groom_mother ?? ""}*\n_and_\n*${wedding.bride_father ?? ""} & ${wedding.bride_mother ?? ""}*\n\n${ceremony}${reception}\n\nPlease click the button below to start RSVP:\n${link}\n\nPlease save this *QR Code from your RSVP* and present it at Check In.\n\nBest Regards,\n${wedding.partner1} & ${wedding.partner2}\n\nPerfect Moment Organizer\nIvan - 085103949090\nRSVP by SF Invitation`
+    return `Dear Mr. & Mrs. ${guest.greeting},\n\nYou are invited to:\nThe Wedding of ${wedding.partner1} & ${wedding.partner2}\n\nBlessed Parents,\n${wedding.groom_father ?? ""} & ${wedding.groom_mother ?? ""}\nand\n${wedding.bride_father ?? ""} & ${wedding.bride_mother ?? ""}\n\n${wedding.venue}\n\nHOLY MATRIMONY\n${wedding.date}\nAt ${wedding.ceremony_time ?? ""}\n${wedding.ceremony_venue ?? ""}\n${wedding.ceremony_maps_url ?? ""}\n\nRECEPTION\n${wedding.date}\nAt ${wedding.reception_time ?? ""}\n${wedding.reception_venue ?? ""}\n${wedding.reception_maps_url ?? ""}\n\nPlease click the button below to start RSVP:\n${link}\n\n${wedding.partner1} & ${wedding.partner2}\n\nPerfect Moment Organizer\nIvan - 085103949090\nRSVP by SF Invitation`
   }
 
   const rsvpBadge = (rsvp: string) => ({
@@ -153,8 +152,8 @@ export default function GuestTable({
             ↻ Refresh
           </button>
           <button onClick={handleExportCSV} style={{ background: "#2c2c2a", color: "#e8d5a3", border: "none", padding: "7px 14px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer", fontFamily: "inherit" }}>
-  ↓ Export CSV
-</button>
+            ↓ Export CSV
+          </button>
           {selected.size > 0 && (
             <button onClick={handleDelete} disabled={deleting} style={{ background: "#a32d2d", color: "#fff", border: "none", padding: "7px 16px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", cursor: deleting ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: deleting ? 0.6 : 1 }}>
               {deleting ? "Menghapus..." : `Hapus ${selected.size} Tamu`}
@@ -178,7 +177,7 @@ export default function GuestTable({
             </tr>
           </thead>
           <tbody>
-            {guests.map(guest => (
+            {paginatedGuests.map(guest => (
               <tr key={guest.id} style={{
                 borderBottom: "1px solid #f5f0e8",
                 background: selected.has(guest.id) ? "#fef9ec"
@@ -268,6 +267,37 @@ export default function GuestTable({
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <div style={{ padding: "14px 24px", borderTop: "1px solid #f0ebe3", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <p style={{ fontSize: 11, color: "#888780" }}>
+            {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, guests.length)} dari {guests.length} tamu
+          </p>
+          <div style={{ display: "flex", gap: 6 }}>
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              style={{ background: "transparent", border: "1px solid #e4ddd0", color: page === 1 ? "#b4b2a9" : "#2c2c2a", padding: "6px 12px", fontSize: 11, cursor: page === 1 ? "not-allowed" : "pointer", fontFamily: "inherit" }}
+            >
+              ← Prev
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+              <button key={p} onClick={() => setPage(p)}
+                style={{ background: p === page ? "#2c2c2a" : "transparent", border: "1px solid #e4ddd0", color: p === page ? "#fff" : "#2c2c2a", padding: "6px 10px", fontSize: 11, cursor: "pointer", fontFamily: "inherit", minWidth: 32 }}
+              >
+                {p}
+              </button>
+            ))}
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              style={{ background: "transparent", border: "1px solid #e4ddd0", color: page === totalPages ? "#b4b2a9" : "#2c2c2a", padding: "6px 12px", fontSize: 11, cursor: page === totalPages ? "not-allowed" : "pointer", fontFamily: "inherit" }}
+            >
+              Next →
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
