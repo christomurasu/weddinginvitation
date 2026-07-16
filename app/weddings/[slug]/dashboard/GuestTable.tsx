@@ -88,6 +88,26 @@ export default function GuestTable({
     router.refresh()
   }
 
+  function handleExportCSV() {
+  const rows = [
+    ["Nama", "No HP", "Link Undangan", "Link WA"],
+    ...guests.map(g => [
+      g.name,
+      g.phone ?? "",
+      `https://sfinvitation.id/invitation-page/${g.code}`,
+      g.phone ? `https://wa.me/62${g.phone.replace(/^0/, "").replace(/\D/g, "")}?text=${encodeURIComponent(waMessage(g))}` : ""
+    ])
+  ]
+  const csv = rows.map(r => r.map(v => `"${v}"`).join(",")).join("\n")
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = "tamu.csv"
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
   async function handleLanguageChange(id: string, lang: string) {
     setUpdatingLang(id)
     await supabase.from("guests").update({ language: lang }).eq("id", id)
@@ -132,6 +152,9 @@ export default function GuestTable({
           <button onClick={() => router.refresh()} style={{ background: "transparent", color: "#888780", border: "1px solid #e4ddd0", padding: "7px 14px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer", fontFamily: "inherit" }}>
             ↻ Refresh
           </button>
+          <button onClick={handleExportCSV} style={{ background: "#2c2c2a", color: "#e8d5a3", border: "none", padding: "7px 14px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer", fontFamily: "inherit" }}>
+  ↓ Export CSV
+</button>
           {selected.size > 0 && (
             <button onClick={handleDelete} disabled={deleting} style={{ background: "#a32d2d", color: "#fff", border: "none", padding: "7px 16px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", cursor: deleting ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: deleting ? 0.6 : 1 }}>
               {deleting ? "Menghapus..." : `Hapus ${selected.size} Tamu`}
