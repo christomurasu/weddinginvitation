@@ -57,9 +57,41 @@ export default function GuestTable({
   const [deleting, setDeleting] = useState(false)
   const [updatingLang, setUpdatingLang] = useState<string | null>(null)
   const [page, setPage] = useState(1)
+  const [search, setSearch] = useState("")
+  const [filterRsvp, setFilterRsvp] = useState("all")
+  const [filterType, setFilterType] = useState("all")
+  const [sortBy, setSortBy] = useState("created")
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc")
+
   const pageSize = 20
-  const totalPages = Math.ceil(guests.length / pageSize)
-  const paginatedGuests = guests.slice((page - 1) * pageSize, page * pageSize)
+
+  function isCeremonyOnly(g: Guest) { return g.invitation_type === "ceremony" }
+
+  const filtered = guests
+    .filter(g => {
+      if (search && !g.name.toLowerCase().includes(search.toLowerCase()) && !g.greeting.toLowerCase().includes(search.toLowerCase())) return false
+      if (filterRsvp === "confirmed" && g.ceremony_rsvp !== "confirmed" && g.reception_rsvp !== "confirmed") return false
+      if (filterRsvp === "pending" && (g.ceremony_rsvp !== "pending" || (!isCeremonyOnly(g) && g.reception_rsvp !== "pending"))) return false
+      if (filterRsvp === "declined" && g.ceremony_rsvp !== "declined") return false
+      if (filterType !== "all" && g.invitation_type !== filterType) return false
+      return true
+    })
+    .sort((a, b) => {
+      let valA: string = "", valB: string = ""
+      if (sortBy === "name") { valA = a.name; valB = b.name }
+      else if (sortBy === "table") { valA = a.table_number ?? ""; valB = b.table_number ?? "" }
+      else return 0
+      return sortDir === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA)
+    })
+
+  const totalPages = Math.ceil(filtered.length / pageSize)
+  const paginatedGuests = filtered.slice((page - 1) * pageSize, page * pageSize)
+
+  function toggleSort(field: string) {
+    if (sortBy === field) setSortDir(d => d === "asc" ? "desc" : "asc")
+    else { setSortBy(field); setSortDir("asc") }
+    setPage(1)
+  }
 
   useEffect(() => {
     setGuests(initialGuests)
@@ -162,6 +194,34 @@ export default function GuestTable({
         </div>
       </div>
 
+      <div style={{ padding: "12px 24px", borderBottom: "1px solid #f0ebe3", display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <input
+          type="text" placeholder="Cari nama / greeting..."
+          value={search} onChange={e => { setSearch(e.target.value); setPage(1) }}
+          style={{ flex: 1, minWidth: 160, border: "1px solid #e4ddd0", padding: "7px 10px", fontSize: 12, background: "#fdf8ee", outline: "none", fontFamily: "inherit", color: "#2c2c2a" }}
+        />
+        <select value={filterRsvp} onChange={e => { setFilterRsvp(e.target.value); setPage(1) }}
+          style={{ border: "1px solid #e4ddd0", padding: "7px 10px", fontSize: 12, background: "#fdf8ee", outline: "none", fontFamily: "inherit", color: "#2c2c2a", cursor: "pointer" }}>
+          <option value="all">Semua RSVP</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="pending">Pending</option>
+          <option value="declined">Declined</option>
+        </select>
+        <select value={filterType} onChange={e => { setFilterType(e.target.value); setPage(1) }}
+          style={{ border: "1px solid #e4ddd0", padding: "7px 10px", fontSize: 12, background: "#fdf8ee", outline: "none", fontFamily: "inherit", color: "#2c2c2a", cursor: "pointer" }}>
+          <option value="all">Semua Tipe</option>
+          <option value="full">Full</option>
+          <option value="ceremony">Ceremony Only</option>
+        </select>
+        <select value={`${sortBy}-${sortDir}`} onChange={e => { const parts = e.target.value.split("-"); setSortBy(parts[0]); setSortDir(parts[1] as "asc" | "desc"); setPage(1) }}
+          style={{ border: "1px solid #e4ddd0", padding: "7px 10px", fontSize: 12, background: "#fdf8ee", outline: "none", fontFamily: "inherit", color: "#2c2c2a", cursor: "pointer" }}>
+          <option value="created-desc">Terbaru</option>
+          <option value="name-asc">Nama A–Z</option>
+          <option value="name-desc">Nama Z–A</option>
+          <option value="table-asc">Table ↑</option>
+          <option value="table-desc">Table ↓</option>
+        </select>
+      </div>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
@@ -271,7 +331,7 @@ export default function GuestTable({
       {totalPages > 1 && (
         <div style={{ padding: "14px 24px", borderTop: "1px solid #f0ebe3", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <p style={{ fontSize: 11, color: "#888780" }}>
-            {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, guests.length)} dari {guests.length} tamu
+            {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, filtered.length)} dari {filtered.length} tamu {filtered.length !== guests.length ? `(${guests.length} total)` : ""}
           </p>
           <div style={{ display: "flex", gap: 6 }}>
             <button
