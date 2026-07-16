@@ -65,12 +65,16 @@ export default async function WeddingDashboardPage({
     return sum + Math.max(c, r)
   }, 0) ?? 0
 
+  const hadirPemberkatan = guests?.filter(g => g.ceremony_adults+g.ceremony_kids).length ?? 0
+  const hadirResepsi = guests?.filter(g => g.reception_adults+g.reception_kids).length ?? 0
+
   const stats = [
     { label: "Invitations", value: total,          color: "#b8965a" },
     { label: "Confirmed",   value: confirmed,      color: "#3b6d11" },
     { label: "Pending",     value: pending,        color: "#888780" },
     { label: "Declined",    value: declined,       color: "#a32d2d" },
-    { label: "Attending",   value: totalAttendees, color: "#b8965a" },
+    { label: "Hadir Pemberkatan", value: hadirPemberkatan, color: "#535A36" },
+    { label: "Hadir Resepsi",     value: hadirResepsi,     color: "#c6294b" },
   ]
 
   return (

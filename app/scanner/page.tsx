@@ -124,17 +124,16 @@ export default function WeddingScannerPage({
   }
 
   async function confirmPresence() {
-    if (!guest) return
-    setConfirming(true)
-    const updateField = mode === "ceremony" ? "scanned_ceremony" : "scanned_reception"
-    await supabase.from("guests").update({
-      scanned: true,
-      [updateField]: true
-    }).eq("code", guest.code)
-    setConfirming(false)
-    setConfirmed(true)
-    setGuest({ ...guest, scanned: true, [updateField]: true })
-  }
+  if (!guest) return
+  setConfirming(true)
+  const updateField = mode === "ceremony" ? "scanned_ceremony" : "scanned_reception"
+  await supabase.from("guests").update({
+    [updateField]: true
+  }).eq("code", guest.code)
+  setConfirming(false)
+  setConfirmed(true)
+  setGuest({ ...guest, [updateField]: true })
+}
 
   function resetScanner() {
     setGuest(null)
