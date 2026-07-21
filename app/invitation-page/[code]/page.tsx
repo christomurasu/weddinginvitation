@@ -371,7 +371,18 @@ export default async function InvitationPage({
                   letterSpacing: "0.05em",
                   fontWeight: 700
                 }}>
-                  was created by SF Invitation
+                  was created by <a
+                    href="https://www.instagram.com/invitationbysf/?hl=en"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      color: "inherit",
+                      textDecoration: "underline",
+                      fontWeight: 600,
+                    }}
+                  >
+                    SF Invitation
+                  </a>
                 </p>
               </div>
             </div>

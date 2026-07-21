@@ -162,7 +162,7 @@ export default function WeddingAddGuestForm({
               fontFamily: "inherit", transition: "all 0.15s"
             }}
           >
-            Pemberkatan Saja
+            Pemberkatan
           </button>
         </div>
       </div>

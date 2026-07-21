@@ -294,7 +294,7 @@ export default function WeddingScannerPage({
                 {confirmed ? (
                   <span style={{ background: "#1a3d1a", color: "#97c459", fontSize: 10, padding: "4px 14px", letterSpacing: "0.15em", textTransform: "uppercase" }}>✓ Checked In — {mode === "ceremony" ? "Pemberkatan" : "Resepsi"}</span>
                 ) : wrongType ? (
-                  <span style={{ background: "#3d1f1f", color: "#f09595", fontSize: 10, padding: "4px 14px", letterSpacing: "0.15em", textTransform: "uppercase" }}>Pemberkatan Saja</span>
+                  <span style={{ background: "#3d1f1f", color: "#f09595", fontSize: 10, padding: "4px 14px", letterSpacing: "0.15em", textTransform: "uppercase" }}>Pemberkatan</span>
                 ) : !isConfirmedForMode ? (
                   <span style={{ background: "#3d1f1f", color: "#f09595", fontSize: 10, padding: "4px 14px", letterSpacing: "0.15em", textTransform: "uppercase" }}>Belum Konfirmasi {mode === "ceremony" ? "Pemberkatan" : "Resepsi"}</span>
                 ) : alreadyScannedForMode ? (
@@ -312,8 +312,15 @@ export default function WeddingScannerPage({
               <div>
                 <div style={rowStyle}>
                   <span style={labelStyle}>Tipe Undangan</span>
-                  <span style={valueStyle}>{guest.invitation_type === "ceremony" ? "Pemberkatan Saja" : "Full"}</span>
+                  <span style={valueStyle}>{guest.invitation_type === "ceremony" ? "Pemberkatan" : "Full"}</span>
                 </div>
+                {guest.invitation_type === "full" && (
+                  <div style={{ marginTop: 8, marginBottom: 8, padding: "10px 14px", background: "#1a2a3d", borderLeft: "2px solid #85b7eb" }}>
+                    <p style={{ color: "#85b7eb", fontSize: 12, margin: 0 }}>
+                      ℹ Tamu ini terundang juga untuk Resepsi
+                    </p>
+                  </div>
+                )}
                 <div style={rowStyle}>
                   <span style={labelStyle}>Table</span>
                   <span style={valueStyle}>{guest.table_number ?? "—"}</span>
