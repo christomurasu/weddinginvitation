@@ -324,7 +324,7 @@ export default function WeddingScannerPage({
                 {confirmed ? (
                   <span style={{ background: "#1a3d1a", color: "#97c459", fontSize: 10, padding: "4px 14px", letterSpacing: "0.15em", textTransform: "uppercase" }}>✓ Checked In — {mode === "ceremony" ? "Pemberkatan" : "Resepsi"}</span>
                 ) : wrongType ? (
-                  <span style={{ background: "#3d1f1f", color: "#f09595", fontSize: 10, padding: "4px 14px", letterSpacing: "0.15em", textTransform: "uppercase" }}>Pemberkatan Saja</span>
+                  <span style={{ background: "#3d1f1f", color: "#f09595", fontSize: 10, padding: "4px 14px", letterSpacing: "0.15em", textTransform: "uppercase" }}>Pemberkatan</span>
                 ) : alreadyScannedForMode ? (
                   <span style={{ background: "#3d2a1a", color: "#ef9f27", fontSize: 10, padding: "4px 14px", letterSpacing: "0.15em", textTransform: "uppercase" }}>⚠ Sudah Scan {mode === "ceremony" ? "Pemberkatan" : "Resepsi"}</span>
                 ) : !isConfirmedForMode ? (
@@ -342,7 +342,7 @@ export default function WeddingScannerPage({
               <div>
                 <div style={rowStyle}>
                   <span style={labelStyle}>Tipe Undangan</span>
-                  <span style={valueStyle}>{guest.invitation_type === "ceremony" ? "Pemberkatan Saja" : "Full"}</span>
+                  <span style={valueStyle}>{guest.invitation_type === "ceremony" ? "Pemberkatan" : "Full"}</span>
                 </div>
                 {mode === "ceremony" && guest.invitation_type === "full" && (
                   <div style={{ marginTop: 8, marginBottom: 8, padding: "10px 14px", background: "#1a2a3d", borderLeft: "2px solid #85b7eb" }}>
