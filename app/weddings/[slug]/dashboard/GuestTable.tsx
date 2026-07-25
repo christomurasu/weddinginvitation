@@ -25,6 +25,8 @@ interface Guest {
   scanned: boolean
   scanned_ceremony: boolean
   scanned_reception: boolean
+  guest_side: string
+  checkin_number: string | null
 }
 
 interface Wedding {
@@ -60,6 +62,7 @@ export default function GuestTable({
   const [search, setSearch] = useState("")
   const [filterRsvp, setFilterRsvp] = useState("all")
   const [filterType, setFilterType] = useState("all")
+  const [filterSide, setFilterSide] = useState("all")
   const [sortBy, setSortBy] = useState("created")
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc")
 
@@ -74,6 +77,7 @@ export default function GuestTable({
       if (filterRsvp === "pending" && (g.ceremony_rsvp !== "pending" || (!isCeremonyOnly(g) && g.reception_rsvp !== "pending"))) return false
       if (filterRsvp === "declined" && g.ceremony_rsvp !== "declined") return false
       if (filterType !== "all" && g.invitation_type !== filterType) return false
+      if (filterSide !== "all" && g.guest_side !== filterSide) return false
       return true
     })
     .sort((a, b) => {
@@ -125,11 +129,26 @@ export default function GuestTable({
   }
 
   function handleExportCSV() {
+    const rsvpStatus = (g: Guest) => {
+      const c = g.ceremony_rsvp ?? "pending"
+      const r = g.reception_rsvp ?? "pending"
+      if (g.invitation_type === "ceremony") {
+        return c === "confirmed" ? "Sudah RSVP" : c === "declined" ? "Menolak" : "Belum RSVP"
+      }
+      if (c === "confirmed" || r === "confirmed") return "Sudah RSVP"
+      if (c === "declined" && r === "declined") return "Menolak"
+      return "Belum RSVP"
+    }
     const rows = [
-      ["Nama", "No HP", "Link Undangan"],
-      ...guests.map(g => [
+      ["Nama", "Greeting", "Dari", "Status RSVP", "No Check-in", "No HP", "Tipe", "Link Undangan"],
+      ...filtered.map(g => [
         g.name,
+        g.greeting,
+        g.guest_side === "bride" ? "Wanita" : "Pria",
+        rsvpStatus(g),
+        g.checkin_number ?? "",
         g.phone ?? "",
+        g.invitation_type === "ceremony" ? "Pemberkatan" : "Full",
         `https://sfinvitation.id/invitation-page/${g.code}`
       ])
     ]
@@ -219,6 +238,12 @@ export default function GuestTable({
           <option value="full">Full</option>
           <option value="ceremony">Ceremony Only</option>
         </select>
+        <select value={filterSide} onChange={e => { setFilterSide(e.target.value); setPage(1) }}
+          style={{ border: "1px solid #e4ddd0", padding: "7px 10px", fontSize: 12, background: "#fdf8ee", outline: "none", fontFamily: "inherit", color: "#2c2c2a", cursor: "pointer" }}>
+          <option value="all">Semua Sisi</option>
+          <option value="groom">Mempelai Pria</option>
+          <option value="bride">Mempelai Wanita</option>
+        </select>
         <select value={`${sortBy}-${sortDir}`} onChange={e => { const parts = e.target.value.split("-"); setSortBy(parts[0]); setSortDir(parts[1] as "asc" | "desc"); setPage(1) }}
           style={{ border: "1px solid #e4ddd0", padding: "7px 10px", fontSize: 12, background: "#fdf8ee", outline: "none", fontFamily: "inherit", color: "#2c2c2a", cursor: "pointer" }}>
           <option value="created-desc">Terbaru</option>
@@ -235,7 +260,7 @@ export default function GuestTable({
               <th style={{ padding: "10px 16px", width: 40 }}>
                 <input type="checkbox" checked={allSelected} onChange={toggleAll} style={{ cursor: "pointer", width: 14, height: 14 }} />
               </th>
-              {["Guest", "Code", "WA", "Table", "Max", "C-RSVP", "R-RSVP", "Hadir P", "Hadir R", "Bahasa", "Link"].map(h => (
+              {["Guest", "Dari", "Code", "WA", "Table", "Max", "C-RSVP", "R-RSVP", "Hadir P", "Hadir R", "Bahasa", "Link"].map(h => (
                 <th key={h} style={{ textAlign: "left", padding: "10px 16px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "#888780", fontWeight: 400 }}>
                   {h}
                 </th>
@@ -256,6 +281,22 @@ export default function GuestTable({
                 <td style={{ padding: "14px 16px" }}>
                   <p style={{ fontWeight: 500, color: "#2c2c2a", marginBottom: 2 }}>{guest.name}</p>
                   <p style={{ fontSize: 11, color: "#888780" }}>{guest.greeting}</p>
+                </td>
+                <td style={{ padding: "14px 16px" }}>
+                  <span style={{
+                    display: "inline-block",
+                    background: guest.guest_side === "bride" ? "#fce8ed" : "#eef0e6",
+                    color: guest.guest_side === "bride" ? "#c6294b" : "#535A36",
+                    fontSize: 10, padding: "2px 8px", letterSpacing: "0.05em",
+                    textTransform: "uppercase", fontWeight: 600, whiteSpace: "nowrap"
+                  }}>
+                    {guest.guest_side === "bride" ? "Wanita" : "Pria"}
+                  </span>
+                  {guest.checkin_number && (
+                    <p style={{ fontSize: 11, color: "#888780", marginTop: 4, fontFamily: "monospace" }}>
+                      #{guest.checkin_number}
+                    </p>
+                  )}
                 </td>
                 <td style={{ padding: "14px 16px" }}>
                   <span style={{ fontFamily: "monospace", fontSize: 11, background: "#fdf8ee", color: "#8a6d3b", border: "1px solid #e8d5a3", padding: "2px 8px" }}>
@@ -325,7 +366,7 @@ export default function GuestTable({
             ))}
             {guests.length === 0 && (
               <tr>
-                <td colSpan={12} style={{ padding: "40px", textAlign: "center", color: "#888780", fontSize: 13 }}>
+                <td colSpan={13} style={{ padding: "40px", textAlign: "center", color: "#888780", fontSize: 13 }}>
                   No guests yet. Add your first guest above.
                 </td>
               </tr>

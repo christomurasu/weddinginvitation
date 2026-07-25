@@ -23,6 +23,9 @@ interface Guest {
   scanned: boolean
   scanned_ceremony: boolean
   scanned_reception: boolean
+  guest_side: string
+  checkin_number_ceremony: string | null
+  checkin_number_reception: string | null
   actual_attendees: number
   max_attendees: number
   invitation_type: string
@@ -142,12 +145,37 @@ export default function WeddingScannerPage({
     const rsvpField = mode === "ceremony" ? "ceremony_rsvp" : "reception_rsvp"
     const adultsField = mode === "ceremony" ? "ceremony_adults" : "reception_adults"
     const kidsField = mode === "ceremony" ? "ceremony_kids" : "reception_kids"
+    const numberField = mode === "ceremony" ? "checkin_number_ceremony" : "checkin_number_reception"
+
+    const existingNumber = mode === "ceremony" ? guest.checkin_number_ceremony : guest.checkin_number_reception
+
+    // Generate a new number for this event only if not already set for this event
+    let checkinNumber = existingNumber
+    if (!checkinNumber && wedding) {
+      const initial = (guest.guest_side === "bride" ? wedding.partner2 : wedding.partner1)
+        .trim().charAt(0).toUpperCase()
+      // Highest existing number for this side across BOTH events combined
+      const { data: sideGuests } = await supabase
+        .from("guests")
+        .select("checkin_number_ceremony, checkin_number_reception")
+        .eq("wedding_id", wedding.id)
+        .eq("guest_side", guest.guest_side)
+      let maxNum = 0
+      for (const sg of sideGuests ?? []) {
+        for (const val of [sg.checkin_number_ceremony, sg.checkin_number_reception]) {
+          const n = parseInt((val ?? "").replace(/\D/g, ""))
+          if (!isNaN(n) && n > maxNum) maxNum = n
+        }
+      }
+      checkinNumber = `${initial}${maxNum + 1}`
+    }
 
     await supabase.from("guests").update({
       [scanField]: true,
       [rsvpField]: "confirmed",
       [adultsField]: editAdults,
       [kidsField]: editKids,
+      [numberField]: checkinNumber,
     }).eq("code", guest.code)
 
     setConfirming(false)
@@ -158,6 +186,7 @@ export default function WeddingScannerPage({
       [rsvpField]: "confirmed",
       [adultsField]: editAdults,
       [kidsField]: editKids,
+      [numberField]: checkinNumber,
     })
   }
 
@@ -365,10 +394,28 @@ export default function WeddingScannerPage({
                     {guest.scanned_ceremony ? "✓ Hadir" : "—"}
                   </span>
                 </div>
-                <div style={{ ...rowStyle, borderBottom: "none" }}>
+                <div style={rowStyle}>
                   <span style={labelStyle}>Hadir Resepsi</span>
                   <span style={{ ...valueStyle, color: guest.scanned_reception ? "#97c459" : "#444441" }}>
                     {guest.invitation_type === "ceremony" ? "N/A" : guest.scanned_reception ? "✓ Hadir" : "—"}
+                  </span>
+                </div>
+                <div style={rowStyle}>
+                  <span style={labelStyle}>Tamu Dari</span>
+                  <span style={{ ...valueStyle, color: guest.guest_side === "bride" ? "#f0a5b8" : "#a5c47d" }}>
+                    {guest.guest_side === "bride" ? "Mempelai Wanita" : "Mempelai Pria"}
+                  </span>
+                </div>
+                <div style={rowStyle}>
+                  <span style={labelStyle}>No Check-in Pemberkatan</span>
+                  <span style={{ ...valueStyle, color: guest.checkin_number_ceremony ? "#e8d5a3" : "#444441", fontSize: 16, fontFamily: "monospace" }}>
+                    {guest.checkin_number_ceremony ?? "—"}
+                  </span>
+                </div>
+                <div style={{ ...rowStyle, borderBottom: "none" }}>
+                  <span style={labelStyle}>No Check-in Resepsi</span>
+                  <span style={{ ...valueStyle, color: guest.checkin_number_reception ? "#e8d5a3" : "#444441", fontSize: 16, fontFamily: "monospace" }}>
+                    {guest.invitation_type === "ceremony" ? "N/A" : guest.checkin_number_reception ?? "—"}
                   </span>
                 </div>
               </div>
@@ -443,6 +490,11 @@ export default function WeddingScannerPage({
             {confirmed && (
               <div style={{ background: "#1a3d1a", border: "1px solid #3b6d11", padding: "16px", textAlign: "center", marginBottom: 10 }}>
                 <p style={{ color: "#97c459", fontSize: 14, marginBottom: 4 }}>✓ Check-in {mode === "ceremony" ? "Pemberkatan" : "Resepsi"} berhasil</p>
+                {(mode === "ceremony" ? guest.checkin_number_ceremony : guest.checkin_number_reception) && (
+                  <p style={{ color: "#e8d5a3", fontSize: 40, fontWeight: 300, margin: "8px 0", letterSpacing: "0.05em" }}>
+                    {mode === "ceremony" ? guest.checkin_number_ceremony : guest.checkin_number_reception}
+                  </p>
+                )}
                 <p style={{ color: "#3b6d11", fontSize: 12 }}>{editAdults} Dewasa{editKids > 0 ? ` · ${editKids} Anak` : ""}</p>
               </div>
             )}

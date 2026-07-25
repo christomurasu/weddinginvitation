@@ -31,6 +31,7 @@ export default function WeddingAddGuestForm({
     max_attendees: "1",
     note: "",
     invitation_type: "full",
+    guest_side: "groom",
   })
 
   async function handleSubmit() {
@@ -47,11 +48,12 @@ export default function WeddingAddGuestForm({
       max_attendees: parseInt(form.max_attendees) || 1,
       note: form.note,
       invitation_type: form.invitation_type,
+      guest_side: form.guest_side,
     })
     setGeneratedLink(`https://sfinvitation.id/invitation-page/${code}`)
     setForm({
       name: "", greeting: "", phone: "", table_number: "",
-      max_attendees: "1", note: "", invitation_type: "full"
+      max_attendees: "1", note: "", invitation_type: "full", guest_side: form.guest_side
     })
     setLoading(false)
     router.refresh()
@@ -130,6 +132,40 @@ export default function WeddingAddGuestForm({
           <input style={inputStyle} type="text" value={form.note}
             onChange={e => setForm({ ...form, note: e.target.value })}
             placeholder="e.g. Vegetarian meal arranged" />
+        </div>
+      </div>
+
+      <div style={{ marginBottom: 16 }}>
+        <label style={labelStyle}>Tamu Dari</label>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            onClick={() => setForm({ ...form, guest_side: "groom" })}
+            style={{
+              flex: 1, padding: "10px",
+              background: form.guest_side === "groom" ? "#535A36" : "#fdf8ee",
+              color: form.guest_side === "groom" ? "#fff" : "#888780",
+              border: "1px solid #e4ddd0",
+              fontSize: 11, letterSpacing: "0.12em",
+              textTransform: "uppercase", cursor: "pointer",
+              fontFamily: "inherit", transition: "all 0.15s"
+            }}
+          >
+            Mempelai Pria
+          </button>
+          <button
+            onClick={() => setForm({ ...form, guest_side: "bride" })}
+            style={{
+              flex: 1, padding: "10px",
+              background: form.guest_side === "bride" ? "#c6294b" : "#fdf8ee",
+              color: form.guest_side === "bride" ? "#fff" : "#888780",
+              border: "1px solid #e4ddd0",
+              fontSize: 11, letterSpacing: "0.12em",
+              textTransform: "uppercase", cursor: "pointer",
+              fontFamily: "inherit", transition: "all 0.15s"
+            }}
+          >
+            Mempelai Wanita
+          </button>
         </div>
       </div>
 
