@@ -65,16 +65,27 @@ export default async function WeddingDashboardPage({
     return sum + Math.max(c, r)
   }, 0) ?? 0
 
-  const hadirPemberkatan = guests?.filter(g => g.ceremony_adults+g.ceremony_kids).length ?? 0
-  const hadirResepsi = guests?.filter(g => g.reception_adults+g.reception_kids).length ?? 0
+  // Pax RSVP terkonfirmasi (dari form RSVP tamu)
+  const paxPemberkatanRsvp = guests?.reduce((sum, g) =>
+    g.ceremony_rsvp === "confirmed" ? sum + (g.ceremony_adults ?? 0) + (g.ceremony_kids ?? 0) : sum, 0) ?? 0
+  const paxResepsiRsvp = guests?.reduce((sum, g) =>
+    g.reception_rsvp === "confirmed" ? sum + (g.reception_adults ?? 0) + (g.reception_kids ?? 0) : sum, 0) ?? 0
+
+  // Pax yang benar-benar hadir (sudah scan/check-in)
+  const paxHadirPemberkatan = guests?.reduce((sum, g) =>
+    g.scanned_ceremony ? sum + (g.ceremony_adults ?? 0) + (g.ceremony_kids ?? 0) : sum, 0) ?? 0
+  const paxHadirResepsi = guests?.reduce((sum, g) =>
+    g.scanned_reception ? sum + (g.reception_adults ?? 0) + (g.reception_kids ?? 0) : sum, 0) ?? 0
 
   const stats = [
-    { label: "Invitations", value: total,          color: "#b8965a" },
-    { label: "Confirmed",   value: confirmed,      color: "#3b6d11" },
-    { label: "Pending",     value: pending,        color: "#888780" },
-    { label: "Declined",    value: declined,       color: "#a32d2d" },
-    { label: "Hadir Pemberkatan", value: hadirPemberkatan, color: "#535A36" },
-    { label: "Hadir Resepsi",     value: hadirResepsi,     color: "#c6294b" },
+    { label: "Invitations",         value: total,               color: "#b8965a" },
+    { label: "Confirmed",           value: confirmed,           color: "#3b6d11" },
+    { label: "Pending",             value: pending,             color: "#888780" },
+    { label: "Declined",            value: declined,            color: "#a32d2d" },
+    { label: "Pax RSVP Pemberkatan", value: paxPemberkatanRsvp, color: "#535A36" },
+    { label: "Pax RSVP Resepsi",    value: paxResepsiRsvp,      color: "#c6294b" },
+    { label: "Pax Hadir Pemberkatan", value: paxHadirPemberkatan, color: "#535A36" },
+    { label: "Pax Hadir Resepsi",   value: paxHadirResepsi,      color: "#c6294b" },
   ]
 
   return (
@@ -130,24 +141,21 @@ export default async function WeddingDashboardPage({
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 24px" }}>
 
         {/* Stats */}
-        <div style={{ display: "flex", gap: 12, marginBottom: 28 }}>
-          {stats.map(stat => (
-            <div key={stat.label} style={{
-              flex: 1, background: "#fff",
-              border: "1px solid #e4ddd0",
-              padding: "20px 12px", textAlign: "center"
-            }}>
-              <p style={{ color: stat.color, fontSize: 38, fontWeight: 300, lineHeight: 1 }}>
-                {stat.value}
-              </p>
-              <p style={{
-                color: "#888780", fontSize: 10,
-                letterSpacing: "0.15em", textTransform: "uppercase", marginTop: 8
-              }}>
-                {stat.label}
-              </p>
-            </div>
-          ))}
+        <div style={{ background: "#fff", border: "1px solid #e4ddd0", marginBottom: 28, overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <tbody>
+              {stats.map((stat, i) => (
+                <tr key={stat.label} style={{ borderBottom: i < stats.length - 1 ? "1px solid #f0ebe3" : "none" }}>
+                  <td style={{ padding: "14px 24px", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "#888780" }}>
+                    {stat.label}
+                  </td>
+                  <td style={{ padding: "14px 24px", textAlign: "right", fontSize: 24, fontWeight: 300, color: stat.color }}>
+                    {stat.value}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {/* Edit wedding form */}
