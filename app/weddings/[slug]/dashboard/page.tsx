@@ -65,6 +65,9 @@ export default async function WeddingDashboardPage({
     return sum + Math.max(c, r)
   }, 0) ?? 0
 
+  const hadirPemberkatan = guests?.filter(g => g.ceremony_adults+g.ceremony_kids).length ?? 0
+  const hadirResepsi = guests?.filter(g => g.reception_adults+g.reception_kids).length ?? 0
+
   // Pax RSVP terkonfirmasi (dari form RSVP tamu)
   const paxPemberkatanRsvp = guests?.reduce((sum, g) =>
     g.ceremony_rsvp === "confirmed" ? sum + (g.ceremony_adults ?? 0) + (g.ceremony_kids ?? 0) : sum, 0) ?? 0
@@ -82,6 +85,8 @@ export default async function WeddingDashboardPage({
     { label: "Confirmed",           value: confirmed,           color: "#3b6d11" },
     { label: "Pending",             value: pending,             color: "#888780" },
     { label: "Declined",            value: declined,            color: "#a32d2d" },
+    { label: "Undangan RSVP Pemberkatan", value: hadirPemberkatan, color: "#535A36" },
+    { label: "Undangan RSVP Resepsi",    value: hadirResepsi,      color: "#c6294b" },
     { label: "Pax RSVP Pemberkatan", value: paxPemberkatanRsvp, color: "#535A36" },
     { label: "Pax RSVP Resepsi",    value: paxResepsiRsvp,      color: "#c6294b" },
     { label: "Pax Hadir Pemberkatan", value: paxHadirPemberkatan, color: "#535A36" },
