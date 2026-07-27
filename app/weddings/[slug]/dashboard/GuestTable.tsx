@@ -26,7 +26,8 @@ interface Guest {
   scanned_ceremony: boolean
   scanned_reception: boolean
   guest_side: string
-  checkin_number: string | null
+  checkin_number_ceremony: string | null
+  checkin_number_reception: string | null
 }
 
 interface Wedding {
@@ -140,17 +141,25 @@ export default function GuestTable({
       return "Belum RSVP"
     }
     const rows = [
-      ["Nama", "Greeting", "Dari", "Status RSVP", "No Check-in", "No HP", "Tipe", "Link Undangan"],
-      ...filtered.map(g => [
-        g.name,
-        g.greeting,
-        g.guest_side === "bride" ? "Wanita" : "Pria",
-        rsvpStatus(g),
-        g.checkin_number ?? "",
-        g.phone ?? "",
-        g.invitation_type === "ceremony" ? "Pemberkatan" : "Full",
-        `https://sfinvitation.id/invitation-page/${g.code}`
-      ])
+      ["Nama", "Greeting", "Dari", "Status RSVP", "Terundang (Max Pax)", "RSVP Pemberkatan (Pax)", "RSVP Resepsi (Pax)", "No Check-in Pemberkatan", "No Check-in Resepsi", "No HP", "Tipe", "Link Undangan"],
+      ...filtered.map(g => {
+        const cPax = g.ceremony_rsvp === "confirmed" ? (g.ceremony_adults ?? 0) + (g.ceremony_kids ?? 0) : 0
+        const rPax = g.reception_rsvp === "confirmed" ? (g.reception_adults ?? 0) + (g.reception_kids ?? 0) : 0
+        return [
+          g.name,
+          g.greeting,
+          g.guest_side === "bride" ? "Wanita" : "Pria",
+          rsvpStatus(g),
+          String(g.max_attendees ?? 1),
+          g.ceremony_rsvp === "confirmed" ? String(cPax) : "-",
+          g.invitation_type === "ceremony" ? "N/A" : g.reception_rsvp === "confirmed" ? String(rPax) : "-",
+          g.checkin_number_ceremony ?? "",
+          g.invitation_type === "ceremony" ? "N/A" : g.checkin_number_reception ?? "",
+          g.phone ?? "",
+          g.invitation_type === "ceremony" ? "Pemberkatan" : "Full",
+          `https://sfinvitation.id/invitation-page/${g.code}`
+        ]
+      })
     ]
     const csv = rows.map(r => r.map(v => `"${v}"`).join(",")).join("\n")
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
@@ -292,9 +301,9 @@ export default function GuestTable({
                   }}>
                     {guest.guest_side === "bride" ? "Wanita" : "Pria"}
                   </span>
-                  {guest.checkin_number && (
+                  {(guest.checkin_number_ceremony || guest.checkin_number_reception) && (
                     <p style={{ fontSize: 11, color: "#888780", marginTop: 4, fontFamily: "monospace" }}>
-                      #{guest.checkin_number}
+                      {[guest.checkin_number_ceremony, guest.checkin_number_reception].filter(Boolean).join(" / ")}
                     </p>
                   )}
                 </td>
