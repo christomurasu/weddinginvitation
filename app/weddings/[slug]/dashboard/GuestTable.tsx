@@ -141,7 +141,7 @@ export default function GuestTable({
       return "Belum RSVP"
     }
     const rows = [
-      ["Nama", "Greeting", "Dari", "Status RSVP", "Terundang (Max Pax)", "RSVP Pemberkatan (Pax)", "RSVP Resepsi (Pax)", "No Check-in Pemberkatan", "No Check-in Resepsi", "No HP", "Tipe", "Link Undangan"],
+      ["Nama", "Greeting", "Dari", "Status RSVP", "No Meja", "Terundang (Max Pax)", "RSVP Pemberkatan (Pax)", "RSVP Resepsi (Pax)", "No Check-in Pemberkatan", "No Check-in Resepsi", "No HP", "Tipe", "Link Undangan"],
       ...filtered.map(g => {
         const cPax = g.ceremony_rsvp === "confirmed" ? (g.ceremony_adults ?? 0) + (g.ceremony_kids ?? 0) : 0
         const rPax = g.reception_rsvp === "confirmed" ? (g.reception_adults ?? 0) + (g.reception_kids ?? 0) : 0
@@ -150,7 +150,8 @@ export default function GuestTable({
           g.greeting,
           g.guest_side === "bride" ? "Wanita" : "Pria",
           rsvpStatus(g),
-          String(g.max_attendees ?? 1),
+          g.table_number ?? "",
+          String((g.reception_adults ?? 1)+(g.reception_kids ?? 1)),
           g.ceremony_rsvp === "confirmed" ? String(cPax) : "-",
           g.invitation_type === "ceremony" ? "N/A" : g.reception_rsvp === "confirmed" ? String(rPax) : "-",
           g.checkin_number_ceremony ?? "",
@@ -161,6 +162,23 @@ export default function GuestTable({
         ]
       })
     ]
+
+    // Baris total
+    const totalMaxPax = filtered.reduce((s, g) => s + (g.max_attendees ?? 1), 0)
+    const totalCeremonyPax = filtered.reduce((s, g) => s + (g.ceremony_rsvp === "confirmed" ? (g.ceremony_adults ?? 0) + (g.ceremony_kids ?? 0) : 0), 0)
+    const totalReceptionPax = filtered.reduce((s, g) => s + (g.reception_rsvp === "confirmed" ? (g.reception_adults ?? 0) + (g.reception_kids ?? 0) : 0), 0)
+    const totalCeremonyGuests = filtered.filter(g => g.ceremony_rsvp === "confirmed").length
+    const totalReceptionGuests = filtered.filter(g => g.invitation_type !== "ceremony" && g.reception_rsvp === "confirmed").length
+
+    rows.push([])
+    rows.push([
+      `TOTAL (${filtered.length} undangan)`, "", "", "", "",
+      String(totalMaxPax),
+      `${totalCeremonyPax} pax / ${totalCeremonyGuests} undangan`,
+      `${totalReceptionPax} pax / ${totalReceptionGuests} undangan`,
+      "", "", "", "", ""
+    ])
+
     const csv = rows.map(r => r.map(v => `"${v}"`).join(",")).join("\n")
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
     const url = URL.createObjectURL(blob)
