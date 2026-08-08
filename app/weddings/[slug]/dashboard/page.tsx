@@ -133,6 +133,13 @@ export default async function WeddingDashboardPage({
           }}>
             Open Scanner →
           </Link>
+          <Link href={`/pagar-ayu/${slug}`} target="_blank" style={{
+            color: "#b8965a", fontSize: 11,
+            letterSpacing: "0.12em", textTransform: "uppercase",
+            textDecoration: "none"
+          }}>
+            Cek Meja (Pagar Ayu) →
+          </Link>
           <Link href={`/invitation-page/${guests?.[0]?.code ?? ""}`} style={{
             color: "#888780", fontSize: 11,
             letterSpacing: "0.12em", textTransform: "uppercase",
