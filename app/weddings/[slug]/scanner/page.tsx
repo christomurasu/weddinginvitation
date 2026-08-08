@@ -37,6 +37,7 @@ interface Wedding {
   partner1: string
   partner2: string
   slug: string
+  cover_photo_url: string | null
 }
 
 export default function WeddingScannerPage({
@@ -237,7 +238,12 @@ export default function WeddingScannerPage({
   })
 
   return (
-    <div style={{ minHeight: "100vh", background: "#2c2c2a" }}>
+    <div style={{
+      minHeight: "100vh",
+      background: wedding?.cover_photo_url
+        ? `linear-gradient(rgba(26,26,24,0.5), rgba(26,26,24,0)), url('${wedding.cover_photo_url}') center/cover fixed`
+        : "#2c2c2a"
+    }}>
 
       <div style={{ padding: "28px 24px", textAlign: "center", borderBottom: "1px solid #444441", position: "relative" }}>
         <Link href={`/weddings/${slug}/dashboard`} style={{ position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)", color: "#888780", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none" }}>
