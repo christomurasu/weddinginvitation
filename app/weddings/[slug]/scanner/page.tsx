@@ -26,6 +26,7 @@ interface Guest {
   guest_side: string
   checkin_number_ceremony: string | null
   checkin_number_reception: string | null
+  angpao_received: boolean
   actual_attendees: number
   max_attendees: number
   invitation_type: string
@@ -153,7 +154,7 @@ export default function WeddingScannerPage({
     // Generate a new number for this event only if not already set for this event
     let checkinNumber = existingNumber
     if (!checkinNumber && wedding) {
-      const initial = (guest.guest_side === "bride" ? wedding.partner2 : wedding.partner1)
+      const initial = guest.guest_side === "bride" ? "F" : "S"
         .trim().charAt(0).toUpperCase()
       // Highest existing number for this side across BOTH events combined
       const { data: sideGuests } = await supabase
@@ -418,13 +419,29 @@ export default function WeddingScannerPage({
                     {guest.checkin_number_ceremony ?? "—"}
                   </span>
                 </div>
-                <div style={{ ...rowStyle, borderBottom: "none" }}>
+                <div style={{ ...rowStyle, borderBottom: mode === "reception" ? "1px solid #2c2c2a" : "none" }}>
                   <span style={labelStyle}>No Check-in Resepsi</span>
                   <span style={{ ...valueStyle, color: guest.checkin_number_reception ? "#e8d5a3" : "#444441", fontSize: 16, fontFamily: "monospace" }}>
                     {guest.invitation_type === "ceremony" ? "N/A" : guest.checkin_number_reception ?? "—"}
                   </span>
                 </div>
+                {mode === "reception" && (
+                  <div style={{ ...rowStyle, borderBottom: "none" }}>
+                    <span style={labelStyle}>Status Angpao</span>
+                    <span style={{ ...valueStyle, color: guest.angpao_received ? "#97c459" : "#ef9f27", fontWeight: 700 }}>
+                      {guest.angpao_received ? "✓ Sudah Kasih" : "Belum"}
+                    </span>
+                  </div>
+                )}
               </div>
+
+              {/* Banner Angpao — mode resepsi */}
+              {mode === "reception" && guest.angpao_received && (
+                <div style={{ marginTop: 14, padding: "16px", background: "#1a3d1a", border: "1px solid #3b6d11", textAlign: "center" }}>
+                  <p style={{ color: "#97c459", fontSize: 15, fontWeight: 700, marginBottom: 4 }}>✓ Sudah Kasih Angpao</p>
+                  <p style={{ color: "#3b6d11", fontSize: 12 }}>Tamu tinggal diberi kitir saja.</p>
+                </div>
+              )}
 
               {/* Editable Pax Counter */}
               <div style={{ marginTop: 18, padding: "16px 14px", background: "#2c2c2a", border: "1px solid #444441" }}>
