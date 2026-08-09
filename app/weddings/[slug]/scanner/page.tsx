@@ -210,7 +210,7 @@ export default function WeddingScannerPage({
     if (!wedding) return
     const { data } = await supabase
       .from("guests").select("*").eq("wedding_id", wedding.id)
-      .ilike("name", `%${value}%`).limit(5)
+      .or(`name.ilike.%${value}%,greeting.ilike.%${value}%`).limit(8)
     setNameResults((data ?? []) as Guest[])
   }
 
