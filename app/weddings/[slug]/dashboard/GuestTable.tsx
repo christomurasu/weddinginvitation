@@ -82,6 +82,24 @@ export default function GuestTable({
       return true
     })
     .sort((a, b) => {
+      // Sort berdasarkan nomor check-in (numerik, per side)
+      if (sortBy === "checkin_ceremony" || sortBy === "checkin_reception") {
+        const field = sortBy === "checkin_ceremony" ? "checkin_number_ceremony" : "checkin_number_reception"
+        const parse = (v: string | null) => {
+          if (!v) return { prefix: "", num: Infinity }
+          const prefix = v.replace(/[0-9]/g, "")
+          const num = parseInt(v.replace(/\D/g, "")) || Infinity
+          return { prefix, num }
+        }
+        const pa = parse(a[field]), pb = parse(b[field])
+        // yang belum punya nomor ditaruh di bawah
+        if (pa.num === Infinity && pb.num === Infinity) return 0
+        if (pa.num === Infinity) return 1
+        if (pb.num === Infinity) return -1
+        const prefixCmp = pa.prefix.localeCompare(pb.prefix)
+        const cmp = prefixCmp !== 0 ? prefixCmp : pa.num - pb.num
+        return sortDir === "asc" ? cmp : -cmp
+      }
       let valA: string = "", valB: string = ""
       if (sortBy === "name") { valA = a.name; valB = b.name }
       else if (sortBy === "table") { valA = a.table_number ?? ""; valB = b.table_number ?? "" }
@@ -278,6 +296,8 @@ export default function GuestTable({
           <option value="name-desc">Nama Z–A</option>
           <option value="table-asc">Table ↑</option>
           <option value="table-desc">Table ↓</option>
+          <option value="checkin_ceremony-asc">No Check-in Pemberkatan ↑</option>
+          <option value="checkin_reception-asc">No Check-in Resepsi ↑</option>
         </select>
       </div>
       <div style={{ overflowX: "auto" }}>
@@ -319,11 +339,6 @@ export default function GuestTable({
                   }}>
                     {guest.guest_side === "bride" ? "Wanita" : "Pria"}
                   </span>
-                  {(guest.checkin_number_ceremony || guest.checkin_number_reception) && (
-                    <p style={{ fontSize: 11, color: "#888780", marginTop: 4, fontFamily: "monospace" }}>
-                      {[guest.checkin_number_ceremony, guest.checkin_number_reception].filter(Boolean).join(" / ")}
-                    </p>
-                  )}
                 </td>
                 <td style={{ padding: "14px 16px" }}>
                   <span style={{ fontFamily: "monospace", fontSize: 11, background: "#fdf8ee", color: "#8a6d3b", border: "1px solid #e8d5a3", padding: "2px 8px" }}>
@@ -365,12 +380,24 @@ export default function GuestTable({
                 </td>
                 <td style={{ padding: "14px 16px" }}>
                   <span style={scannedBadge(guest.scanned_ceremony)}>{guest.scanned_ceremony ? "✓ Hadir" : "—"}</span>
+                  {guest.checkin_number_ceremony && (
+                    <p style={{ fontSize: 12, color: "#8a6d3b", marginTop: 4, fontFamily: "monospace", fontWeight: 700 }}>
+                      {guest.checkin_number_ceremony}
+                    </p>
+                  )}
                 </td>
                 <td style={{ padding: "14px 16px" }}>
                   {guest.invitation_type === "ceremony" ? (
                     <span style={{ color: "#b4b2a9", fontSize: 10 }}>N/A</span>
                   ) : (
-                    <span style={scannedBadge(guest.scanned_reception)}>{guest.scanned_reception ? "✓ Hadir" : "—"}</span>
+                    <>
+                      <span style={scannedBadge(guest.scanned_reception)}>{guest.scanned_reception ? "✓ Hadir" : "—"}</span>
+                      {guest.checkin_number_reception && (
+                        <p style={{ fontSize: 12, color: "#8a6d3b", marginTop: 4, fontFamily: "monospace", fontWeight: 700 }}>
+                          {guest.checkin_number_reception}
+                        </p>
+                      )}
+                    </>
                   )}
                 </td>
                 <td style={{ padding: "14px 16px" }}>
