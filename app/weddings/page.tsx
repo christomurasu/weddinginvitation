@@ -2,6 +2,8 @@ import { supabase } from "../lib/supabase"
 import Link from "next/link"
 import LogoutButton from "./[slug]/dashboard/LogoutButton"
 
+export const dynamic = "force-dynamic"
+
 export default async function WeddingsPage() {
   const { data: weddings } = await supabase
     .from("weddings")
