@@ -197,7 +197,7 @@ export default function WeddingScannerPage({
         </button>
         <button onClick={() => { setMode("reception"); setGuest(null); setError(""); setConfirmed(false) }}
           style={{ flex: 1, padding: "14px", background: mode === "reception" ? "#535A36" : "transparent", color: mode === "reception" ? "#fff" : "#888780", border: "none", fontFamily: "inherit", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", fontWeight: mode === "reception" ? 700 : 400 }}>
-          Resepsi
+          Ramah Tamah
         </button>
       </div>
 

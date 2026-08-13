@@ -4,16 +4,16 @@ export const t = {
   en: {
     // IntroSection
     dearGuest: "Dear",
-    invitedTo: "You are invited to celebrate the wedding of",
+    invitedTo: "You are invited to celebrate the Wedding Thanksgiving Mass of",
     theGroom: "The Groom",
     theBride: "The Bride",
     firstSonOf: "The first son of",
     firstDaughterOf: "The first daughter of",
     // CountdownBanner
-    countingDays: "Counting days until the wedding",
+    countingDays: "Counting days until the mass",
     days: "Days", hours: "Hours", min: "Min", sec: "Sec",
     // Section labels
-    holyMatrimony: "Holy Matrimony",
+    holyMatrimony: "Thanksgiving Mass",
     reception: "Reception",
     wishes: "Wishes",
     wishesTitle: "WISHES",
@@ -34,17 +34,17 @@ export const t = {
   id: {
     // IntroSection
     dearGuest: "Kepada Bapak/Ibu",
-    invitedTo: "Kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam acara pernikahan",
+    invitedTo: "Kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam acara Misa Syukur Pernikahan",
     theGroom: "Mempelai Pria",
     theBride: "Mempelai Wanita",
     firstSonOf: "Putra dari",
     firstDaughterOf: "Putri dari",
     // CountdownBanner
-    countingDays: "Menghitung hari menuju pernikahan",
+    countingDays: "Menghitung hari menuju Misa Syukur",
     days: "Hari", hours: "Jam", min: "Menit", sec: "Detik",
     // Section labels
-    holyMatrimony: "Pemberkatan Nikah",
-    reception: "Resepsi",
+    holyMatrimony: "Misa Syukur",
+    reception: "Ramah Tamah",
     wishes: "Ucapan & Doa",
     wishesTitle: "UCAPAN",
     // RSVP

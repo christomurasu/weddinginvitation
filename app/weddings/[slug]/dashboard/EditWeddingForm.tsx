@@ -454,7 +454,7 @@ export default function EditWeddingForm({ wedding }: { wedding: Wedding }) {
       </div>
 
       <div style={divider} />
-      <span style={sectionLabel}>Pemberkatan Nikah</span>
+      <span style={sectionLabel}>Misa Syukur</span>
       <div style={{ marginBottom: 14 }}>
         <label style={labelStyle}>Waktu</label>
         <input style={inputStyle} type="text" value={form.ceremony_time} onChange={e => setForm({ ...form, ceremony_time: e.target.value })} placeholder="e.g. 12.30 WIB" />
