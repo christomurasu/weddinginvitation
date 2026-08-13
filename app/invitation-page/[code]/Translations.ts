@@ -33,10 +33,10 @@ export const t = {
   },
   id: {
     // IntroSection
-    dearGuest: "Kepada Bapak/Ibu",
+    dearGuest: "Kepada Yth.",
     invitedTo: "Kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam acara Misa Syukur Pernikahan",
-    theGroom: "Mempelai Pria",
-    theBride: "Mempelai Wanita",
+    theGroom: "",
+    theBride: "",
     firstSonOf: "Putra dari",
     firstDaughterOf: "Putri dari",
     // CountdownBanner
