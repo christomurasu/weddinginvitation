@@ -10,7 +10,8 @@ export default function WishForm({
   weddingId, guestName, lang = "en",
   guestCode, guestGreeting, isCeremonyOnly, maxAttendees,
   ceremonyRsvp, ceremonyAdults, ceremonyKids,
-  receptionRsvp, receptionAdults, receptionKids
+  receptionRsvp, receptionAdults, receptionKids,
+  showQr = true
 }: {
   weddingId: string
   guestName: string
@@ -25,13 +26,15 @@ export default function WishForm({
   receptionRsvp: string
   receptionAdults: number
   receptionKids: number
+  showQr?: boolean
 }) {
   const router = useRouter()
   const rsvpRef = useRef<RSVPSectionRef>(null)
   const [message, setMessage] = useState("")
   const [loading, setLoading] = useState(false)
+  const [saved, setSaved] = useState(false)
   const [showPopup, setShowPopup] = useState(
-    ceremonyRsvp === "confirmed" || (!isCeremonyOnly && receptionRsvp === "confirmed")
+    showQr && (ceremonyRsvp === "confirmed" || (!isCeremonyOnly && receptionRsvp === "confirmed"))
   )
   const tr = t[lang]
 
@@ -55,7 +58,8 @@ export default function WishForm({
       router.refresh()
     }
     setLoading(false)
-    setShowPopup(true)
+    if (showQr) setShowPopup(true)
+    else { setSaved(true); setTimeout(() => setSaved(false), 3000) }
   }
 
   return (
@@ -117,7 +121,7 @@ export default function WishForm({
           opacity: loading ? 0.5 : 1
         }}
       >
-        {loading ? "..." : tr.wishButton}
+        {loading ? "..." : saved ? (lang === "id" ? "✓ Tersimpan!" : "✓ Saved!") : tr.wishButton}
       </button>
     </div>
   )

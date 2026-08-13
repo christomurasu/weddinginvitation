@@ -332,6 +332,7 @@ export default async function InvitationPage({
               receptionRsvp={guest.reception_rsvp ?? "pending"}
               receptionAdults={guest.reception_adults ?? 0}
               receptionKids={guest.reception_kids ?? 0}
+              showQr={wedding.show_qr ?? true}
             />
           </div>
         </div>
