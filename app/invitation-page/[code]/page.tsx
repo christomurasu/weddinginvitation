@@ -151,7 +151,7 @@ export default async function InvitationPage({
           <IntroSection
             guestGreeting={guest.greeting || "Honoured Guest"}
             name={wedding.partner1}
-            parentLabel={tr.firstSonOf}
+            parentLabel={tr.firstDaughterOf}
             parentNames={`${wedding.groom_father ?? ""} & ${wedding.groom_mother ?? ""}`}
             photoUrl={wedding.groom_intro_photo_url}
             backgroundUrl={wedding.groom_intro_bg_url}
@@ -166,7 +166,7 @@ export default async function InvitationPage({
           <IntroSection
             guestGreeting={guest.greeting || "Honoured Guest"}
             name={wedding.partner2}
-            parentLabel={tr.firstDaughterOf}
+            parentLabel={tr.firstSonOf}
             parentNames={`${wedding.bride_father ?? ""} & ${wedding.bride_mother ?? ""}`}
             photoUrl={wedding.bride_intro_photo_url}
             backgroundUrl={wedding.bride_intro_bg_url}
