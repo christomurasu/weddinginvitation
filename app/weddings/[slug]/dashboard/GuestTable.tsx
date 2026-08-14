@@ -220,7 +220,7 @@ export default function GuestTable({
     if (guest.language === "id") {
         const ceremony = `MISA SYUKUR\n${wedding.ceremony_time ?? ""}\n${wedding.ceremony_venue ?? ""}`
         const reception = guest.invitation_type === "full" ? `\n\nRAMAH TAMAH\n${wedding.reception_time ?? ""}\n${wedding.reception_venue ?? ""}` : ""
-        return `Kepada Yth. ${guest.greeting},\n _(kami mohon maaf bila ada kesalahan penulisan nama maupun gelar)_ \n\nKami mengundang Bapak/Ibu/Sdr untuk menghadiri :\n*Misa Syukur Pernikahan ${wedding.partner1} & ${wedding.partner2}*\n\n${ceremony}${reception}\n\nSilakan klik link di bawah untuk konfirmasi kehadiran:\n${link}\n\nHormat kami, \n${wedding.bride_father} & ${wedding.bride_mother} \n${wedding.groom_father} & ${wedding.groom_mother} \n${wedding.partner1} & ${wedding.partner2}\n\nRSVP by SF Invitation`
+        return `Kepada Yth. \n${guest.greeting}\n\n _(kami mohon maaf bila ada kesalahan penulisan nama maupun gelar)_ \n\nKami mengundang Bapak/Ibu/Sdr untuk menghadiri :\n*Misa Syukur Pernikahan ${wedding.partner1} & ${wedding.partner2}*\n\n${ceremony}${reception}\n\nSilakan klik link di bawah untuk konfirmasi kehadiran:\n${link}\n\nHormat kami, \n${wedding.bride_father} & ${wedding.bride_mother} \n${wedding.groom_father} & ${wedding.groom_mother} \n${wedding.partner1} & ${wedding.partner2}\n\nRSVP by SF Invitation`
 
     }
 

@@ -64,12 +64,12 @@ function RSVPCard({ title, bgColor, titleColor, field, maxAttendees, initialRsvp
           {tr.no}
         </button>
       </div>
-      {rsvp === "confirmed" && (
+      {/* {rsvp === "confirmed" && (
         <div style={{ display: "flex", gap: 16 }}>
           <Counter label={tr.adults} value={adults} onChange={handleAdults} textColor={titleColor} max={maxAttendees - kids} />
           <Counter label={tr.kids} value={kids} onChange={handleKids} textColor={titleColor} max={maxAttendees - adults} />
         </div>
-      )}
+      )} */}
     </div>
   )
 }
@@ -114,9 +114,9 @@ const RSVPSection = forwardRef<RSVPSectionRef, {
       <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(11px, 2dvh, 15px)", color: "#5F5F5F", marginBottom: 4, lineHeight: 1.5 }}>
         {tr.rsvpSubtitle}
       </p>
-      <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(10px, 2dvh, 12px)", color: "#888780", marginBottom: 20 }}>
+      {/* <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: "clamp(10px, 2dvh, 12px)", color: "#888780", marginBottom: 20 }}>
         (Valid for {maxAttendees} {maxAttendees === 1 ? "person" : "persons"})
-      </p>
+      </p> */}
 
       <RSVPCard
         title={tr.holyMatrimony} bgColor="#f2d857" titleColor="#5F5F5F"
