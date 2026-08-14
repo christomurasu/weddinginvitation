@@ -123,6 +123,20 @@ export default function WishForm({
       >
         {loading ? "..." : saved ? (lang === "id" ? "✓ Tersimpan!" : "✓ Saved!") : tr.wishButton}
       </button>
+
+      <div style={{ margin: 24, textAlign: "center", alignContent: "center"}}>
+        <div style={{ display: "flex", justifyContent: "center", gap: 20, marginBottom: 12 }}>
+          <img src="/no-angpao.png" alt="Tanpa angpao" style={{ width: 56, height: 56, objectFit: "contain" }} />
+          <img src="/no-gift.png" alt="Tanpa kado" style={{ width: 56, height: 56, objectFit: "contain" }} />
+        </div>
+        <p style={{
+          fontFamily: "'Poppins', sans-serif", fontWeight: 400,
+          fontSize: "clamp(11px, 2dvh, 15px)",
+          color: "#5F5F5F", lineHeight: 1.6, maxWidth: 300, margin: "0 auto"
+        }}>
+          Ungkapan tanda kasih yang diberikan mohon berupa doa untuk kebahagiaan anak kami. Terima kasih
+        </p>
+      </div>
     </div>
   )
 }
