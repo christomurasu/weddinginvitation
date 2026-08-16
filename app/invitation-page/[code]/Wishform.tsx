@@ -135,7 +135,8 @@ export default function WishForm({
           color: "#5F5F5F", lineHeight: 1.6, maxWidth: 300, margin: "0 auto"
         }}>
           Ungkapan tanda kasih yang diberikan mohon berupa doa untuk kebahagiaan anak kami. 
-          <p>Terima kasih</p>
+          <br />
+          Terima kasih
         </p>
       </div>
     </div>
