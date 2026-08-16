@@ -159,7 +159,7 @@ export default function GuestTable({
       return "Belum RSVP"
     }
     const rows = [
-      ["Nama", "Greeting", "Dari", "Status RSVP", "No Meja", "Terundang (Max Pax)", "RSVP Pemberkatan (Pax)", "RSVP Resepsi (Pax)", "No Check-in Pemberkatan", "No Check-in Resepsi", "No HP", "Tipe", "Link Undangan"],
+      ["Nama", "Greeting", "Dari", "Status RSVP", "No Meja", "Terundang (Max Pax)", "RSVP Pemberkatan (Pax)", "RSVP Resepsi (Pax)", "No Check-in Pemberkatan", "No Check-in Resepsi", "No HP", "Tipe", "Link Undangan", "Link WA"],
       ...filtered.map(g => {
         const cPax = g.ceremony_rsvp === "confirmed" ? (g.ceremony_adults ?? 0) + (g.ceremony_kids ?? 0) : 0
         const rPax = g.reception_rsvp === "confirmed" ? (g.reception_adults ?? 0) + (g.reception_kids ?? 0) : 0
@@ -176,7 +176,8 @@ export default function GuestTable({
           g.invitation_type === "ceremony" ? "N/A" : g.checkin_number_reception ?? "",
           g.phone ?? "",
           g.invitation_type === "ceremony" ? "Pemberkatan" : "Full",
-          `https://sfinvitation.id/invitation-page/${g.code}`
+          `https://sfinvitation.id/invitation-page/${g.code}`,
+          g.phone ? `https://wa.me/62${g.phone.replace(/^0/, "").replace(/\D/g, "")}?text=${encodeURIComponent(waMessage(g))}` : ""
         ]
       })
     ]
@@ -194,7 +195,7 @@ export default function GuestTable({
       String(totalMaxPax),
       `${totalCeremonyPax} pax / ${totalCeremonyGuests} undangan`,
       `${totalReceptionPax} pax / ${totalReceptionGuests} undangan`,
-      "", "", "", "", ""
+      "", "", "", "", "", ""
     ])
 
     const csv = rows.map(r => r.map(v => `"${v}"`).join(",")).join("\n")
@@ -214,7 +215,7 @@ export default function GuestTable({
     setUpdatingLang(null)
   }
 
-  const waMessage = (guest: Guest) => {
+  function waMessage(guest: Guest) {
     const link = `https://sfinvitation.id/invitation-page/${guest.code}`
 
     if (guest.language === "id") {
