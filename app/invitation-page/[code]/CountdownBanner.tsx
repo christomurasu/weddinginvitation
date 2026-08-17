@@ -13,7 +13,7 @@ function calcTimeLeft(targetDate: string) {
   }
 }
 
-export default function CountdownBanner({ targetDate, lang = "en" }: { targetDate: string; lang?: Lang }) {
+export default function CountdownBanner({ targetDate, lang = "en", nonKristen }: { targetDate: string; lang?: Lang; nonKristen?: boolean }) {
   const [timeLeft, setTimeLeft] = useState(() => calcTimeLeft(targetDate))
 
   useEffect(() => {
@@ -27,7 +27,6 @@ export default function CountdownBanner({ targetDate, lang = "en" }: { targetDat
     <div style={{
       width: "100%",
       height: "calc(126dvh / 844 * 100)",
-      // marginTop: 24,
       background: "#535A36",
       display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center",
@@ -48,7 +47,7 @@ export default function CountdownBanner({ targetDate, lang = "en" }: { targetDat
         lineHeight: 1.2,
         width: "100%"
       }}>
-        {tr.countingDays}
+        {nonKristen ? tr.countingDaysNonKristen : tr.countingDays}
       </p>
 
       <div style={{ display: "flex", alignItems: "flex-start", gap: "clamp(8px, 2dvh, 16px)" }}>

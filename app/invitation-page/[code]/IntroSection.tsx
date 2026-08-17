@@ -3,11 +3,11 @@ import { t, Lang } from "./Translations"
 export default function IntroSection({
   guestGreeting, name, parentLabel, parentNames,
   photoUrl, backgroundUrl, stampUrl, roleLabel, align,
-  showGreeting = true, lang = "en"
+  showGreeting = true, lang = "en", nonKristen
 }: {
   guestGreeting: string; name: string; parentLabel: string; parentNames: string
   photoUrl?: string; backgroundUrl?: string; stampUrl?: string
-  roleLabel: string; align: "left" | "right"; showGreeting?: boolean; lang?: Lang
+  roleLabel: string; align: "left" | "right"; showGreeting?: boolean; lang?: Lang; nonKristen?: boolean
 }) {
   const textAlign = align === "left" ? "left" : "right"
   const textSide = align === "left" ? "flex-start" : "flex-end"
@@ -33,7 +33,7 @@ export default function IntroSection({
               <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "clamp(11px, 2.3dvh, 15px)", color: "#5F5F5F" }}>{guestGreeting},</span>
             </p>
             <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: "clamp(11px, 2.3dvh, 15px)", color: "#5F5F5F", marginBottom: "2dvh", maxWidth: 260 }}>
-              {tr.invitedTo}
+              {nonKristen ? tr.invitedToNonKristen : tr.invitedTo}
             </p>
           </>
         )}

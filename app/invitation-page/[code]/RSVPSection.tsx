@@ -81,8 +81,8 @@ export interface RSVPSectionRef {
 const RSVPSection = forwardRef<RSVPSectionRef, {
   guestCode: string; guestGreeting: string; isCeremonyOnly: boolean; maxAttendees: number
   ceremonyRsvp: string; ceremonyAdults: number; ceremonyKids: number
-  receptionRsvp: string; receptionAdults: number; receptionKids: number; lang?: Lang
-}>(({ guestCode, guestGreeting, isCeremonyOnly, maxAttendees, ceremonyRsvp, ceremonyAdults, ceremonyKids, receptionRsvp, receptionAdults, receptionKids, lang = "en" }, ref) => {
+  receptionRsvp: string; receptionAdults: number; receptionKids: number; lang?: Lang, nonKristen : boolean
+}>(({ guestCode, guestGreeting, isCeremonyOnly, maxAttendees, ceremonyRsvp, ceremonyAdults, ceremonyKids, receptionRsvp, receptionAdults, receptionKids, lang = "en", nonKristen }, ref) => {
   const tr = t[lang]
   const [cState, setCState] = useState({ rsvp: ceremonyRsvp === "pending" ? "confirmed" : ceremonyRsvp, adults: ceremonyRsvp === "pending" ? 1 : ceremonyAdults, kids: ceremonyRsvp === "pending" ? 0 : ceremonyKids })
   const [rState, setRState] = useState({ rsvp: receptionRsvp === "pending" ? "confirmed" : receptionRsvp, adults: receptionRsvp === "pending" ? 1 : receptionAdults, kids: receptionRsvp === "pending" ? 0 : receptionKids })
@@ -119,7 +119,7 @@ const RSVPSection = forwardRef<RSVPSectionRef, {
       </p> */}
 
       <RSVPCard
-        title={tr.holyMatrimony} bgColor="#f2d857" titleColor="#5F5F5F"
+        title={nonKristen ? "Ramah Tamah" : tr.holyMatrimony} bgColor="#f2d857" titleColor="#5F5F5F"
         field="ceremony" maxAttendees={maxAttendees}
         initialRsvp={ceremonyRsvp} initialAdults={ceremonyAdults} initialKids={ceremonyKids}
         lang={lang} onChange={(rsvp, adults, kids) => setCState({ rsvp, adults, kids })}

@@ -20,7 +20,7 @@ function parseCSV(text: string) {
   }).filter(row => row.name)
 }
 
-const COLUMNS = ["name", "greeting", "phone", "table_number", "invitation_type", "max_attendees", "seats", "language", "note"]
+const COLUMNS = ["name", "greeting", "phone", "table_number", "invitation_type", "guest_side", "non_kristen", "max_attendees", "seats", "language", "note"]
 
 export default function CSVImport({ weddingId }: { weddingId: string }) {
   const router = useRouter()
@@ -72,6 +72,8 @@ export default function CSVImport({ weddingId }: { weddingId: string }) {
         phone,
         table_number: row.table_number || null,
         invitation_type: row.invitation_type === "ceremony" ? "ceremony" : "full",
+        guest_side: row.guest_side === "bride" ? "bride" : "groom",
+        non_kristen: (row.non_kristen ?? "").toLowerCase() === "true" || row.non_kristen === "1" || (row.non_kristen ?? "").toLowerCase() === "ya",
         max_attendees: parseInt(row.max_attendees) || 1,
         seats: parseInt(row.seats) || 1,
         language: row.language === "id" ? "id" : "en",
@@ -96,7 +98,7 @@ export default function CSVImport({ weddingId }: { weddingId: string }) {
     if (fileRef.current) fileRef.current.value = ""
   }
 
-  const templateCSV = `name,greeting,phone,table_number,invitation_type,max_attendees,seats,language,note\nChristopher Sonny,Mr. Christopher,081234567890,Table 1,full,2,2,en,\nFelyn Karina,Mrs. Felyn,089876543210,Table 2,ceremony,1,1,id,Special guest`
+  const templateCSV = `name,greeting,phone,table_number,invitation_type,guest_side,non_kristen,max_attendees,seats,language,note\nChristopher Sonny,Mr. Christopher,081234567890,Table 1,full,groom,,2,2,en,\nFelyn Karina,Mrs. Felyn,089876543210,Table 2,full,bride,true,1,1,id,Special guest`
   const templateBlob = `data:text/csv;charset=utf-8,${encodeURIComponent(templateCSV)}`
 
   return (
@@ -107,7 +109,7 @@ export default function CSVImport({ weddingId }: { weddingId: string }) {
 
       <p style={labelStyle}>Format Kolom</p>
       <div style={{ background: "#fdf8ee", border: "1px solid #e4ddd0", padding: "12px 14px", marginBottom: 16, fontSize: 12, fontFamily: "monospace", color: "#2c2c2a", lineHeight: 1.8 }}>
-        name, greeting, phone, table_number, invitation_type, max_attendees, seats, language, note
+        name, greeting, phone, table_number, invitation_type, guest_side, non_kristen, max_attendees, seats, language, note
       </div>
 
       <div style={{ background: "#f5f0e8", border: "1px solid #e4ddd0", padding: "12px 14px", marginBottom: 20, fontSize: 12, lineHeight: 1.8 }}>
@@ -118,6 +120,8 @@ export default function CSVImport({ weddingId }: { weddingId: string }) {
           ["phone", "❌ Opsional", "Nomor WA (misal: 08123456789)"],
           ["table_number", "❌ Opsional", "Nomor meja (misal: Table 1)"],
           ["invitation_type", "✅ Wajib", "full atau ceremony"],
+          ["guest_side", "❌ Opsional", "groom atau bride (default groom)"],
+          ["non_kristen", "❌ Opsional", "true / ya / 1 untuk non-Kristen"],
           ["max_attendees", "✅ Wajib", "Jumlah tamu maksimal"],
           ["seats", "✅ Wajib", "Jumlah kursi"],
           ["language", "✅ Wajib", "en (Inggris) atau id (Indonesia)"],

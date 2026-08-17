@@ -61,7 +61,16 @@ export default async function InvitationPage({
   const photoList = (await supabase.from("wedding_photos").select("*").eq("wedding_id", wedding.id).order("order_index", { ascending: true })).data ?? []
   const wishes = (await supabase.from("wishes").select("*").eq("wedding_id", wedding.id).order("created_at", { ascending: false })).data ?? []
 
-  const isCeremonyOnly = guest.invitation_type === "ceremony"
+  const isNonKristen = guest.non_kristen === true
+
+  // Untuk tamu non-Kristen: section pertama menampilkan data RESEPSI, dan section resepsi disembunyikan
+  const isCeremonyOnly = guest.invitation_type === "ceremony" || isNonKristen
+
+  const cerImage = isNonKristen ? wedding.reception_image_url : wedding.ceremony_image_url
+  const cerVenue = isNonKristen ? wedding.reception_venue : wedding.ceremony_venue
+  const cerAddress = isNonKristen ? wedding.reception_address : wedding.ceremony_address
+  const cerTime = isNonKristen ? wedding.reception_time : wedding.ceremony_time
+  const cerMaps = isNonKristen ? wedding.reception_maps_url : wedding.ceremony_maps_url
 
   const bgStyle = wedding.cover_photo_url ? `url('${wedding.cover_photo_url}') center/cover no-repeat` : "#d6cfc6"
   const sectionBg = wedding.cover_photo_url
@@ -159,6 +168,7 @@ export default async function InvitationPage({
             roleLabel={tr.theGroom}
             align="left"
             lang={lang}
+            nonKristen={guest.non_kristen}
           />
         </div>
 
@@ -175,6 +185,7 @@ export default async function InvitationPage({
             align="right"
             showGreeting={false}
             lang={lang}
+            nonKristen={guest.non_kristen}
           />
         </div>
 
@@ -187,18 +198,18 @@ export default async function InvitationPage({
         {/* Holy Matrimony */}
         <div className="snap-section" style={sectionBg}>
           <div style={{ height: "100dvh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-            {wedding.wedding_date_iso && <CountdownBanner targetDate={wedding.wedding_date_iso} lang={lang} />}
+            {wedding.wedding_date_iso && <CountdownBanner targetDate={wedding.wedding_date_iso} lang={lang} nonKristen={guest.non_kristen}/>}
             <p style={{
               fontFamily: "'Poppins', sans-serif", fontWeight: 700,
               fontSize: "clamp(14px, 3dvh, 18px)",
               color: "#5F5F5F", textAlign: "center",
               padding: "1.5dvh 28px 1dvh"
             }}>
-              {tr.holyMatrimony}
+              {guest.non_kristen ? "Ramah Tamah" : tr.holyMatrimony}
             </p>
-            {wedding.ceremony_image_url ? (
+            {cerImage ? (
               <div style={{ margin: "0 35px", aspectRatio: "325 / 240", position: "relative", overflow: "hidden", flexShrink: 0 }}>
-                <img src={wedding.ceremony_image_url} alt="Gereja" style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
+                <img src={cerImage} alt="Gereja" style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
               </div>
             ) : (
               <div style={{ margin: "0 35px", aspectRatio: "325 / 150", background: "#ede5d8", flexShrink: 0 }} />
@@ -209,16 +220,16 @@ export default async function InvitationPage({
                 fontSize: "clamp(13px, 3dvh, 16px)",
                 color: "#5F5F5F", marginBottom: "0.5dvh"
               }}>
-                {wedding.ceremony_venue}
+                {cerVenue}
               </p>
               <p style={{
                 fontFamily: "'Poppins', sans-serif", fontWeight: 400,
                 fontSize: "clamp(11px, 2dvh, 15px)",
                 color: "#5F5F5F", lineHeight: 1.5, marginBottom: "1.5dvh"
               }}>
-                {wedding.ceremony_address}
+                {cerAddress}
               </p>
-              <DateMapsRow dayName={dayName} day={dayNumber} monthYear={monthYear} time={wedding.ceremony_time} mapsUrl={wedding.ceremony_maps_url} lang={lang} />
+              <DateMapsRow dayName={dayName} day={dayNumber} monthYear={monthYear} time={cerTime} mapsUrl={cerMaps} lang={lang} />
             </div>
           </div>
         </div>
@@ -333,6 +344,7 @@ export default async function InvitationPage({
               receptionAdults={guest.reception_adults ?? 0}
               receptionKids={guest.reception_kids ?? 0}
               showQr={wedding.show_qr ?? true}
+              nonKristen={guest.non_kristen ?? false}
             />
           </div>
         </div>

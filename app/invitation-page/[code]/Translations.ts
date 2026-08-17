@@ -5,12 +5,14 @@ export const t = {
     // IntroSection
     dearGuest: "Dear",
     invitedTo: "You are invited to celebrate the Wedding Thanksgiving Mass of",
+    invitedToNonKristen: "Kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam acara Syukuran Pernikahan",
     theGroom: "The Groom",
     theBride: "The Bride",
     firstSonOf: "The first son of",
     firstDaughterOf: "The first daughter of",
     // CountdownBanner
     countingDays: "Counting days until the mass",
+    countingDaysNonKristen: "Menghitung hari menuju Syukuran",
     days: "Days", hours: "Hours", min: "Min", sec: "Sec",
     // Section labels
     holyMatrimony: "Thanksgiving Mass",
@@ -35,12 +37,14 @@ export const t = {
     // IntroSection
     dearGuest: "Kepada Yth.",
     invitedTo: "Kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam acara Misa Syukur Pernikahan",
+    invitedToNonKristen: "Kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam acara Syukuran Pernikahan",
     theGroom: "",
     theBride: "",
     firstSonOf: "Putra dari",
     firstDaughterOf: "Putri dari",
     // CountdownBanner
     countingDays: "Menghitung hari menuju Misa Syukur",
+    countingDaysNonKristen: "Menghitung hari menuju Syukuran",
     days: "Hari", hours: "Jam", min: "Menit", sec: "Detik",
     // Section labels
     holyMatrimony: "Misa Syukur",

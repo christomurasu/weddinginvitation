@@ -11,7 +11,7 @@ export default function WishForm({
   guestCode, guestGreeting, isCeremonyOnly, maxAttendees,
   ceremonyRsvp, ceremonyAdults, ceremonyKids,
   receptionRsvp, receptionAdults, receptionKids,
-  showQr = true
+  showQr = true, nonKristen
 }: {
   weddingId: string
   guestName: string
@@ -27,6 +27,7 @@ export default function WishForm({
   receptionAdults: number
   receptionKids: number
   showQr?: boolean
+  nonKristen: boolean
 }) {
   const router = useRouter()
   const rsvpRef = useRef<RSVPSectionRef>(null)
@@ -85,6 +86,7 @@ export default function WishForm({
         receptionAdults={receptionAdults}
         receptionKids={receptionKids}
         lang={lang}
+        nonKristen={nonKristen}
       />
 
       <div style={{ marginBottom: 2 }}>
