@@ -69,7 +69,7 @@ export default async function InvitationPage({
   const cerImage = isNonKristen ? wedding.reception_image_url : wedding.ceremony_image_url
   const cerVenue = isNonKristen ? wedding.reception_venue : wedding.ceremony_venue
   const cerAddress = isNonKristen ? wedding.reception_address : wedding.ceremony_address
-  const cerTime = isNonKristen ? wedding.reception_time : wedding.ceremony_time
+  const cerTime = isNonKristen ? "Minggu, 23 Agustus 2026 Pukul 14.00" : wedding.ceremony_time
   const cerMaps = isNonKristen ? wedding.reception_maps_url : wedding.ceremony_maps_url
 
   const bgStyle = wedding.cover_photo_url ? `url('${wedding.cover_photo_url}') center/cover no-repeat` : "#d6cfc6"
