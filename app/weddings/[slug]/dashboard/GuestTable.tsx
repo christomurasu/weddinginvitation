@@ -218,13 +218,11 @@ export default function GuestTable({
 
   function waMessage(guest: Guest) {
     const link = `https://sfinvitation.id/invitation-page/${guest.code}`
-    const titleMessage = guest.non_kristen ? "Syukuran Pernikahan" : "Misa Syukur Pernikahan"
-
+    const titleMessage = guest.non_kristen ? "SYUKURAN PERNIKAHAN" : "MISA SYUKUR"
     if (guest.language === "id") {
-        const ceremony = `${titleMessage}\n${wedding.ceremony_time ?? ""}\n${wedding.ceremony_venue ?? ""}`
+        const ceremony = `{titleMessage}\n${wedding.ceremony_time ?? ""}\n${wedding.ceremony_venue ?? ""}`
         const reception = guest.invitation_type === "full" ? `\n\nRAMAH TAMAH\n${wedding.reception_time ?? ""}\n${wedding.reception_venue ?? ""}` : ""
-        const ceremonyReception = guest.non_kristen ? `RAMAH TAMAH\nMinggu, 23 Agustus 2026 Pukul 14.00\n${wedding.reception_venue ?? ""}` : `${ceremony}${reception}`
-        return `Kepada Yth. \n${guest.greeting}\n\n _(kami mohon maaf bila ada kesalahan penulisan nama maupun gelar)_ \n\nKami mengundang Bapak/Ibu/Sdr untuk menghadiri :\n*${titleMessage} ${wedding.partner1} & ${wedding.partner2}*\n\n${ceremonyReception}\n\nSilakan klik link di bawah untuk konfirmasi kehadiran:\n${link}\n\nHormat kami, \n${wedding.bride_father} & ${wedding.bride_mother} \n${wedding.groom_father} & ${wedding.groom_mother} \n${wedding.partner1} & ${wedding.partner2}\n\nRSVP by SF Invitation`
+        return `Kepada Yth. \n${guest.greeting}\n\n _(kami mohon maaf bila ada kesalahan penulisan nama maupun gelar)_ \n\nKami mengundang Bapak/Ibu/Sdr untuk menghadiri :\n*Misa Syukur Pernikahan ${wedding.partner1} & ${wedding.partner2}*\n\n${ceremony}${reception}\n\nSilakan klik link di bawah untuk konfirmasi kehadiran:\n${link}\n\nHormat kami, \n${wedding.bride_father} & ${wedding.bride_mother} \n${wedding.groom_father} & ${wedding.groom_mother} \n${wedding.partner1} & ${wedding.partner2}\n\nRSVP by SF Invitation`
     }
 
     const ceremony = `THANKSGIVING MASS\n${wedding.ceremony_time ?? ""}\n${wedding.ceremony_venue ?? ""}`
