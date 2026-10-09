@@ -78,3 +78,8 @@ alter table birthday_guests add column if not exists menu_note text;
 -- v4: konfirmasi hadir di tiket + teks terima kasih untuk yang tidak hadir
 alter table birthday_guests add column if not exists rsvp text;   -- 'attending' / 'declined' / null
 alter table birthdays add column if not exists thanks_text text default 'THANK YOU FOR YOUR CONFIRMATION';
+
+-- v5: preview link (WhatsApp) & favicon per event
+alter table birthdays add column if not exists share_description text;
+alter table birthdays add column if not exists share_image_url text;
+alter table birthdays add column if not exists icon_url text;
