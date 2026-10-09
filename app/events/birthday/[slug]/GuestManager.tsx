@@ -8,7 +8,10 @@ interface Guest {
   code: string
   name: string
   phone: string | null
-  menu_name: string | null
+  rsvp: string | null
+  food_name: string | null
+  drink_name: string | null
+  menu_note: string | null
 }
 
 function makeCode() {
@@ -110,7 +113,7 @@ export default function GuestManager({
         <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 12 }}>
           <thead>
             <tr style={{ borderBottom: "1px solid #e4ddd0" }}>
-              <th style={th}>NAMA</th><th style={th}>KODE</th><th style={th}>MENU</th><th style={th}>LINK</th><th />
+              <th style={th}>NAMA</th><th style={th}>KODE</th><th style={th}>HADIR</th><th style={th}>MENU</th><th style={th}>LINK</th><th />
             </tr>
           </thead>
           <tbody>
@@ -118,7 +121,15 @@ export default function GuestManager({
               <tr key={g.id} style={{ borderBottom: "1px solid #f0ebe3" }}>
                 <td style={td}>{g.name}</td>
                 <td style={{ ...td, fontFamily: "monospace" }}>{g.code}</td>
-                <td style={{ ...td, color: g.menu_name ? "#3b6d11" : "#b4b2a9" }}>{g.menu_name ?? "Belum pilih"}</td>
+                <td style={{ ...td, color: g.rsvp === "attending" ? "#3b6d11" : g.rsvp === "declined" ? "#a32d2d" : "#b4b2a9" }}>
+                  {g.rsvp === "attending" ? "Hadir" : g.rsvp === "declined" ? "Tidak" : "Belum"}
+                </td>
+                <td style={td}>
+                  <span style={{ color: g.food_name ? "#3b6d11" : "#b4b2a9" }}>{g.food_name ?? "Belum pilih makanan"}</span>
+                  <br />
+                  <span style={{ color: g.drink_name ? "#3b6d11" : "#b4b2a9" }}>{g.drink_name ?? "Belum pilih minuman"}</span>
+                  {g.menu_note && <p style={{ margin: "4px 0 0", fontSize: 11, color: "#a32d2d", fontStyle: "italic" }}>Note: {g.menu_note}</p>}
+                </td>
                 <td style={{ ...td, whiteSpace: "nowrap" }}>
                   <button onClick={() => {
                     navigator.clipboard.writeText(link(g.code))

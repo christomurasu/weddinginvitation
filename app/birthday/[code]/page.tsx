@@ -1,7 +1,7 @@
 import { supabase } from "../../lib/supabase"
-import QRCode from "qrcode"
 import type { Metadata } from "next"
 import MenuPicker from "./MenuPicker"
+import { RsvpProvider, RsvpButtons } from "./Rsvp"
 
 export const dynamic = "force-dynamic"
 
@@ -51,8 +51,7 @@ export default async function BirthdayInvitationPage({
   }
 
   const b = guest.birthdays
-  const menuItems = (await supabase.from("birthday_menu_items").select("id, name").eq("birthday_id", b.id).order("order_index", { ascending: true })).data ?? []
-  const qrDataUrl = await QRCode.toDataURL(code, { margin: 1, width: 400, color: { dark: "#111111", light: "#ffffff" } })
+  const menuItems = (await supabase.from("birthday_menu_items").select("id, name, kind, category").eq("birthday_id", b.id).order("order_index", { ascending: true })).data ?? []
 
   const label = { fontSize: "3.6cqw", color: "#8a8a8a", letterSpacing: "0.02em", lineHeight: 1.35 }
   const value = { fontSize: "3.6cqw", color: "#1a1a1a", fontWeight: 700, lineHeight: 1.35 }
@@ -79,10 +78,13 @@ export default async function BirthdayInvitationPage({
           display: flex; flex-direction: column;
         }
         .bday-img { display: block; max-width: 100%; }
+        /* Belum jawab → hanya page 1-2; hadir → page 3-5; tidak hadir → page 6 */
+        #bday-wrapper:not([data-rsvp="attending"]) .only-attending,
+        #bday-wrapper:not([data-rsvp="declined"]) .only-declined { display: none; }
         @keyframes bday-bounce { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(6px) } }
       `}</style>
 
-      <div id="bday-wrapper">
+      <RsvpProvider initial={guest.rsvp === "attending" || guest.rsvp === "declined" ? guest.rsvp : null}>
 
         {/* Page 1 — cover full */}
         <div className="bday-section" style={{ background: "#0b0000" }}>
@@ -132,19 +134,19 @@ export default async function BirthdayInvitationPage({
                 <div>
                   <p style={label}>VENUE</p>
                   <p style={{ ...value, fontWeight: 400 }}>{b.venue}</p>
-                  {b.venue_address && <p style={{ fontSize: "2.8cqw", color: "#1a1a1a", lineHeight: 1.35, marginTop: "1cqw" }}>{b.venue_address}</p>}
+                  {b.venue_address && <p style={{ ...value, fontWeight: 400, marginTop: "1cqw" }}>{b.venue_address}</p>}
                 </div>
               </div>
 
-              <div style={{ height: "22%", padding: "2% 0 7%", display: "flex", justifyContent: "center" }}>
-                <img src={qrDataUrl} alt={`QR ${code}`} className="bday-img" style={{ height: "100%", aspectRatio: "1" }} />
+              <div style={{ height: "22%", padding: "0 0 7%" }}>
+                <RsvpButtons guestCode={code} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Page 3 — casting call */}
-        <div className="bday-section" style={{ ...bg(b.bg3_url), alignItems: "center", padding: "8dvh 6% 0" }}>
+        {/* Page 3 — casting call (hadir) */}
+        <div className="bday-section only-attending" style={{ ...bg(b.bg3_url), alignItems: "center", padding: "8dvh 6% 0" }}>
           {b.casting_title_url && (
             <img src={b.casting_title_url} alt="Casting Call" className="bday-img" style={{ width: "80%", marginBottom: "4dvh" }} />
           )}
@@ -167,26 +169,32 @@ export default async function BirthdayInvitationPage({
           )}
         </div>
 
-        {/* Page 4 — menu */}
-        <div className="bday-section" style={{ ...bg(b.bg4_url), padding: "2dvh 5% 3dvh" }}>
+        {/* Page 4 — menu (hadir) */}
+        <div className="bday-section only-attending" style={{ ...bg(b.bg4_url), padding: "2dvh 5% 3dvh" }}>
           {b.menu_title_url && (
             <img src={b.menu_title_url} alt="Menu" className="bday-img" style={{ width: "100%", maxHeight: "22dvh", objectFit: "contain", margin: "0 auto 2dvh" }} />
           )}
           <p style={{ color: "#fff", fontSize: 10, lineHeight: 1.4, marginBottom: "2dvh", padding: "0 2%" }}>{b.menu_text}</p>
-          <MenuPicker guestCode={code} items={menuItems} initialSelected={guest.menu_item_id ?? null} />
+          <MenuPicker guestCode={code} items={menuItems} initialFood={guest.menu_item_id ?? null} initialDrink={guest.drink_item_id ?? null} initialNote={guest.menu_note ?? ""} />
         </div>
 
-        {/* Page 5 — see you there */}
-        <div className="bday-section" style={{ ...bg(b.bg5_url), alignItems: "center", justifyContent: "center" }}>
+        {/* Page 5 — see you there (hadir) */}
+        <div className="bday-section only-attending" style={{ ...bg(b.bg5_url), alignItems: "center", justifyContent: "center" }}>
           {b.see_you_url && <img src={b.see_you_url} alt="See you there!" className="bday-img" style={{ width: "100%", maxHeight: "90dvh", objectFit: "contain" }} />}
         </div>
 
-        {/* Page 6 — foto */}
-        <div className="bday-section" style={{ ...bg(b.bg6_url), alignItems: "center", justifyContent: "center" }}>
-          {b.photo_url && <img src={b.photo_url} alt="See you there!" className="bday-img" style={{ width: "100%", maxHeight: "90dvh", objectFit: "contain" }} />}
+        {/* Page 6 — terima kasih (tidak hadir) */}
+        <div className="bday-section only-declined" style={{ ...bg(b.bg6_url), alignItems: "center", justifyContent: "center", gap: "3dvh", padding: "0 8%" }}>
+          {b.photo_url && <img src={b.photo_url} alt="" className="bday-img" style={{ width: "100%", maxHeight: "65dvh", objectFit: "contain" }} />}
+          <p style={{
+            color: "#fff", fontWeight: 700, textAlign: "center", letterSpacing: "0.04em",
+            fontSize: "clamp(14px, 4.4vw, 20px)", lineHeight: 1.35, whiteSpace: "pre-line"
+          }}>
+            {b.thanks_text || "THANK YOU FOR YOUR CONFIRMATION"}
+          </p>
         </div>
 
-      </div>
+      </RsvpProvider>
     </>
   )
 }

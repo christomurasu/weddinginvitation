@@ -26,24 +26,31 @@ export default async function BirthdayDashboardPage({
 
   const [{ data: menu }, { data: guests }] = await Promise.all([
     supabase.from("birthday_menu_items").select("*").eq("birthday_id", birthday.id).order("order_index", { ascending: true }),
-    supabase.from("birthday_guests").select("*, birthday_menu_items(name)").eq("birthday_id", birthday.id).order("created_at", { ascending: false }),
+    supabase.from("birthday_guests").select("*").eq("birthday_id", birthday.id).order("created_at", { ascending: false }),
   ])
 
+  const menuName = new Map((menu ?? []).map(m => [m.id, m.name as string]))
+  // Hitung pilihan menu hanya dari tamu yang hadir
+  const attending = (guests ?? []).filter(g => g.rsvp === "attending")
   const menuItems = (menu ?? []).map(m => ({
     ...m,
-    chosen: guests?.filter(g => g.menu_item_id === m.id).length ?? 0,
+    chosen: attending.filter(g => g.menu_item_id === m.id || g.drink_item_id === m.id).length,
   }))
   const guestRows = (guests ?? []).map(g => ({
-    id: g.id, code: g.code, name: g.name, phone: g.phone,
-    menu_name: (g.birthday_menu_items as { name: string } | null)?.name ?? null,
+    id: g.id, code: g.code, name: g.name, phone: g.phone, rsvp: g.rsvp as string | null,
+    food_name: menuName.get(g.menu_item_id) ?? null,
+    drink_name: menuName.get(g.drink_item_id) ?? null,
+    menu_note: g.menu_note as string | null,
   }))
 
   const total = guestRows.length
-  const chosen = guestRows.filter(g => g.menu_name).length
+  const hadir = guestRows.filter(g => g.rsvp === "attending")
   const stats = [
     { label: "Invitations", value: total, color: "#b8965a" },
-    { label: "Sudah Pilih Menu", value: chosen, color: "#3b6d11" },
-    { label: "Belum Pilih Menu", value: total - chosen, color: "#888780" },
+    { label: "Hadir", value: hadir.length, color: "#3b6d11" },
+    { label: "Tidak Hadir", value: guestRows.filter(g => g.rsvp === "declined").length, color: "#a32d2d" },
+    { label: "Belum Konfirmasi", value: guestRows.filter(g => !g.rsvp).length, color: "#888780" },
+    { label: "Hadir — Belum Lengkap Pilih Menu", value: hadir.filter(g => !g.food_name || !g.drink_name).length, color: "#888780" },
   ]
 
   return (

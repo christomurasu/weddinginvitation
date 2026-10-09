@@ -66,3 +66,15 @@ drop policy if exists "birthday_menu_items app access" on birthday_menu_items;
 create policy "birthday_menu_items app access" on birthday_menu_items for all to anon, authenticated using (true) with check (true);
 drop policy if exists "birthday_guests app access" on birthday_guests;
 create policy "birthday_guests app access" on birthday_guests for all to anon, authenticated using (true) with check (true);
+
+-- v2: menu dikelompokkan per kategori, tamu pilih 1 makanan + 1 minuman
+alter table birthday_menu_items add column if not exists kind text not null default 'food';  -- 'food' / 'drink'
+alter table birthday_menu_items add column if not exists category text;                      -- mis. 'Indonesian Food'
+alter table birthday_guests add column if not exists drink_item_id uuid references birthday_menu_items(id) on delete set null;
+
+-- v3: catatan khusus menu dari tamu (alergi / pantangan)
+alter table birthday_guests add column if not exists menu_note text;
+
+-- v4: konfirmasi hadir di tiket + teks terima kasih untuk yang tidak hadir
+alter table birthday_guests add column if not exists rsvp text;   -- 'attending' / 'declined' / null
+alter table birthdays add column if not exists thanks_text text default 'THANK YOU FOR YOUR CONFIRMATION';

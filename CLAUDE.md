@@ -254,7 +254,7 @@ Di bawah `Wishform` ada div (mengisi sisa ruang, bukan snap-section sendiri) ber
 
 Template terpisah — **tidak menyentuh tabel/route wedding**. Skema di `supabase/birthday.sql` (tabel `birthdays`, `birthday_menu_items`, `birthday_guests`; bucket `birthday-photos`).
 
-- **Undangan tamu:** `app/birthday/[code]/` — 6 page snap-scroll: cover full → tiket (Dear nama, detail, QR dari `code` via lib `qrcode` di server) → casting call → menu (search + radio, `MenuPicker` simpan `menu_item_id` langsung) → see you there → foto.
+- **Undangan tamu:** `app/birthday/[code]/` — 6 page snap-scroll: cover full → tiket (Dear nama, detail, QR dari `code` via lib `qrcode` di server) → casting call → menu (chip kategori scroll horizontal + search + radio; tamu pilih 1 makanan → `menu_item_id` dan 1 minuman → `drink_item_id`; menu punya `kind` food/drink + `category`) → see you there → foto.
 - **Admin:** pakai login yang sama, di `app/events/birthday/new` dan `app/events/birthday/[slug]` (terlindungi `middleware.ts`). Daftar `/events` berisi wedding + birthday.
 - Semua asset gambar & teks per-event diatur di `EditBirthdayForm` (`TEXT_FIELDS` / `IMAGE_GROUPS`). Tambah field baru = tambah kolom di SQL + satu baris di array itu.
 - Kode tamu prefix `BD-`. Format WA birthday masih sementara (`GuestManager.waMessage`).

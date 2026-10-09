@@ -17,6 +17,7 @@ const TEXT_FIELDS: { key: string; label: string; placeholder?: string; multiline
   { key: "venue_address", label: "Alamat Venue", placeholder: "e.g. Jl. Sukomanunggal Jaya No.28, Surabaya" },
   { key: "casting_text", label: "Teks Casting Call (Page 3)", multiline: true },
   { key: "menu_text", label: "Teks Menu (Page 4)", multiline: true },
+  { key: "thanks_text", label: "Teks Terima Kasih — tamu tidak hadir (Page 6)", placeholder: "THANK YOU FOR YOUR CONFIRMATION", multiline: true },
 ]
 
 const IMAGE_GROUPS: { title: string; fields: { key: string; label: string }[] }[] = [
@@ -41,7 +42,7 @@ const IMAGE_GROUPS: { title: string; fields: { key: string; label: string }[] }[
     { key: "bg5_url", label: "Background" },
     { key: "see_you_url", label: "See You There (PNG)" },
   ] },
-  { title: "Page 6 — Foto", fields: [
+  { title: "Page 6 — Tidak Hadir (Terima Kasih)", fields: [
     { key: "bg6_url", label: "Background" },
     { key: "photo_url", label: "Foto (PNG)" },
   ] },
