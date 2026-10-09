@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { supabase } from "../../lib/supabase"
+import { supabase } from "../../../lib/supabase"
 import { useRouter } from "next/navigation"
 
 export default function NewWeddingPage() {
@@ -52,7 +52,7 @@ export default function NewWeddingPage() {
       return
     }
 
-    router.push(`/weddings/${slug}/dashboard`)
+    router.push(`/events/weddings/${slug}/dashboard`)
   }
 
   const inputStyle = {
@@ -125,7 +125,7 @@ export default function NewWeddingPage() {
                 DASHBOARD URL
               </p>
               <p style={{ fontSize: 12, color: "#b8965a", fontFamily: "monospace" }}>
-                /weddings/{makeSlug(form.partner1, form.partner2)}/dashboard
+                /events/weddings/{makeSlug(form.partner1, form.partner2)}/dashboard
               </p>
             </div>
           )}
@@ -194,7 +194,7 @@ export default function NewWeddingPage() {
               {loading ? "Creating..." : "Create Wedding"}
             </button>
             <button
-              onClick={() => router.push("/weddings")}
+              onClick={() => router.push("/events")}
               style={{
                 background: "transparent", color: "#888780",
                 border: "1px solid #e4ddd0", padding: "13px 20px",

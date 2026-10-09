@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server"
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  const isProtected = pathname.startsWith("/weddings")
+  const isProtected = pathname.startsWith("/events")
   if (!isProtected) return NextResponse.next()
 
   const session = request.cookies.get("admin_session")?.value
@@ -16,5 +16,5 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/weddings/:path*"]
+  matcher: ["/events/:path*"]
 }

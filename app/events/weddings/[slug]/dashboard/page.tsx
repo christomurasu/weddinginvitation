@@ -1,4 +1,4 @@
-import { supabase } from "../../../lib/supabase"
+import { supabase } from "../../../../lib/supabase"
 import Link from "next/link"
 import WeddingAddGuestForm from "./WeddingAddGuestForm"
 import EditWeddingForm from "./EditWeddingForm"
@@ -101,14 +101,14 @@ export default async function WeddingDashboardPage({
         background: "#2c2c2a", padding: "40px 32px",
         textAlign: "center", position: "relative"
       }}>
-        <Link href="/weddings" style={{
+        <Link href="/events" style={{
           position: "absolute", left: 24, top: "50%",
           transform: "translateY(-50%)",
           color: "#888780", fontSize: 11,
           letterSpacing: "0.12em", textTransform: "uppercase",
           textDecoration: "none"
         }}>
-          ← All Weddings
+          ← All Events
         </Link>
 
         <LogoutButton />
@@ -126,7 +126,7 @@ export default async function WeddingDashboardPage({
           {wedding.date} · {wedding.venue}
         </p>
         <div style={{ marginTop: 16, display: "flex", gap: 20, justifyContent: "center" }}>
-          <Link href={`/weddings/${slug}/scanner`} style={{
+          <Link href={`/events/weddings/${slug}/scanner`} style={{
             color: "#b8965a", fontSize: 11,
             letterSpacing: "0.12em", textTransform: "uppercase",
             textDecoration: "none"
