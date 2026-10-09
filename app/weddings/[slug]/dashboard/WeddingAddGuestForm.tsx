@@ -32,6 +32,7 @@ export default function WeddingAddGuestForm({
     note: "",
     invitation_type: "full",
     guest_side: "groom",
+    non_kristen: false,
   })
 
   async function handleSubmit() {
@@ -49,11 +50,12 @@ export default function WeddingAddGuestForm({
       note: form.note,
       invitation_type: form.invitation_type,
       guest_side: form.guest_side,
+      non_kristen: form.non_kristen,
     })
     setGeneratedLink(`https://sfinvitation.id/invitation-page/${code}`)
     setForm({
       name: "", greeting: "", phone: "", table_number: "",
-      max_attendees: "1", note: "", invitation_type: "full", guest_side: form.guest_side
+      max_attendees: "1", note: "", invitation_type: "full", guest_side: form.guest_side, non_kristen: false
     })
     setLoading(false)
     router.refresh()
@@ -201,6 +203,45 @@ export default function WeddingAddGuestForm({
             Pemberkatan
           </button>
         </div>
+      </div>
+
+      <div style={{ marginBottom: 20 }}>
+        <label style={labelStyle}>Tamu Non-Kristen</label>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            onClick={() => setForm({ ...form, non_kristen: false })}
+            style={{
+              flex: 1, padding: "10px",
+              background: !form.non_kristen ? "#2c2c2a" : "#fdf8ee",
+              color: !form.non_kristen ? "#fff" : "#888780",
+              border: "1px solid #e4ddd0",
+              fontSize: 11, letterSpacing: "0.12em",
+              textTransform: "uppercase", cursor: "pointer",
+              fontFamily: "inherit", transition: "all 0.15s"
+            }}
+          >
+            Kristen (Normal)
+          </button>
+          <button
+            onClick={() => setForm({ ...form, non_kristen: true })}
+            style={{
+              flex: 1, padding: "10px",
+              background: form.non_kristen ? "#b8965a" : "#fdf8ee",
+              color: form.non_kristen ? "#fff" : "#888780",
+              border: "1px solid #e4ddd0",
+              fontSize: 11, letterSpacing: "0.12em",
+              textTransform: "uppercase", cursor: "pointer",
+              fontFamily: "inherit", transition: "all 0.15s"
+            }}
+          >
+            Non-Kristen
+          </button>
+        </div>
+        {form.non_kristen && (
+          <p style={{ fontSize: 11, color: "#b8965a", marginTop: 6 }}>
+            Hanya menampilkan 1 acara (data resepsi). Section pemberkatan/gereja disembunyikan.
+          </p>
+        )}
       </div>
 
       <button

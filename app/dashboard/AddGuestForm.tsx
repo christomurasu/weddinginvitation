@@ -124,7 +124,7 @@ export default function WeddingAddGuestForm({ weddingId, slug }: { weddingId: st
             Pemberkatan + Resepsi
           </button>
           <button onClick={() => setForm({ ...form, invitation_type: "ceremony" })} style={toggleBtn(form.invitation_type === "ceremony")}>
-            Pemberkatan Saja
+            Pemberkatan
           </button>
         </div>
       </div>
