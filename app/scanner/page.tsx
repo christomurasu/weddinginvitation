@@ -181,7 +181,7 @@ export default function WeddingScannerPage({
     <div style={{ minHeight: "100vh", background: "#2c2c2a" }}>
 
       <div style={{ padding: "28px 24px", textAlign: "center", borderBottom: "1px solid #444441", position: "relative" }}>
-        <Link href={`/weddings/${slug}/dashboard`} style={{ position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)", color: "#888780", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none" }}>
+        <Link href={`/events/weddings/${slug}/dashboard`} style={{ position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)", color: "#888780", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none" }}>
           ← Dashboard
         </Link>
         <p style={{ color: "#e8d5a3", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 6 }}>

@@ -26,11 +26,11 @@ Panduan untuk Claude Code saat mengembangkan proyek ini. Baca file ini lebih dul
 - **React 19** — Server Components default; Client Components pakai `"use client"`. Pola `forwardRef` + `useImperativeHandle` dipakai (mis. `RSVPSection` expose method `save()`).
 - **Supabase** — PostgreSQL + Storage (bucket `wedding-photos`, public).
 - **Vercel** — deploy otomatis dari GitHub.
-- **Auth admin** — cookie `admin_session` harus sama dengan `process.env.ADMIN_SECRET`; `middleware.ts` melindungi route `/weddings/*`.
+- **Auth admin** — cookie `admin_session` harus sama dengan `process.env.ADMIN_SECRET`; `middleware.ts` melindungi route `/events/*` (URL lama `/weddings/*` di-redirect via `next.config.ts`).
 
 **Catatan konfigurasi:**
 - `next.config.ts` memakai `typescript: { ignoreBuildErrors: true }` — build tetap jalan walau ada TS error. **Jangan andalkan ini**; tetap perbaiki error nyata.
-- Halaman yang menampilkan data dinamis **wajib** `export const dynamic = "force-dynamic"` agar tidak kena static cache Vercel (lihat §9). Saat ini baru dipasang di `app/weddings/page.tsx`.
+- Halaman yang menampilkan data dinamis **wajib** `export const dynamic = "force-dynamic"` agar tidak kena static cache Vercel (lihat §9). Saat ini dipasang di `app/events/page.tsx`, `app/birthday/[code]`, `app/events/birthday/[slug]`.
 
 ---
 
@@ -56,7 +56,7 @@ Konfigurasi per pernikahan.
 | Kolom | Tipe | Keterangan |
 |---|---|---|
 | `id` | uuid | PK |
-| `slug` | text | dipakai di URL `/weddings/[slug]/...` |
+| `slug` | text | dipakai di URL `/events/weddings/[slug]/...` |
 | `partner1` / `partner2` | text | nama mempelai |
 | `date` | date/text | tanggal acara |
 | `couple_photo_url` | text | foto mempelai (juga dipakai sbg OG image) |
@@ -126,9 +126,11 @@ app/
     RSVPPopupWrapper.tsx / RSVPPopUp.tsx  # popup QR (Show QR Code / Back to Invitation) — perhatikan "U" besar di nama file
     Translations.ts               # t.en / t.id
     CoverPage.tsx, Gallery.tsx, QRCodeDisplay.tsx, dll.
-  weddings/
-    page.tsx                      # daftar wedding (WAJIB force-dynamic)
-    [slug]/
+  events/
+    page.tsx                      # daftar semua event: wedding + birthday (WAJIB force-dynamic)
+    birthday/new, birthday/[slug] # admin birthday (lihat §13)
+    weddings/new/page.tsx         # buat wedding baru
+    weddings/[slug]/
       dashboard/
         page.tsx                  # stats (tabel) + link Scanner/Preview/Cek Meja
         GuestTable.tsx            # tabel tamu: pagination(20), search, filter, sort, export CSV
@@ -139,9 +141,9 @@ app/
     page.tsx + PagarAyuSearch.tsx # lookup read-only no-login (cari nama → nomor meja)
   login/ + api/login, api/logout  # login admin (set/hapus cookie admin_session)
   lib/supabase.ts                 # client Supabase
-  dashboard/page.tsx              # legacy: hanya redirect ke /weddings
-  scanner/page.tsx                # legacy: scanner versi lama (pakai yang di weddings/[slug]/scanner)
-middleware.ts                     # proteksi /weddings/* via cookie admin_session
+  dashboard/page.tsx              # legacy: hanya redirect ke /events
+  scanner/page.tsx                # legacy: scanner versi lama (pakai yang di events/weddings/[slug]/scanner)
+middleware.ts                     # proteksi /events/* via cookie admin_session
 public/                           # SF_for_link.png, no-angpao.png, no-gift.png, fonts/, dll.
 ```
 
@@ -243,5 +245,16 @@ Di bawah `Wishform` ada div (mengisi sisa ruang, bukan snap-section sendiri) ber
 
 ## 12. Known Issues / TODO
 
-- Hanya `app/weddings/page.tsx` yang `force-dynamic`. Bila dashboard / pagar-ayu / undangan menampilkan data basi di produksi, tambahkan di sana.
+- Halaman wedding (dashboard / pagar-ayu / undangan) belum `force-dynamic`. Bila menampilkan data basi di produksi, tambahkan di sana.
 - `CountdownBanner` punya hydration mismatch yang diabaikan owner (masih berfungsi).
+
+---
+
+## 13. Template Ulang Tahun (Birthday)
+
+Template terpisah — **tidak menyentuh tabel/route wedding**. Skema di `supabase/birthday.sql` (tabel `birthdays`, `birthday_menu_items`, `birthday_guests`; bucket `birthday-photos`).
+
+- **Undangan tamu:** `app/birthday/[code]/` — 6 page snap-scroll: cover full → tiket (Dear nama, detail, QR dari `code` via lib `qrcode` di server) → casting call → menu (search + radio, `MenuPicker` simpan `menu_item_id` langsung) → see you there → foto.
+- **Admin:** pakai login yang sama, di `app/events/birthday/new` dan `app/events/birthday/[slug]` (terlindungi `middleware.ts`). Daftar `/events` berisi wedding + birthday.
+- Semua asset gambar & teks per-event diatur di `EditBirthdayForm` (`TEXT_FIELDS` / `IMAGE_GROUPS`). Tambah field baru = tambah kolom di SQL + satu baris di array itu.
+- Kode tamu prefix `BD-`. Format WA birthday masih sementara (`GuestManager.waMessage`).
