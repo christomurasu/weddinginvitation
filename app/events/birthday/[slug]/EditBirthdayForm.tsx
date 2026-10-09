@@ -7,6 +7,7 @@ const BUCKET = "birthday-photos"
 
 const TEXT_FIELDS: { key: string; label: string; placeholder?: string; multiline?: boolean }[] = [
   { key: "event_title", label: "Judul Event (tab browser & preview WA)", placeholder: "e.g. Sera's Danger Zone" },
+  { key: "share_description", label: "Deskripsi Preview Link (WA)", placeholder: "e.g. You are invited to Sera's Birthday Premiere!" },
   { key: "premiere_title", label: "Judul Tiket", placeholder: "THE BIRTHDAY PREMIERE" },
   { key: "celebrant_name", label: "Starring", placeholder: "e.g. Seraphine Amadea" },
   { key: "genre", label: "Genre", placeholder: "e.g. Comedy, Action" },
@@ -21,6 +22,10 @@ const TEXT_FIELDS: { key: string; label: string; placeholder?: string; multiline
 ]
 
 const IMAGE_GROUPS: { title: string; fields: { key: string; label: string }[] }[] = [
+  { title: "Preview Link (WhatsApp) & Icon", fields: [
+    { key: "share_image_url", label: "Gambar Preview (JPG ±1200×630, kosong = pakai cover)" },
+    { key: "icon_url", label: "Icon / Favicon (PNG persegi)" },
+  ] },
   { title: "Page 1 — Cover", fields: [{ key: "cover_url", label: "Gambar Cover (full)" }] },
   { title: "Page 2 — Tiket", fields: [
     { key: "bg2_url", label: "Background" },

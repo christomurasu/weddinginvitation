@@ -11,15 +11,22 @@ export async function generateMetadata({
   params: Promise<{ code: string }>
 }): Promise<Metadata> {
   const { code } = await params
-  const { data: guest } = await supabase.from("birthday_guests").select("birthdays(event_title, cover_url)").eq("code", code).single()
-  const b = guest?.birthdays as { event_title?: string; cover_url?: string } | undefined
+  const { data: guest } = await supabase.from("birthday_guests")
+    .select("birthdays(event_title, cover_url, share_description, share_image_url, icon_url)").eq("code", code).single()
+  const b = guest?.birthdays as {
+    event_title?: string; cover_url?: string; share_description?: string; share_image_url?: string; icon_url?: string
+  } | undefined
   const title = b?.event_title || "SF Invitation"
+  const description = b?.share_description || "You are invited!"
+  const image = b?.share_image_url || b?.cover_url
+  const images = image ? [{ url: image }] : []
+  // Semua field di-set eksplisit supaya tidak mewarisi favicon/OG wedding dari app/layout.tsx
   return {
     title,
-    openGraph: {
-      title,
-      images: b?.cover_url ? [{ url: b.cover_url }] : [],
-    },
+    description,
+    icons: { icon: b?.icon_url || "/favicon.ico", apple: b?.icon_url || "/favicon.ico" },
+    openGraph: { title, description, images, type: "website", siteName: "SF Invitation" },
+    twitter: { card: "summary_large_image", title, description, images },
   }
 }
 
