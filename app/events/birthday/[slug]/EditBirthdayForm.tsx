@@ -53,20 +53,25 @@ const IMAGE_GROUPS: { title: string; fields: { key: string; label: string }[] }[
   ] },
 ]
 
-// JPG/foto > 1MB dikompres ke max 1200px; PNG (transparan) diupload apa adanya
-function compressImage(file: File): Promise<Blob> {
+// Resize ke max lebar maxW (longest=true → batasi sisi terpanjang). Default JPEG; "image/png" untuk icon
+function compressImage(file: File, maxW = 1200, type = "image/jpeg", longest = false): Promise<Blob> {
   return new Promise((resolve) => {
     const canvas = document.createElement("canvas")
     const ctx = canvas.getContext("2d")!
     const img = new Image()
     const url = URL.createObjectURL(file)
     img.onload = () => {
-      const ratio = Math.min(1200 / img.width, 1)
+      const ratio = Math.min(maxW / (longest ? Math.max(img.width, img.height) : img.width), 1)
       canvas.width = img.width * ratio
       canvas.height = img.height * ratio
+      // JPEG tidak punya transparansi → isi hitam dulu supaya area transparan PNG tidak jadi abu-abu
+      if (type === "image/jpeg") {
+        ctx.fillStyle = "#000"
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+      }
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
       URL.revokeObjectURL(url)
-      canvas.toBlob(blob => resolve(blob!), "image/jpeg", 0.82)
+      canvas.toBlob(blob => resolve(blob!), type, 0.8)
     }
     img.src = url
   })
@@ -86,9 +91,20 @@ export default function EditBirthdayForm({ birthday }: { birthday: Record<string
     e.target.value = ""
     if (!file) return
     setBusy(field)
-    const asIs = file.type === "image/png" || file.size < 1024 * 1024
-    const blob = asIs ? file : await compressImage(file)
-    const contentType = asIs ? file.type : "image/jpeg"
+    // Preview WA wajib kecil (<300KB) → JPEG sisi terpanjang 1200px; icon → PNG 256px.
+    // Asset lain: PNG apa adanya, foto > 1MB dikompres.
+    let blob: Blob = file
+    let contentType = file.type
+    if (field === "share_image_url") {
+      blob = await compressImage(file, 1200, "image/jpeg", true)
+      contentType = "image/jpeg"
+    } else if (field === "icon_url") {
+      blob = await compressImage(file, 256, "image/png", true)
+      contentType = "image/png"
+    } else if (file.type !== "image/png" && file.size >= 1024 * 1024) {
+      blob = await compressImage(file)
+      contentType = "image/jpeg"
+    }
     const ext = contentType === "image/png" ? "png" : contentType.split("/")[1] ?? "jpg"
     const fileName = `${birthday.id}/${field}-${new Date().getTime()}.${ext}`
     const { data, error } = await supabase.storage.from(BUCKET).upload(fileName, blob, { contentType })

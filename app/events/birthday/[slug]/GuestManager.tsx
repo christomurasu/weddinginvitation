@@ -25,7 +25,7 @@ const link = (code: string) => `https://sfinvitation.id/birthday/${code}`
 
 // ponytail: format WA sementara, ganti sesuai teks dari owner
 function waMessage(g: Guest, eventTitle: string) {
-  return `Dear *${g.name}*,\n\nYou are invited to celebrate _${eventTitle}_!\n\nOpen your invitation & choose your menu here:\n${link(g.code)}\n\nPlease keep the QR Code on your ticket and show it at Check In.`
+  return `Dear *${g.name}*,\n\nYou are invited to celebrate _${eventTitle}_!\n\nOpen your invitation & choose your menu here:\n${link(g.code)}`
 }
 
 export default function GuestManager({
