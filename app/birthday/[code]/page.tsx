@@ -17,7 +17,7 @@ export async function generateMetadata({
     event_title?: string; cover_url?: string; share_description?: string; share_image_url?: string; icon_url?: string
   } | undefined
   const title = b?.event_title || "SF Invitation"
-  const description = b?.share_description || "You are invited!"
+  const description = b?.share_description || (b?.event_title ? `You are invited to ${b.event_title}!` : "You are invited!")
   const image = b?.share_image_url || b?.cover_url
   const images = image ? [{ url: image }] : []
   // Semua field di-set eksplisit supaya tidak mewarisi favicon/OG wedding dari app/layout.tsx
@@ -25,7 +25,7 @@ export async function generateMetadata({
     title,
     description,
     icons: { icon: b?.icon_url || "/favicon.ico", apple: b?.icon_url || "/favicon.ico" },
-    openGraph: { title, description, images, type: "website", siteName: "SF Invitation" },
+    openGraph: { title, description, images, type: "website", siteName: "SF Invitation", url: `/birthday/${code}` },
     twitter: { card: "summary_large_image", title, description, images },
   }
 }
