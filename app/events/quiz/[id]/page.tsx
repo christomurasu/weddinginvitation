@@ -6,7 +6,7 @@ import { supabase } from "../../../lib/supabase"
 import { COLORS, LABELS, type Question } from "../../../quiz/shared"
 
 const blank = (): Question => ({ q: "", options: ["", "", "", ""], correct: 0, time: 20 })
-const input = { border: "1px solid #e4ddd0", padding: "10px 12px", fontSize: 13, background: "#fdf8ee", fontFamily: "inherit", width: "100%" }
+const input = { border: "1px solid #e4ddd0", padding: "10px 12px", fontSize: 13, background: "#fdf8ee", color: "#2c2c2a", fontFamily: "inherit", width: "100%" }
 
 export default function EditQuizPage() {
   const { id } = useParams<{ id: string }>()

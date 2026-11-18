@@ -50,7 +50,7 @@ export default function QuizListPage() {
         <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
           <input value={title} onChange={e => setTitle(e.target.value)} onKeyDown={e => e.key === "Enter" && create()}
             placeholder="Judul kuis baru, mis. Seberapa kenal Sonny & Felyn?"
-            style={{ flex: 1, border: "1px solid #e4ddd0", padding: "11px 13px", fontSize: 13, background: "#fff", fontFamily: "inherit" }} />
+            style={{ flex: 1, border: "1px solid #e4ddd0", padding: "11px 13px", fontSize: 13, background: "#fff", color: "#2c2c2a", fontFamily: "inherit" }} />
           <button onClick={create} style={btn}>+ Buat</button>
         </div>
 
