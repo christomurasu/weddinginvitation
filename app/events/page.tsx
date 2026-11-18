@@ -39,6 +39,14 @@ export default async function WeddingsPage() {
 
         {/* New event buttons */}
         <div style={{ marginBottom: 24, display: "flex", gap: 8, justifyContent: "flex-end" }}>
+          <Link href="/events/quiz" style={{
+            background: "#b8965a", color: "#fff",
+            padding: "12px 28px", fontSize: 11,
+            letterSpacing: "0.18em", textTransform: "uppercase",
+            textDecoration: "none", display: "inline-block"
+          }}>
+            Quiz Games
+          </Link>
           <Link href="/events/birthday/new" style={{
             background: "#c6294b", color: "#fff",
             padding: "12px 28px", fontSize: 11,
