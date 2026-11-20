@@ -51,8 +51,9 @@ export default function EditQuizPage() {
             <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 10 }}>
               <b style={{ color: "#b8965a" }}>#{i + 1}</b>
               <input value={q.q} onChange={e => update(i, { q: e.target.value })} placeholder="Pertanyaan" style={input} />
-              <select value={q.time} onChange={e => update(i, { time: Number(e.target.value) })} aria-label="Waktu" style={{ ...input, width: 90 }}>
+              <select value={q.time} onChange={e => update(i, { time: Number(e.target.value) })} aria-label="Waktu" style={{ ...input, width: 130 }}>
                 {[10, 20, 30, 60].map(s => <option key={s} value={s}>{s} dtk</option>)}
+                <option value={0}>Tanpa timer</option>
               </select>
               <button onClick={() => setQuestions(qs => qs.filter((_, j) => j !== i))} aria-label="Hapus soal"
                 style={{ border: "none", background: "none", color: "#c6294b", cursor: "pointer", fontSize: 16 }}>✕</button>
