@@ -1,4 +1,4 @@
-export type Question = { q: string; options: string[]; correct: number; time: number }
+export type Question = { q: string; options: string[]; correct: number; time: number } // time 0 = tanpa timer
 
 export type Quiz = {
   id: string
@@ -12,9 +12,10 @@ export type Quiz = {
 export const COLORS = ["#c6294b", "#2f6fb0", "#c99a2e", "#3c8d5a"]
 export const LABELS = ["A", "B", "C", "D"]
 
-// Benar = 500–1000 poin, makin cepat makin besar. Salah = 0.
+// Benar = 500–1000 poin, makin cepat makin besar (tanpa timer: rata 1000). Salah = 0.
 export function points(correct: boolean, ms: number, timeSec: number) {
   if (!correct) return 0
+  if (!timeSec) return 1000
   return Math.round(1000 * (1 - Math.min(ms / (timeSec * 1000), 1) / 2))
 }
 

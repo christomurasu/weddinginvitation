@@ -120,14 +120,14 @@ export default function PlayQuizPage() {
   </>)
 
   if (quiz.status === "question" && question) {
-    const left = Math.max(0, Math.ceil((shownAt + question.time * 1000 - now) / 1000))
+    const left = question.time ? Math.max(0, Math.ceil((shownAt + question.time * 1000 - now) / 1000)) : Infinity
     if (my) return wrap(<><h1 style={{ fontSize: 28 }}>Jawaban terkirim ✓</h1><p style={{ color: "#b4b2a9" }}>Tunggu yang lain...</p></>)
     if (left === 0) return wrap(<h1 style={{ fontSize: 28 }}>Waktu habis ⏰</h1>)
     return (
       <div style={{ height: "100dvh", background: "#2c2c2a", color: "#fff", padding: 12, display: "flex", flexDirection: "column", gap: 12 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
           <p style={{ fontSize: 18, flex: 1 }}>{question.q}</p>
-          <b style={{ fontSize: 32, color: left <= 5 ? "#c6294b" : "#e8d5a3" }}>{left}</b>
+          {question.time > 0 && <b style={{ fontSize: 32, color: left <= 5 ? "#c6294b" : "#e8d5a3" }}>{left}</b>}
         </div>
         <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {question.options.map((opt, k) => opt.trim() && (

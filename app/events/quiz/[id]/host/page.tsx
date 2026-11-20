@@ -55,7 +55,10 @@ export default function HostPage() {
 
   async function go(status: Quiz["status"], current_index: number) {
     if (!quiz) return
-    if (status === "question") setDeadline(Date.now() + quiz.questions[current_index].time * 1000)
+    if (status === "question") {
+      const t = quiz.questions[current_index].time
+      setDeadline(t ? Date.now() + t * 1000 : Infinity) // tanpa timer: tunggu semua jawab / klik tombol
+    }
     setQuiz({ ...quiz, status, current_index })
     await supabase.from("quizzes").update({ status, current_index }).eq("id", id)
   }
@@ -121,9 +124,9 @@ export default function HostPage() {
           <h1 style={{ fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 400, maxWidth: 1000 }}>{question.q}</h1>
           {quiz.status === "question" ? (
             <div style={{ display: "flex", gap: 40, alignItems: "center" }}>
-              <span style={{ fontSize: 64, fontWeight: 700, color: remaining <= 5 ? "#c6294b" : "#e8d5a3" }}>{remaining}</span>
+              {question.time > 0 && <span style={{ fontSize: 64, fontWeight: 700, color: remaining <= 5 ? "#c6294b" : "#e8d5a3" }}>{remaining}</span>}
               <span style={{ fontSize: 20, color: "#b4b2a9" }}>{current.length}/{players.length} menjawab</span>
-              <button onClick={() => go("reveal", idx)} style={{ ...bigBtn, background: "#3d3d3a", padding: "10px 20px", fontSize: 12 }}>Lewati</button>
+              <button onClick={() => go("reveal", idx)} style={{ ...bigBtn, background: "#3d3d3a", padding: "10px 20px", fontSize: 12 }}>{question.time ? "Lewati" : "Tampilkan Jawaban"}</button>
             </div>
           ) : (
             <button onClick={() => (isLast ? go("ended", idx) : go("question", idx + 1))} style={bigBtn}>
