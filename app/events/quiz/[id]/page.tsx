@@ -13,6 +13,8 @@ export default function EditQuizPage() {
   const [title, setTitle] = useState("")
   const [questions, setQuestions] = useState<Question[]>([])
   const [saved, setSaved] = useState(false)
+  const [grab, setGrab] = useState<number | null>(null) // handle ⠿ sedang ditekan → kartu boleh di-drag
+  const [drag, setDrag] = useState<number | null>(null) // kartu yang sedang di-drag
 
   useEffect(() => {
     supabase.from("quizzes").select("title, questions").eq("id", id).single().then(({ data }) => {
@@ -24,6 +26,9 @@ export default function EditQuizPage() {
 
   const update = (i: number, patch: Partial<Question>) =>
     setQuestions(qs => qs.map((q, j) => (j === i ? { ...q, ...patch } : q)))
+
+  const move = (from: number, to: number) =>
+    setQuestions(qs => { const a = [...qs]; a.splice(to, 0, a.splice(from, 1)[0]); return a })
 
   async function save() {
     // Opsi kosong boleh (mis. soal Benar/Salah cukup 2 opsi), tapi jawaban benar wajib terisi
@@ -47,8 +52,19 @@ export default function EditQuizPage() {
 
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "32px 24px 120px" }}>
         {questions.map((q, i) => (
-          <div key={i} style={{ background: "#fff", border: "1px solid #e4ddd0", padding: 20, marginBottom: 16 }}>
+          <div key={i} draggable={grab === i}
+            onDragStart={e => { e.dataTransfer.setData("text/plain", ""); setDrag(i) }}
+            onDragOver={e => { e.preventDefault(); if (drag !== null && drag !== i) { move(drag, i); setDrag(i) } }}
+            onDragEnd={() => { setDrag(null); setGrab(null) }}
+            style={{ background: "#fff", border: "1px solid #e4ddd0", padding: 20, marginBottom: 16, opacity: drag === i ? 0.4 : 1 }}>
             <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 10 }}>
+              <button onMouseDown={() => setGrab(i)} onMouseUp={() => setGrab(null)}
+                onKeyDown={e => {
+                  if (e.key === "ArrowUp" && i > 0) move(i, i - 1)
+                  if (e.key === "ArrowDown" && i < questions.length - 1) move(i, i + 1)
+                }}
+                aria-label="Geser urutan soal (drag, atau tombol panah atas/bawah)" title="Drag untuk ubah urutan"
+                style={{ border: "none", background: "none", color: "#b4b2a9", cursor: "grab", fontSize: 20, padding: "0 2px" }}>⠿</button>
               <b style={{ color: "#b8965a" }}>#{i + 1}</b>
               <input value={q.q} onChange={e => update(i, { q: e.target.value })} placeholder="Pertanyaan" style={input} />
               <select value={q.time} onChange={e => update(i, { time: Number(e.target.value) })} aria-label="Waktu" style={{ ...input, width: 130 }}>
